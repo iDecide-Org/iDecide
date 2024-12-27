@@ -1,71 +1,35 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { Book, ArrowRight, GraduationCap, Search, Menu, X } from "lucide-react";
+import Navbar from "./NavBar";
+import { Link } from "react-router";
+import { ArrowRight, Book, GraduationCap, Search } from "lucide-react";
 
 const HomePage: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [userName] = useState("محمد علي");
+
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setIsProfileOpen(false);
+  };
 
   return (
     <div className="bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col min-h-screen w-full overflow-x-hidden">
-      {/* Navigation Bar */}
-      <nav className="bg-white p-4 border-b border-gray-200 flex justify-between items-center w-full">
-        <div className="flex items-center space-x-6">
-          <Link
-            to="/"
-            className="flex items-center text-2xl font-bold text-blue-600"
-          >
-            <Book className="w-8 h-8 mr-2" strokeWidth={1.5} />
-            iDecide
-          </Link>
-        </div>
-        <div className="flex items-center space-x-4">
-          <div className="hidden md:flex space-x-6">
-            <Link
-              to="/about"
-              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-            >
-              من نحن
-            </Link>
-            <Link
-              to="/feed"
-              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-            >
-              استكشف الجامعات
-            </Link>
-            <Link
-              to="/feed"
-              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-            >
-              استكشف التخصصات
-            </Link>
-            <Link
-              to="/feed"
-              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-            >
-              استكشف المسارات الوظيفية
-            </Link>
-            <Link
-              to="/self"
-              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-            >
-              اعرف نفسك
-            </Link>
-          </div>
-          <Link to="/login" className="text-blue-600 hover:underline">
-            تسجيل الدخول
-          </Link>
-          <button
-            className="md:hidden text-gray-700 hover:text-blue-600"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            {isMenuOpen ? (
-              <X className="w-6 h-6" />
-            ) : (
-              <Menu className="w-6 h-6" />
-            )}
-          </button>
-        </div>
-      </nav>
+      <Navbar
+        isMenuOpen={isMenuOpen}
+        setIsMenuOpen={setIsMenuOpen}
+        isProfileOpen={isProfileOpen}
+        setIsProfileOpen={setIsProfileOpen}
+        isLoggedIn={isLoggedIn}
+        userName={userName}
+        handleLogin={handleLogin}
+        handleLogout={handleLogout}
+      />
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden bg-white border-b border-gray-200 w-full">

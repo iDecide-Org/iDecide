@@ -1,3 +1,4 @@
+// Simulated Universities data
 const universities = [
   {
     id: 1,
@@ -104,6 +105,7 @@ const universities = [
     establishment: "2023",
   },
 ];
+
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -118,13 +120,16 @@ import {
 } from "lucide-react";
 import Navbar from "./NavBar";
 
-const UniversitiesPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState("الجامعات");
-  const [isCumulativeFilter, setIsCumulativeFilter] = useState(false);
-  const [universityName, setUniversityName] = useState("");
+const FeedPage: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState({
+    location: "",
+    type: "",
+    establishment: "",
+  });
   const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [userName] = useState("محمد علي");
 
   const handleLogin = () => {
@@ -135,6 +140,20 @@ const UniversitiesPage: React.FC = () => {
     setIsLoggedIn(false);
     setIsProfileOpen(false);
   };
+
+  const filteredUniversities = universities.filter((university) => {
+    const matchesSearch = university.name
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    const matchesLocation = university.location.includes(filters.location);
+    const matchesType = university.type.includes(filters.type);
+    const matchesEstablishment = university.establishment.includes(
+      filters.establishment
+    );
+    return (
+      matchesSearch && matchesLocation && matchesType && matchesEstablishment
+    );
+  });
 
   return (
     <div className="bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col min-h-screen w-full overflow-x-hidden">
@@ -149,6 +168,7 @@ const UniversitiesPage: React.FC = () => {
         handleLogin={handleLogin}
         handleLogout={handleLogout}
       />
+
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden bg-white border-b border-gray-200 w-full">
@@ -191,50 +211,9 @@ const UniversitiesPage: React.FC = () => {
           </div>
         </div>
       )}
-      {/* Search and Filter Section */}
+
+      {/* Search and Filters Section */}
       <section className="bg-white p-6 border-b border-gray-200 w-full">
-        <h2 className="text-3xl font-semibold text-center text-gray-800 mb-4">
-          اكتشف أفضل الجامعات والكليات والتخصصات المتاحة.
-        </h2>
-        <p className="text-center text-gray-700 mb-6">
-          ابحث عن الجامعات والكليات والتخصصات التي تلبي طموحاتك الأكاديمية.
-        </p>
-
-        {/* Tabs */}
-        <div className="flex justify-center space-x-4 mb-6">
-          <button
-            className={`px-4 py-2 rounded-md focus:outline-none ${
-              activeTab === "الجامعات"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            } transition duration-200`}
-            onClick={() => setActiveTab("الجامعات")}
-          >
-            الجامعات
-          </button>
-          <button
-            className={`px-4 py-2 rounded-md focus:outline-none ${
-              activeTab === "كليات"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            } transition duration-200`}
-            onClick={() => setActiveTab("كليات")}
-          >
-            كليات
-          </button>
-          <button
-            className={`px-4 py-2 rounded-md focus:outline-none ${
-              activeTab === "تخصصات الكليات"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            } transition duration-200`}
-            onClick={() => setActiveTab("تخصصات الكليات")}
-          >
-            تخصصات الكليات
-          </button>
-        </div>
-
-        {/* Search and Filters */}
         <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4 mb-4">
           <div className="relative flex-grow w-full md:w-auto">
             <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -243,67 +222,63 @@ const UniversitiesPage: React.FC = () => {
             <input
               type="text"
               placeholder="ابحث عن جامعة"
-              value={universityName}
-              onChange={(e) => setUniversityName(e.target.value)}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full text-right px-9 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 transition duration-300 pl-10"
             />
           </div>
-          <select className="w-full md:w-auto px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 transition duration-300">
-            <option>نوع الجامعة</option>
-            <option>الجامعات الخاصة</option>
-            <option>الجامعات الأهلية</option>
-            <option>الجامعات الحكومية</option>
-          </select>
-          <select className="w-full md:w-auto px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 transition duration-300">
-            <option>المكان (الأقاليم، محافظة)</option>
+          <select
+            value={filters.location}
+            onChange={(e) =>
+              setFilters({ ...filters, location: e.target.value })
+            }
+            className="w-full md:w-auto px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 transition duration-300"
+          >
+            <option value="">المكان (الأقاليم، محافظة)</option>
             <option>القاهرة</option>
             <option>الجيزة</option>
             <option>الأسكندرية</option>
           </select>
-          <button className="w-full md:w-auto bg-blue-600 text-white py-2 px-6 rounded-md hover:bg-blue-700 transition duration-300">
-            فلترة
-          </button>
-        </div>
-        <div className="flex items-center justify-end">
-          <label
-            htmlFor="cumulativeFilter"
-            className="flex items-center cursor-pointer"
+          <select
+            value={filters.type}
+            onChange={(e) => setFilters({ ...filters, type: e.target.value })}
+            className="w-full md:w-auto px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 transition duration-300"
           >
-            <span className="text-gray-700 mr-2">الفلترة التراكمية</span>
-            <div className="relative">
-              <input
-                type="checkbox"
-                id="cumulativeFilter"
-                className="sr-only"
-                checked={isCumulativeFilter}
-                onChange={() => setIsCumulativeFilter(!isCumulativeFilter)}
-              />
-              <div
-                className={`w-10 h-5 bg-gray-400 rounded-full shadow-inner transition duration-300 ease-in-out transform ${
-                  isCumulativeFilter ? "bg-blue-600" : ""
-                }`}
-              >
-                <span
-                  className={`absolute w-4 h-4 bg-white rounded-full shadow transform transition duration-300 ease-in-out ${
-                    isCumulativeFilter ? "translate-x-5" : "translate-x-0.5"
-                  }`}
-                ></span>
-              </div>
-            </div>
-          </label>
+            <option value="">نوع الجامعة</option>
+            <option>الجامعات الخاصة</option>
+            <option>الجامعات الأهلية</option>
+            <option>الجامعات الحكومية</option>
+          </select>
+          <select
+            value={filters.establishment}
+            onChange={(e) =>
+              setFilters({ ...filters, establishment: e.target.value })
+            }
+            className="w-full md:w-auto px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 transition duration-300"
+          >
+            <option value="">سنة التأسيس</option>
+            <option>2019</option>
+            <option>2023</option>
+            <option>2002</option>
+          </select>
         </div>
       </section>
-      {/* University Cards */}
-      <section className="w-full flex-grow">
-        <div className="w-full px-4">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-8 text-right">
-            نتائج البحث : ({universities.length})
-          </h2>
+
+      {/* University Cards Section */}
+      <section className="w-full flex-grow p-6">
+        <h2 className="text-2xl font-semibold text-gray-800 mb-8 text-right">
+          الجامعات المقترحة لك : ({filteredUniversities.length})
+        </h2>
+        {filteredUniversities.length === 0 ? (
+          <div className="text-center text-gray-600">
+            لا توجد جامعات تطابق تفضيلاتك.
+          </div>
+        ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {universities.map((university) => (
+            {filteredUniversities.map((university) => (
               <div
                 key={university.id}
-                className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col"
+                className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col hover:shadow-lg transition-shadow duration-300"
               >
                 <div className="relative">
                   <img
@@ -370,8 +345,9 @@ const UniversitiesPage: React.FC = () => {
               </div>
             ))}
           </div>
-        </div>
+        )}
       </section>
+
       {/* Footer Note */}
       <footer className="text-center text-xs text-gray-500 py-4 w-full">
         © {new Date().getFullYear()} iDecide. All rights reserved.
@@ -380,4 +356,4 @@ const UniversitiesPage: React.FC = () => {
   );
 };
 
-export default UniversitiesPage;
+export default FeedPage;
