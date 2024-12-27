@@ -1,3 +1,109 @@
+const universities = [
+  {
+    id: 1,
+    name: "جامعة المدينة بالقاهرة CUC",
+    location: "مدينة هليوبوليس الجديدة، طري....",
+    type: "الجامعات الخاصة",
+    image:
+      "https://www.propertyfinder.eg/blog/wp-content/uploads/2020/03/nile.jpg",
+    views: "4.8K",
+    date: "2024-09-17",
+    colleges: "0+",
+    majors: "0",
+    establishment: "2019",
+  },
+  {
+    id: 2,
+    name: "الأكاديمية العربية للعلوم.....",
+    location: "مدينة العلمين العلمين، محاف...",
+    type: "الجامعات ذات الطبيعة الخاصة",
+    image:
+      "https://studyinegy.com/wp-content/uploads/2023/06/5AB2E0FB-B130-41D1-8F5B-7D754A3E3521.webp",
+    views: "7.5K",
+    date: "2024-09-24",
+    colleges: "4+",
+    majors: "14",
+    establishment: "2023",
+  },
+  {
+    id: 3,
+    name: "الجامعة الفرنسية في مصر UFE",
+    location: "37 طريق القاهرة الإسماعيلية.....",
+    type: "الجامعات الأهلية",
+    image:
+      "https://almasaraleqtsady.com/wp-content/uploads/2022/08/IMG-20220816-WA0036.jpg",
+    views: "10.3K",
+    date: "2024-08-13",
+    colleges: "3+",
+    majors: "8",
+    establishment: "2002",
+  },
+  {
+    id: 4,
+    name: "جامعة المدينة بالقاهرة CUC",
+    location: "مدينة هليوبوليس الجديدة، طري....",
+    type: "الجامعات الخاصة",
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6KMlIVDSaa4JsLeDHDwUF7jpiRQvha6U_3A&s",
+    views: "4.8K",
+    date: "2024-09-17",
+    colleges: "0+",
+    majors: "0",
+    establishment: "2019",
+  },
+  {
+    id: 5,
+    name: "الجامعة المصرية للتعلم الالكتروني",
+    location: "مدينة العلمين العلمين، محاف...",
+    type: "الجامعات ذات الطبيعة الخاصة",
+    image:
+      "https://img.youm7.com/ArticleImgs/2020/8/5/359465-%D8%B1%D8%A6%D9%8A%D8%B3%D9%8A%D8%A9.jpeg",
+    views: "7.5K",
+    date: "2024-09-24",
+    colleges: "4+",
+    majors: "14",
+    establishment: "2023",
+  },
+  {
+    id: 6,
+    name: "جامعة الملك سلمان الدولية",
+    location: "37 طريق القاهرة الإسماعيلية.....",
+    type: "الجامعات الأهلية",
+    image: "https://cdn.elwatannews.com/watan/840x473/10812096271660043610.jpg",
+    views: "10.3K",
+    date: "2024-08-13",
+    colleges: "3+",
+    majors: "8",
+    establishment: "2002",
+  },
+
+  {
+    id: 7,
+    name: "جامعة المدينة بالقاهرة CUC",
+    location: "مدينة هليوبوليس الجديدة، طري....",
+    type: "الجامعات الخاصة",
+    image:
+      "https://www.propertyfinder.eg/blog/wp-content/uploads/2020/03/nile.jpg",
+    views: "4.8K",
+    date: "2024-09-17",
+    colleges: "0+",
+    majors: "0",
+    establishment: "2019",
+  },
+  {
+    id: 8,
+    name: "الأكاديمية العربية للعلوم.....",
+    location: "مدينة العلمين العلمين، محاف...",
+    type: "الجامعات ذات الطبيعة الخاصة",
+    image:
+      "https://studyinegy.com/wp-content/uploads/2023/06/5AB2E0FB-B130-41D1-8F5B-7D754A3E3521.webp",
+    views: "7.5K",
+    date: "2024-09-24",
+    colleges: "4+",
+    majors: "14",
+    establishment: "2023",
+  },
+];
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -10,125 +116,20 @@ import {
   GraduationCap,
   Building,
   Clock,
+  Menu,
+  X,
 } from "lucide-react";
 
 const UniversitiesPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("الجامعات");
   const [isCumulativeFilter, setIsCumulativeFilter] = useState(false);
   const [universityName, setUniversityName] = useState("");
-
-  const universities = [
-    {
-      id: 1,
-      name: "جامعة المدينة بالقاهرة CUC",
-      location: "مدينة هليوبوليس الجديدة، طري....",
-      type: "الجامعات الخاصة",
-      image:
-        "https://www.propertyfinder.eg/blog/wp-content/uploads/2020/03/nile.jpg",
-      views: "4.8K",
-      date: "2024-09-17",
-      colleges: "0+",
-      majors: "0",
-      establishment: "2019",
-    },
-    {
-      id: 2,
-      name: "الأكاديمية العربية للعلوم.....",
-      location: "مدينة العلمين العلمين، محاف...",
-      type: "الجامعات ذات الطبيعة الخاصة",
-      image:
-        "https://studyinegy.com/wp-content/uploads/2023/06/5AB2E0FB-B130-41D1-8F5B-7D754A3E3521.webp",
-      views: "7.5K",
-      date: "2024-09-24",
-      colleges: "4+",
-      majors: "14",
-      establishment: "2023",
-    },
-    {
-      id: 3,
-      name: "الجامعة الفرنسية في مصر UFE",
-      location: "37 طريق القاهرة الإسماعيلية.....",
-      type: "الجامعات الأهلية",
-      image:
-        "https://almasaraleqtsady.com/wp-content/uploads/2022/08/IMG-20220816-WA0036.jpg",
-      views: "10.3K",
-      date: "2024-08-13",
-      colleges: "3+",
-      majors: "8",
-      establishment: "2002",
-    },
-    {
-      id: 4,
-      name: "جامعة المدينة بالقاهرة CUC",
-      location: "مدينة هليوبوليس الجديدة، طري....",
-      type: "الجامعات الخاصة",
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6KMlIVDSaa4JsLeDHDwUF7jpiRQvha6U_3A&s",
-      views: "4.8K",
-      date: "2024-09-17",
-      colleges: "0+",
-      majors: "0",
-      establishment: "2019",
-    },
-    {
-      id: 5,
-      name: "الجامعة المصرية للتعلم الالكتروني",
-      location: "مدينة العلمين العلمين، محاف...",
-      type: "الجامعات ذات الطبيعة الخاصة",
-      image:
-        "https://img.youm7.com/ArticleImgs/2020/8/5/359465-%D8%B1%D8%A6%D9%8A%D8%B3%D9%8A%D8%A9.jpeg",
-      views: "7.5K",
-      date: "2024-09-24",
-      colleges: "4+",
-      majors: "14",
-      establishment: "2023",
-    },
-    {
-      id: 6,
-      name: "جامعة الملك سلمان الدولية",
-      location: "37 طريق القاهرة الإسماعيلية.....",
-      type: "الجامعات الأهلية",
-      image:
-        "https://cdn.elwatannews.com/watan/840x473/10812096271660043610.jpg",
-      views: "10.3K",
-      date: "2024-08-13",
-      colleges: "3+",
-      majors: "8",
-      establishment: "2002",
-    },
-
-    {
-      id: 7,
-      name: "جامعة المدينة بالقاهرة CUC",
-      location: "مدينة هليوبوليس الجديدة، طري....",
-      type: "الجامعات الخاصة",
-      image:
-        "https://www.propertyfinder.eg/blog/wp-content/uploads/2020/03/nile.jpg",
-      views: "4.8K",
-      date: "2024-09-17",
-      colleges: "0+",
-      majors: "0",
-      establishment: "2019",
-    },
-    {
-      id: 8,
-      name: "الأكاديمية العربية للعلوم.....",
-      location: "مدينة العلمين العلمين، محاف...",
-      type: "الجامعات ذات الطبيعة الخاصة",
-      image:
-        "https://studyinegy.com/wp-content/uploads/2023/06/5AB2E0FB-B130-41D1-8F5B-7D754A3E3521.webp",
-      views: "7.5K",
-      date: "2024-09-24",
-      colleges: "4+",
-      majors: "14",
-      establishment: "2023",
-    },
-  ];
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <div className="bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col min-h-screen w-full overflow-x-hidden">
       {/* Navigation Bar */}
-      <nav className="bg-white p-4 border-b border-gray-200 flex justify-around items-center w-full max-w-7xl mx-auto">
+      <nav className="bg-white p-4 border-b border-gray-200 flex justify-between items-center w-full max-w-7xl mx-auto">
         <div className="flex items-center space-x-6">
           <Link
             to="/"
@@ -137,43 +138,97 @@ const UniversitiesPage: React.FC = () => {
             <Book className="w-8 h-8 mr-2" strokeWidth={1.5} />
             iDecide
           </Link>
-          <Link
-            to="/about"
-            className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-          >
-            من نحن
-          </Link>
-          <Link
-            to="/universities"
-            className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-          >
-            استكشف الجامعات
-          </Link>
-          <Link
-            to="/majors"
-            className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-          >
-            استكشف التخصصات
-          </Link>
-          <Link
-            to="/careers"
-            className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-          >
-            استكشف المسارات الوظيفية
-          </Link>
-          <Link
-            to="/self"
-            className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-          >
-            اعرف نفسك
-          </Link>
         </div>
         <div className="flex items-center space-x-4">
+          <div className="hidden md:flex space-x-6">
+            <Link
+              to="/about"
+              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
+            >
+              من نحن
+            </Link>
+            <Link
+              to="/universities"
+              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
+            >
+              استكشف الجامعات
+            </Link>
+            <Link
+              to="/majors"
+              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
+            >
+              استكشف التخصصات
+            </Link>
+            <Link
+              to="/careers"
+              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
+            >
+              استكشف المسارات الوظيفية
+            </Link>
+            <Link
+              to="/self"
+              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
+            >
+              اعرف نفسك
+            </Link>
+          </div>
           <Link to="/login" className="text-blue-600 hover:underline">
             تسجيل الدخول
           </Link>
+          <button
+            className="md:hidden text-gray-700 hover:text-blue-600"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
+          </button>
         </div>
       </nav>
+      {/* Mobile Menu */}
+      {isMenuOpen && (
+        <div className="md:hidden bg-white border-b border-gray-200 w-full">
+          <div className="flex flex-col space-y-4 p-4">
+            <Link
+              to="/about"
+              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              من نحن
+            </Link>
+            <Link
+              to="/universities"
+              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              استكشف الجامعات
+            </Link>
+            <Link
+              to="/majors"
+              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              استكشف التخصصات
+            </Link>
+            <Link
+              to="/careers"
+              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              استكشف المسارات الوظيفية
+            </Link>
+            <Link
+              to="/self"
+              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              اعرف نفسك
+            </Link>
+          </div>
+        </div>
+      )}
       {/* Search and Filter Section */}
       <section className="bg-white p-6 border-b border-gray-200 w-full max-w-7xl mx-auto">
         <h2 className="text-3xl font-semibold text-center text-gray-800 mb-4">
@@ -218,8 +273,8 @@ const UniversitiesPage: React.FC = () => {
         </div>
 
         {/* Search and Filters */}
-        <div className="flex items-center space-x-4 mb-4">
-          <div className="relative flex-grow">
+        <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4 mb-4">
+          <div className="relative flex-grow w-full md:w-auto">
             <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
               <Search className="w-5 h-5 text-gray-400" />
             </div>
@@ -228,22 +283,22 @@ const UniversitiesPage: React.FC = () => {
               placeholder="ابحث عن جامعة"
               value={universityName}
               onChange={(e) => setUniversityName(e.target.value)}
-              className="w-full text-right px-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 transition duration-300 pl-10"
+              className="w-full text-right px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 transition duration-300 pl-10"
             />
           </div>
-          <select className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 transition duration-300">
+          <select className="w-full md:w-auto px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 transition duration-300">
             <option>نوع الجامعة</option>
             <option>الجامعات الخاصة</option>
             <option>الجامعات الأهلية</option>
             <option>الجامعات الحكومية</option>
           </select>
-          <select className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 transition duration-300">
+          <select className="w-full md:w-auto px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 transition duration-300">
             <option>المكان (الأقاليم، محافظة)</option>
             <option>القاهرة</option>
             <option>الجيزة</option>
             <option>الأسكندرية</option>
           </select>
-          <button className="bg-blue-600 text-white py-2 px-6 rounded-md hover:bg-blue-700 transition duration-300">
+          <button className="w-full md:w-auto bg-blue-600 text-white py-2 px-6 rounded-md hover:bg-blue-700 transition duration-300">
             فلترة
           </button>
         </div>
