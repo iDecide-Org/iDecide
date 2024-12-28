@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   UserCircle,
@@ -14,23 +14,54 @@ const ProfilePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("البيانات الشخصية");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userName, setUserName] = useState("");
+  const [userEmail, setUserEmail] = useState("");
 
-  const userName = "محمد علي";
-  const userEmail = "jodojodo780@gmail.com";
+  useEffect(() => {
+    // Fetch user data from API
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/auth/user", {
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          const user = await response.json();
+          setIsLoggedIn(true);
+          setUserName(user.name);
+          setUserEmail(user.email);
+        } else {
+          setIsLoggedIn(false);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        setIsLoggedIn(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const handleTabClick = (tab: string) => {
     setActiveTab(tab);
   };
 
-  const handleLogin = () => {
-    setIsLoggedIn(true);
+  const handleLogout = async () => {
+    try {
+      await fetch("http://localhost:3000/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      setIsLoggedIn(false);
+      setIsProfileOpen(false);
+      setUserName("");
+      setUserEmail("");
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
   };
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setIsProfileOpen(false);
-  };
   return (
     <div className="bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col min-h-screen">
       <Navbar
@@ -40,11 +71,10 @@ const ProfilePage: React.FC = () => {
         setIsProfileOpen={setIsProfileOpen}
         isLoggedIn={isLoggedIn}
         userName={userName}
-        handleLogin={handleLogin}
+        handleLogin={() => setIsLoggedIn(true)}
         handleLogout={handleLogout}
       />
 
-      {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden bg-white border-b border-gray-200 w-full">
           <div className="flex flex-col space-y-4 p-4">
@@ -87,9 +117,7 @@ const ProfilePage: React.FC = () => {
         </div>
       )}
 
-      {/* Main Content */}
       <div className="flex flex-1">
-        {/* Sidebar */}
         <aside className="bg-white p-6 w-64 border-r border-gray-200 shadow-lg">
           <div className="mb-6 text-center">
             <div className="relative">
@@ -130,13 +158,11 @@ const ProfilePage: React.FC = () => {
           </button>
         </aside>
 
-        {/* Main Content Area */}
         <main className="flex-1 p-8">
           <div className="bg-white rounded-lg shadow-lg p-8">
             <h2 className="text-2xl font-semibold text-gray-800 mb-8">
               حسابي الشخصي
             </h2>
-            {/* Actual profile form content */}
             {activeTab === "البيانات الشخصية" && (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -150,7 +176,7 @@ const ProfilePage: React.FC = () => {
                     <input
                       type="text"
                       id="firstName"
-                      defaultValue={userName.split(" ")[0]}
+                      defaultValue={userName.split(" ")[0] || ""}
                       className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
                       dir="rtl"
                     />
@@ -165,7 +191,7 @@ const ProfilePage: React.FC = () => {
                     <input
                       type="text"
                       id="lastName"
-                      defaultValue={userName.split(" ")[1]}
+                      defaultValue={userName.split(" ")[1] || ""}
                       className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
                       dir="rtl"
                     />
@@ -182,7 +208,7 @@ const ProfilePage: React.FC = () => {
                     <input
                       type="email"
                       id="email"
-                      defaultValue={userEmail}
+                      defaultValue={userEmail || ""}
                       className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
                       dir="rtl"
                     />

@@ -106,7 +106,7 @@ const universities = [
   },
 ];
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   Search,
@@ -128,18 +128,47 @@ const FeedPage: React.FC = () => {
     type: "",
     establishment: "",
   });
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [userName] = useState("محمد علي");
+  const [userName, setUserName] = useState("");
 
   const handleLogin = () => {
     setIsLoggedIn(true);
   };
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setIsProfileOpen(false);
+  const handleLogout = async () => {
+    try {
+      await fetch("http://localhost:3000/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      setIsLoggedIn(false);
+      setIsProfileOpen(false);
+      setUserName("");
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
   };
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/auth/user", {
+          credentials: "include",
+        });
+        if (response.ok) {
+          const user = await response.json();
+          setIsLoggedIn(true);
+          setUserName(user.name);
+        } else {
+          setIsLoggedIn(false);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+    fetchUserData();
+  }, []);
 
   const filteredUniversities = universities.filter((university) => {
     const matchesSearch = university.name
