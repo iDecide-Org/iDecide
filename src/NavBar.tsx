@@ -77,7 +77,7 @@ const Navbar: React.FC<NavbarProps> = ({
             استكشف المسارات الوظيفية
           </Link>
           <Link
-            to="/self"
+            to="/chatbot"
             className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
           >
             اعرف نفسك

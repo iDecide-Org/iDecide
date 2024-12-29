@@ -6,6 +6,7 @@ import SignupPage from "./SignupPage";
 import UniversitiesPage from "./UniversitiesPage";
 import ProfilePage from "./ProfilePage";
 import FeedPage from "./FeedPage";
+import Chatbot from "./Chatbot";
 
 const App: React.FC = () => {
   return (
@@ -17,6 +18,7 @@ const App: React.FC = () => {
         <Route path="/universities" element={<UniversitiesPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/feed" element={<FeedPage />} />
+        <Route path="/chatbot" element={<Chatbot />} />
       </Routes>
     </BrowserRouter>
   );
