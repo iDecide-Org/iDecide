@@ -20,6 +20,7 @@ const UniversityDetails: React.FC = () => {
   const [userName, setUserName] = useState("");
   const [activeTab, setActiveTab] = useState("عن الجامعة");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   // Images array
   const images = [
@@ -74,11 +75,17 @@ const UniversityDetails: React.FC = () => {
 
   // Image navigation
   const nextImage = () => {
+    if (isTransitioning) return; // Prevent rapid clicking
+    setIsTransitioning(true);
     setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    setTimeout(() => setIsTransitioning(false), 500); // Match duration with CSS
   };
 
   const prevImage = () => {
+    if (isTransitioning) return; // Prevent rapid clicking
+    setIsTransitioning(true);
     setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+    setTimeout(() => setIsTransitioning(false), 500); // Match duration with CSS
   };
 
   // Tabs array
@@ -92,7 +99,7 @@ const UniversityDetails: React.FC = () => {
   ];
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen">
+    <div className="bg-gradient-to-br from-blue-50/50 to-blue-100/50 min-h-screen">
       <Navbar
         isMenuOpen={isMenuOpen}
         setIsMenuOpen={setIsMenuOpen}
@@ -106,51 +113,89 @@ const UniversityDetails: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Main Content Card */}
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden backdrop-blur-sm border border-gray-100">
           {/* Image Slider */}
-          <div className="relative h-[500px]">
-            <img
-              src={images[currentImageIndex]}
-              alt="University"
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-
+          <div className="relative h-[600px] overflow-hidden">
+            {images.map((image, index) => (
+              <img
+                key={index}
+                src={image}
+                alt={`University ${index + 1}`}
+                className={`absolute w-full h-full object-cover transition-all duration-500 ease-in-out
+                  ${index === currentImageIndex 
+                    ? "opacity-100 translate-x-0" 
+                    : index < currentImageIndex 
+                      ? "opacity-0 translate-x-full" 
+                      : "opacity-0 -translate-x-full"
+                  }`}
+              />
+            ))}
+            
             {/* Navigation Arrows */}
             <button
               onClick={prevImage}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/90 p-3 rounded-full hover:bg-white transition duration-300"
+              disabled={isTransitioning}
+              className={`absolute left-6 top-1/2 transform -translate-y-1/2 
+                bg-white/20 backdrop-blur-md p-4 rounded-full 
+                hover:bg-white/90 transition-all duration-300 group
+                ${isTransitioning ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
             >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
-            <button
-              onClick={nextImage}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/90 p-3 rounded-full hover:bg-white transition duration-300"
-            >
-              <ChevronRight className="w-6 h-6" />
+              <ChevronLeft className="w-6 h-6 text-white group-hover:text-gray-800" />
             </button>
 
+            <button
+              onClick={nextImage}
+              disabled={isTransitioning}
+              className={`absolute right-6 top-1/2 transform -translate-y-1/2 
+                bg-white/20 backdrop-blur-md p-4 rounded-full 
+                hover:bg-white/90 transition-all duration-300 group
+                ${isTransitioning ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+            >
+              <ChevronRight className="w-6 h-6 text-white group-hover:text-gray-800" />
+            </button>
+
+            {/* Optional: Add slide indicators */}
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+              {images.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => {
+                    if (!isTransitioning) {
+                      setIsTransitioning(true);
+                      setCurrentImageIndex(index);
+                      setTimeout(() => setIsTransitioning(false), 500);
+                    }
+                  }}
+                  className={`w-2 h-2 rounded-full transition-all duration-300 
+                    ${currentImageIndex === index 
+                      ? 'bg-white w-4' 
+                      : 'bg-white/50 hover:bg-white/75'}`}
+                  disabled={isTransitioning}
+                />
+              ))}
+            </div>
+
             {/* Action Buttons */}
-            <div className="absolute top-4 right-4 flex space-x-2">
-              <button className="bg-white/90 p-3 rounded-full hover:bg-white transition duration-300">
-                <Heart className="w-5 h-5 text-gray-700" />
+            <div className="absolute top-6 right-6 flex space-x-3">
+              <button className="bg-white/20 backdrop-blur-md p-3 rounded-full hover:bg-white/90 transition-all duration-300 group">
+                <Heart className="w-5 h-5 text-white group-hover:text-red-500" />
               </button>
-              <button className="bg-white/90 p-3 rounded-full hover:bg-white transition duration-300">
-                <Share2 className="w-5 h-5 text-gray-700" />
+              <button className="bg-white/20 backdrop-blur-md p-3 rounded-full hover:bg-white/90 transition-all duration-300 group">
+                <Share2 className="w-5 h-5 text-white group-hover:text-blue-500" />
               </button>
             </div>
 
             {/* University Info Overlay */}
-            <div className="absolute bottom-0 right-0 left-0 p-8 text-white">
-              <h1 className="text-4xl font-bold mb-4">
+            <div className="absolute bottom-0 right-0 left-0 p-10 text-white backdrop-blur-sm bg-black/20">
+              <h1 className="text-5xl font-bold mb-6 leading-tight">
                 الأكاديمية العربية للعلوم والتكنولوجيا والنقل البحري
               </h1>
-              <div className="flex items-center space-x-6">
-                <div className="flex items-center">
+              <div className="flex items-center space-x-8">
+                <div className="flex items-center bg-white/10 rounded-full px-4 py-2">
                   <MapPin className="w-5 h-5 ml-2" />
                   <span>مدينة العلمين، محافظة مطروح</span>
                 </div>
-                <div className="flex items-center">
+                <div className="flex items-center bg-white/10 rounded-full px-4 py-2">
                   <Eye className="w-5 h-5 ml-2" />
                   <span>4.8K مشاهدة</span>
                 </div>
@@ -159,29 +204,31 @@ const UniversityDetails: React.FC = () => {
           </div>
 
           {/* Stats Section */}
-          <div className="grid grid-cols-3 gap-6 p-6 bg-gray-50">
-            <div className="flex items-center justify-center space-x-4 p-4 bg-white rounded-lg shadow-sm">
-              <GraduationCap className="w-8 h-8 text-blue-600" />
+          <div className="grid grid-cols-3 gap-8 p-8 bg-gray-50/50">
+            <div className="flex items-center justify-center space-x-4 p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100">
+              <div className="bg-blue-50 p-3 rounded-full">
+                <GraduationCap className="w-8 h-8 text-blue-600" />
+              </div>
               <div className="text-center">
-                <span className="block text-2xl font-bold text-gray-800">
+                <span className="block text-3xl font-bold text-gray-800 mb-1">
                   25+
                 </span>
                 <span className="text-sm text-gray-600">برنامج دراسي</span>
               </div>
             </div>
-            <div className="flex items-center justify-center space-x-4 p-4 bg-white rounded-lg shadow-sm">
+            <div className="flex items-center justify-center space-x-4 p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100">
               <Building className="w-8 h-8 text-blue-600" />
               <div className="text-center">
-                <span className="block text-2xl font-bold text-gray-800">
+                <span className="block text-3xl font-bold text-gray-800 mb-1">
                   10+
                 </span>
                 <span className="text-sm text-gray-600">كلية</span>
               </div>
             </div>
-            <div className="flex items-center justify-center space-x-4 p-4 bg-white rounded-lg shadow-sm">
+            <div className="flex items-center justify-center space-x-4 p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100">
               <Calendar className="w-8 h-8 text-blue-600" />
               <div className="text-center">
-                <span className="block text-2xl font-bold text-gray-800">
+                <span className="block text-3xl font-bold text-gray-800 mb-1">
                   2019
                 </span>
                 <span className="text-sm text-gray-600">سنة التأسيس</span>
@@ -190,16 +237,16 @@ const UniversityDetails: React.FC = () => {
           </div>
 
           {/* Tabs Navigation */}
-          <div className="border-b">
-            <div className="flex justify-center space-x-8">
+          <div className="border-b bg-white sticky top-0 z-10 backdrop-blur-md">
+            <div className="flex justify-center space-x-8 px-4">
               {tabs.map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`py-4 px-6 -mb-px ${
+                  className={`py-4 px-6 -mb-px transition-all duration-300 ${
                     activeTab === tab
-                      ? "border-b-2 border-blue-600 text-blue-600 font-semibold"
-                      : "text-gray-500 hover:text-gray-700"
+                      ? "border-b-2 border-blue-600 text-blue-600 font-semibold scale-105"
+                      : "text-gray-500 hover:text-gray-700 hover:bg-gray-50/50"
                   }`}
                 >
                   {tab}
@@ -209,11 +256,11 @@ const UniversityDetails: React.FC = () => {
           </div>
 
           {/* Tab Content */}
-          <div className="p-8">
+          <div className="p-10">
             {activeTab === "عن الجامعة" && (
-              <div className="space-y-8">
+              <div className="space-y-10">
                 <div className="prose max-w-none">
-                  <p className="text-gray-600 leading-relaxed">
+                  <p className="text-gray-600 leading-relaxed text-lg">
                     تعتبر الأكاديمية العربية للعلوم والتكنولوجيا والنقل البحري
                     مركزاً تعليمياً رائداً في الوطن العربي، حيث تقدم برامج
                     دراسية متميزة متوافقة دولياً. وتجمع بين التعليم النظري
@@ -230,9 +277,9 @@ const UniversityDetails: React.FC = () => {
                   ].map((feature) => (
                     <div
                       key={feature}
-                      className="flex items-start space-x-3 p-4 bg-gray-50 rounded-lg"
+                      className="flex items-start space-x-4 p-6 bg-gray-50/50 rounded-xl hover:bg-gray-50 transition-all duration-300"
                     >
-                      <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 ml-2" />
+                      <div className="w-3 h-3 bg-blue-600 rounded-full mt-2 ml-3" />
                       <span className="text-gray-700">{feature}</span>
                     </div>
                   ))}
@@ -242,15 +289,15 @@ const UniversityDetails: React.FC = () => {
           </div>
 
           {/* CTA Section */}
-          <div className="p-8 bg-gray-50 border-t">
+          <div className="p-16 bg-gradient-to-br from-blue-50 to-blue-100 border-t">
             <div className="max-w-2xl mx-auto text-center">
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">
+              <h3 className="text-3xl font-bold text-gray-800 mb-6">
                 هل أنت مستعد للانضمام إلينا؟
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600 mb-8 text-lg">
                 اكتشف المزيد عن برامجنا وابدأ رحلتك الأكاديمية معنا.
               </p>
-              <button className="bg-blue-600 text-white py-3 px-8 rounded-lg hover:bg-blue-700 transition duration-300">
+              <button className="bg-blue-600 text-white py-4 px-10 rounded-xl hover:bg-blue-700 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1">
                 معلومات التقديم
               </button>
             </div>

@@ -10,7 +10,6 @@ const HomePage: React.FC = () => {
   const [userName, setUserName] = useState("");
 
   useEffect(() => {
-    // Fetch the logged-in user's details when the component mounts
     const fetchUser = async () => {
       try {
         const response = await fetch("http://localhost:3000/auth/user", {
