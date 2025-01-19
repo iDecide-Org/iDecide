@@ -18,8 +18,6 @@ const Chatbot = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   useEffect(() => {
     // Initialize chat with first bot message
@@ -128,12 +126,7 @@ const Chatbot = () => {
   return (
     <>
       {" "}
-      <Navbar
-        isMenuOpen={isMenuOpen}
-        setIsMenuOpen={setIsMenuOpen}
-        isProfileOpen={isProfileOpen}
-        setIsProfileOpen={setIsProfileOpen}
-      />
+      <Navbar />
       <div
         className="min-h-screen bg-gray-50 flex items-center justify-center p-4"
         dir="rtl"

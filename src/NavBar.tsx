@@ -1,23 +1,13 @@
 // Navbar.tsx
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { User, Menu, X, LogOut, Settings } from "lucide-react";
-import { useAuth } from "./AuthContext"; // Import useAuth
+import { useAuth } from "./AuthContext";
 
-interface NavbarProps {
-  isMenuOpen: boolean;
-  setIsMenuOpen: (open: boolean) => void;
-  isProfileOpen: boolean;
-  setIsProfileOpen: (open: boolean) => void;
-}
-
-const Navbar: React.FC<NavbarProps> = ({
-  isMenuOpen,
-  setIsMenuOpen,
-  isProfileOpen,
-  setIsProfileOpen,
-}) => {
-  const { isLoggedIn, userName, handleLogout } = useAuth(); // Use the context
+const Navbar: React.FC = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const { isLoggedIn, userName, handleLogout } = useAuth();
 
   return (
     <nav className="bg-white p-4 border-b border-gray-200 flex justify-between items-center w-full">
@@ -27,7 +17,6 @@ const Navbar: React.FC<NavbarProps> = ({
           className="flex items-center text-2xl font-bold text-blue-600"
         >
           <span className="mr-2">
-            {" "}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -35,9 +24,9 @@ const Navbar: React.FC<NavbarProps> = ({
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
               className="lucide lucide-book w-9 h-9 text-blue"
             >
               <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"></path>
@@ -46,6 +35,7 @@ const Navbar: React.FC<NavbarProps> = ({
           iDecide
         </Link>
       </div>
+
       <div className="flex items-center space-x-4">
         <div className="hidden md:flex space-x-6">
           <Link
@@ -79,6 +69,7 @@ const Navbar: React.FC<NavbarProps> = ({
             اعرف نفسك
           </Link>
         </div>
+
         {isLoggedIn ? (
           <div className="relative">
             <button
@@ -121,6 +112,7 @@ const Navbar: React.FC<NavbarProps> = ({
             تسجيل الدخول
           </Link>
         )}
+
         <button
           className="md:hidden text-gray-700 hover:text-blue-600"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -132,6 +124,49 @@ const Navbar: React.FC<NavbarProps> = ({
           )}
         </button>
       </div>
+
+      {/* Mobile Menu */}
+      {isMenuOpen && (
+        <div className="md:hidden bg-white border-b border-gray-200 w-full absolute top-16 left-0">
+          <div className="flex flex-col space-y-4 p-4">
+            <Link
+              to="/about"
+              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              من نحن
+            </Link>
+            <Link
+              to="/universities"
+              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              استكشف الجامعات
+            </Link>
+            <Link
+              to="/universities"
+              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              استكشف التخصصات
+            </Link>
+            <Link
+              to="/universities"
+              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              استكشف المسارات الوظيفية
+            </Link>
+            <Link
+              to="/chatbot"
+              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              اعرف نفسك
+            </Link>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };

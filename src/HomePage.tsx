@@ -1,62 +1,12 @@
-import React, { useState } from "react";
 import Navbar from "./NavBar";
 import { Link } from "react-router-dom"; // Fixed incorrect import
 import { ArrowRight, Book, GraduationCap, Search } from "lucide-react";
 
 const HomePage: React.FC = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-
   return (
     <div className="bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col min-h-screen w-full overflow-x-hidden">
-      <Navbar
-        isMenuOpen={isMenuOpen}
-        setIsMenuOpen={setIsMenuOpen}
-        isProfileOpen={isProfileOpen}
-        setIsProfileOpen={setIsProfileOpen}
-      />
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-white border-b border-gray-200 w-full">
-          <div className="flex flex-col space-y-4 p-4">
-            <Link
-              to="/about"
-              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              من نحن
-            </Link>
-            <Link
-              to="/universities"
-              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              استكشف الجامعات
-            </Link>
-            <Link
-              to="/majors"
-              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              استكشف التخصصات
-            </Link>
-            <Link
-              to="/careers"
-              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              استكشف المسارات الوظيفية
-            </Link>
-            <Link
-              to="/self"
-              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              اعرف نفسك
-            </Link>
-          </div>
-        </div>
-      )}
+      <Navbar />
+
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center p-8 w-full">
         <div className="flex w-full bg-white shadow-2xl rounded-2xl overflow-hidden">

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import {
   UserCircle,
   User,
@@ -13,8 +12,6 @@ import { useAuth } from "./AuthContext";
 
 const ProfilePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("البيانات الشخصية");
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const { userName, email, handleLogout } = useAuth();
 
@@ -24,54 +21,7 @@ const ProfilePage: React.FC = () => {
 
   return (
     <div className="bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col min-h-screen">
-      <Navbar
-        isMenuOpen={isMenuOpen}
-        setIsMenuOpen={setIsMenuOpen}
-        isProfileOpen={isProfileOpen}
-        setIsProfileOpen={setIsProfileOpen}
-      />
-
-      {isMenuOpen && (
-        <div className="md:hidden bg-white border-b border-gray-200 w-full">
-          <div className="flex flex-col space-y-4 p-4">
-            <Link
-              to="/about"
-              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              من نحن
-            </Link>
-            <Link
-              to="/universities"
-              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              استكشف الجامعات
-            </Link>
-            <Link
-              to="/majors"
-              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              استكشف التخصصات
-            </Link>
-            <Link
-              to="/careers"
-              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              استكشف المسارات الوظيفية
-            </Link>
-            <Link
-              to="/self"
-              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              اعرف نفسك
-            </Link>
-          </div>
-        </div>
-      )}
+      <Navbar />
 
       <div className="flex flex-1">
         <aside className="bg-white p-6 w-64 border-r border-gray-200 shadow-lg">

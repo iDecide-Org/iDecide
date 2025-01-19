@@ -107,7 +107,6 @@ const universities = [
 ];
 
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import {
   Search,
   MapPin,
@@ -121,14 +120,12 @@ import {
 import Navbar from "./NavBar";
 
 const FeedPage: React.FC = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState({
     location: "",
     type: "",
     establishment: "",
   });
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const filteredUniversities = universities.filter((university) => {
     const matchesSearch = university.name
@@ -146,58 +143,8 @@ const FeedPage: React.FC = () => {
 
   return (
     <div className="bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col min-h-screen w-full overflow-x-hidden">
-      {/* Navigation Bar */}
-      <Navbar
-        isMenuOpen={isMenuOpen}
-        setIsMenuOpen={setIsMenuOpen}
-        isProfileOpen={isProfileOpen}
-        setIsProfileOpen={setIsProfileOpen}
-      />
+      <Navbar />
 
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-white border-b border-gray-200 w-full">
-          <div className="flex flex-col space-y-4 p-4">
-            <Link
-              to="/about"
-              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              من نحن
-            </Link>
-            <Link
-              to="/universities"
-              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              استكشف الجامعات
-            </Link>
-            <Link
-              to="/majors"
-              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              استكشف التخصصات
-            </Link>
-            <Link
-              to="/careers"
-              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              استكشف المسارات الوظيفية
-            </Link>
-            <Link
-              to="/self"
-              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              اعرف نفسك
-            </Link>
-          </div>
-        </div>
-      )}
-
-      {/* Search and Filters Section */}
       <section className="bg-white p-6 border-b border-gray-200 w-full">
         <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4 mb-4">
           <div className="relative flex-grow w-full md:w-auto">

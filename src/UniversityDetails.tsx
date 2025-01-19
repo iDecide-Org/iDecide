@@ -14,8 +14,7 @@ import Navbar from "./NavBar";
 
 const UniversityDetails: React.FC = () => {
   // State management
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
+
   const [activeTab, setActiveTab] = useState("عن الجامعة");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -53,12 +52,7 @@ const UniversityDetails: React.FC = () => {
 
   return (
     <div className="bg-gradient-to-br from-blue-50/50 to-blue-100/50 min-h-screen">
-      <Navbar
-        isMenuOpen={isMenuOpen}
-        setIsMenuOpen={setIsMenuOpen}
-        isProfileOpen={isProfileOpen}
-        setIsProfileOpen={setIsProfileOpen}
-      />
+      <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Main Content Card */}

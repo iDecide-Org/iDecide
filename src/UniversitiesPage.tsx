@@ -122,62 +122,13 @@ const UniversitiesPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("الجامعات");
   const [isCumulativeFilter, setIsCumulativeFilter] = useState(false);
   const [universityName, setUniversityName] = useState("");
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   // Use the useAuth hook to access authentication state and functions
 
   return (
     <div className="bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col min-h-screen w-full overflow-x-hidden">
-      {/* Navigation Bar */}
-      <Navbar
-        isMenuOpen={isMenuOpen}
-        setIsMenuOpen={setIsMenuOpen}
-        isProfileOpen={isProfileOpen}
-        setIsProfileOpen={setIsProfileOpen}
-      />
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-white border-b border-gray-200 w-full">
-          <div className="flex flex-col space-y-4 p-4">
-            <Link
-              to="/about"
-              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              من نحن
-            </Link>
-            <Link
-              to="/universities"
-              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              استكشف الجامعات
-            </Link>
-            <Link
-              to="/majors"
-              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              استكشف التخصصات
-            </Link>
-            <Link
-              to="/careers"
-              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              استكشف المسارات الوظيفية
-            </Link>
-            <Link
-              to="/self"
-              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              اعرف نفسك
-            </Link>
-          </div>
-        </div>
-      )}
+      <Navbar />
+
       {/* Search and Filter Section */}
       <section className="bg-white p-6 border-b border-gray-200 w-full">
         <h2 className="text-3xl font-semibold text-center text-gray-800 mb-4">
