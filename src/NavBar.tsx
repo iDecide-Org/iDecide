@@ -1,16 +1,14 @@
+// Navbar.tsx
 import React from "react";
 import { Link } from "react-router-dom";
 import { User, Menu, X, LogOut, Settings } from "lucide-react";
+import { useAuth } from "./AuthContext"; // Import useAuth
 
 interface NavbarProps {
   isMenuOpen: boolean;
   setIsMenuOpen: (open: boolean) => void;
   isProfileOpen: boolean;
   setIsProfileOpen: (open: boolean) => void;
-  isLoggedIn: boolean;
-  userName: string;
-  handleLogin: () => void;
-  handleLogout: () => void;
 }
 
 const Navbar: React.FC<NavbarProps> = ({
@@ -18,11 +16,9 @@ const Navbar: React.FC<NavbarProps> = ({
   setIsMenuOpen,
   isProfileOpen,
   setIsProfileOpen,
-  isLoggedIn,
-  userName,
-  handleLogin,
-  handleLogout,
 }) => {
+  const { isLoggedIn, userName, handleLogout } = useAuth(); // Use the context
+
   return (
     <nav className="bg-white p-4 border-b border-gray-200 flex justify-between items-center w-full">
       <div className="flex items-center space-x-6">
@@ -121,11 +117,7 @@ const Navbar: React.FC<NavbarProps> = ({
             )}
           </div>
         ) : (
-          <Link
-            to="/login"
-            className="text-blue-600 hover:underline"
-            onClick={handleLogin}
-          >
+          <Link to="/login" className="text-blue-600 hover:underline">
             تسجيل الدخول
           </Link>
         )}

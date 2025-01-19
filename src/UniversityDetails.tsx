@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   MapPin,
   GraduationCap,
@@ -16,8 +16,6 @@ const UniversityDetails: React.FC = () => {
   // State management
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userName, setUserName] = useState("");
   const [activeTab, setActiveTab] = useState("عن الجامعة");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -29,51 +27,6 @@ const UniversityDetails: React.FC = () => {
     "https://lh3.googleusercontent.com/p/AF1QipNtjbr2-XmWZvfaULJI6jJlqsYBdf9EDihGu6JR=s1360-w1360-h1020",
   ];
 
-  // Fetch user data on component mount
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/auth/user", {
-          credentials: "include",
-        });
-
-        if (response.ok) {
-          const user = await response.json();
-          setIsLoggedIn(true);
-          setUserName(user.name);
-        } else {
-          setIsLoggedIn(false);
-          setUserName("");
-        }
-      } catch (error) {
-        console.error("Error fetching user:", error);
-        setIsLoggedIn(false);
-      }
-    };
-
-    fetchUser();
-  }, []);
-
-  // Handle login/logout
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-  };
-
-  const handleLogout = async () => {
-    try {
-      await fetch("http://localhost:3000/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-      setIsLoggedIn(false);
-      setIsProfileOpen(false);
-      setUserName("");
-    } catch (error) {
-      console.error("Error logging out:", error);
-    }
-  };
-
-  // Image navigation
   const nextImage = () => {
     if (isTransitioning) return; // Prevent rapid clicking
     setIsTransitioning(true);
@@ -105,10 +58,6 @@ const UniversityDetails: React.FC = () => {
         setIsMenuOpen={setIsMenuOpen}
         isProfileOpen={isProfileOpen}
         setIsProfileOpen={setIsProfileOpen}
-        isLoggedIn={isLoggedIn}
-        userName={userName}
-        handleLogin={handleLogin}
-        handleLogout={handleLogout}
       />
 
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -122,15 +71,16 @@ const UniversityDetails: React.FC = () => {
                 src={image}
                 alt={`University ${index + 1}`}
                 className={`absolute w-full h-full object-cover transition-all duration-500 ease-in-out
-                  ${index === currentImageIndex 
-                    ? "opacity-100 translate-x-0" 
-                    : index < currentImageIndex 
-                      ? "opacity-0 translate-x-full" 
+                  ${
+                    index === currentImageIndex
+                      ? "opacity-100 translate-x-0"
+                      : index < currentImageIndex
+                      ? "opacity-0 translate-x-full"
                       : "opacity-0 -translate-x-full"
                   }`}
               />
             ))}
-            
+
             {/* Navigation Arrows */}
             <button
               onClick={prevImage}
@@ -138,7 +88,11 @@ const UniversityDetails: React.FC = () => {
               className={`absolute left-6 top-1/2 transform -translate-y-1/2 
                 bg-white/20 backdrop-blur-md p-4 rounded-full 
                 hover:bg-white/90 transition-all duration-300 group
-                ${isTransitioning ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+                ${
+                  isTransitioning
+                    ? "cursor-not-allowed opacity-50"
+                    : "cursor-pointer"
+                }`}
             >
               <ChevronLeft className="w-6 h-6 text-white group-hover:text-gray-800" />
             </button>
@@ -149,7 +103,11 @@ const UniversityDetails: React.FC = () => {
               className={`absolute right-6 top-1/2 transform -translate-y-1/2 
                 bg-white/20 backdrop-blur-md p-4 rounded-full 
                 hover:bg-white/90 transition-all duration-300 group
-                ${isTransitioning ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+                ${
+                  isTransitioning
+                    ? "cursor-not-allowed opacity-50"
+                    : "cursor-pointer"
+                }`}
             >
               <ChevronRight className="w-6 h-6 text-white group-hover:text-gray-800" />
             </button>
@@ -167,9 +125,11 @@ const UniversityDetails: React.FC = () => {
                     }
                   }}
                   className={`w-2 h-2 rounded-full transition-all duration-300 
-                    ${currentImageIndex === index 
-                      ? 'bg-white w-4' 
-                      : 'bg-white/50 hover:bg-white/75'}`}
+                    ${
+                      currentImageIndex === index
+                        ? "bg-white w-4"
+                        : "bg-white/50 hover:bg-white/75"
+                    }`}
                   disabled={isTransitioning}
                 />
               ))}

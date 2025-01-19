@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   UserCircle,
@@ -9,57 +9,17 @@ import {
   LogOut,
 } from "lucide-react";
 import Navbar from "./NavBar";
+import { useAuth } from "./AuthContext";
 
 const ProfilePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("البيانات الشخصية");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userName, setUserName] = useState("");
-  const [userEmail, setUserEmail] = useState("");
 
-  useEffect(() => {
-    // Fetch user data from API
-    const fetchUserData = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/auth/user", {
-          credentials: "include",
-        });
-
-        if (response.ok) {
-          const user = await response.json();
-          setIsLoggedIn(true);
-          setUserName(user.name);
-          setUserEmail(user.email);
-        } else {
-          setIsLoggedIn(false);
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-        setIsLoggedIn(false);
-      }
-    };
-
-    fetchUserData();
-  }, []);
+  const { userName, email, handleLogout } = useAuth();
 
   const handleTabClick = (tab: string) => {
     setActiveTab(tab);
-  };
-
-  const handleLogout = async () => {
-    try {
-      await fetch("http://localhost:3000/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-      setIsLoggedIn(false);
-      setIsProfileOpen(false);
-      setUserName("");
-      setUserEmail("");
-    } catch (error) {
-      console.error("Error logging out:", error);
-    }
   };
 
   return (
@@ -69,10 +29,6 @@ const ProfilePage: React.FC = () => {
         setIsMenuOpen={setIsMenuOpen}
         isProfileOpen={isProfileOpen}
         setIsProfileOpen={setIsProfileOpen}
-        isLoggedIn={isLoggedIn}
-        userName={userName}
-        handleLogin={() => setIsLoggedIn(true)}
-        handleLogout={handleLogout}
       />
 
       {isMenuOpen && (
@@ -124,7 +80,7 @@ const ProfilePage: React.FC = () => {
               <div className="flex flex-col items-center space-y-2 text-gray-700 focus:outline-none">
                 <UserCircle className="w-16 h-16 text-blue-600" />
                 <div className="font-bold text-lg">{userName}</div>
-                <div className="text-sm text-gray-500">{userEmail}</div>
+                <div className="text-sm text-gray-500">{email}</div>
               </div>
             </div>
           </div>
@@ -176,7 +132,7 @@ const ProfilePage: React.FC = () => {
                     <input
                       type="text"
                       id="firstName"
-                      defaultValue={userName.split(" ")[0] || ""}
+                      value={userName}
                       className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
                       dir="rtl"
                     />
@@ -191,7 +147,7 @@ const ProfilePage: React.FC = () => {
                     <input
                       type="text"
                       id="lastName"
-                      defaultValue={userName.split(" ")[1] || ""}
+                      value={userName}
                       className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
                       dir="rtl"
                     />
@@ -208,7 +164,7 @@ const ProfilePage: React.FC = () => {
                     <input
                       type="email"
                       id="email"
-                      defaultValue={userEmail || ""}
+                      value={email}
                       className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
                       dir="rtl"
                     />

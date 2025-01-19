@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Mail, Lock, Book } from "lucide-react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "./AuthContext"; // Import useAuth
 
-// Interface matching the SigninDto
 interface SigninFormInputs {
   email: string;
   password: string;
@@ -12,7 +12,8 @@ interface SigninFormInputs {
 const LoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
+  const { handleLogin } = useAuth(); // Use the handleLogin function from AuthContext
 
   const {
     register,
@@ -25,27 +26,8 @@ const LoginPage: React.FC = () => {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:3000/auth/signin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.log(errorData);
-
-        throw new Error(errorData.message || "Login failed");
-      }
-
-      // Redirect to homepage after successful login
-      navigate("/");
-
-      // Handle successful login here, e.g., redirect or save token
-      console.log("Login successful");
+      await handleLogin(data.email, data.password); // This updates the global state
+      navigate("/"); // Redirect to homepage
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "An unexpected error occurred"

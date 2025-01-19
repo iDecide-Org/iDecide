@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { MessageSquare, Send, User, Bot } from "lucide-react";
+import Navbar from "./NavBar";
 
 interface Message {
   id: number;
@@ -17,7 +18,9 @@ const Chatbot = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+
   useEffect(() => {
     // Initialize chat with first bot message
     setMessages([
@@ -48,12 +51,13 @@ const Chatbot = () => {
         minute: "2-digit",
       }),
     };
-  
+
     setMessages((prev) => [...prev, newMessage]);
-  
+
     try {
       // Updated URL to match FastAPI endpoint
-      const response = await fetch("http://localhost:8000/chat/", {  // Note the trailing slash
+      const response = await fetch("http://localhost:8000/chat/", {
+        // Note the trailing slash
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -66,7 +70,7 @@ const Chatbot = () => {
       }
 
       const data: ChatResponse = await response.json();
-      
+
       // Add bot response
       const botResponse: Message = {
         id: newMessage.id + 1,
@@ -84,7 +88,11 @@ const Chatbot = () => {
       if (data.recommended_college_majors?.length) {
         const majorsMessage: Message = {
           id: botResponse.id + 1,
-          text: "التخصصات الموصى بها:\n" + data.recommended_college_majors.map((major, index) => `${index + 1}. ${major}`).join("\n"),
+          text:
+            "التخصصات الموصى بها:\n" +
+            data.recommended_college_majors
+              .map((major, index) => `${index + 1}. ${major}`)
+              .join("\n"),
           isBot: true,
           timestamp: new Date().toLocaleTimeString([], {
             hour: "2-digit",
@@ -118,78 +126,92 @@ const Chatbot = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4" dir="rtl">
-      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg overflow-hidden">
-        {/* Header */}
-        <div className="bg-blue-500 text-white p-4 flex items-center gap-2">
-          <MessageSquare className="w-6 h-6" />
-          <h1 className="text-xl font-semibold">المستشار التعليمي</h1>
-        </div>
+    <>
+      {" "}
+      <Navbar
+        isMenuOpen={isMenuOpen}
+        setIsMenuOpen={setIsMenuOpen}
+        isProfileOpen={isProfileOpen}
+        setIsProfileOpen={setIsProfileOpen}
+      />
+      <div
+        className="min-h-screen bg-gray-50 flex items-center justify-center p-4"
+        dir="rtl"
+      >
+        <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg overflow-hidden">
+          {/* Header */}
+          <div className="bg-blue-500 text-white p-4 flex items-center gap-2">
+            <MessageSquare className="w-6 h-6" />
+            <h1 className="text-xl font-semibold">المستشار التعليمي</h1>
+          </div>
 
-        {/* Messages */}
-        <div className="h-[500px] overflow-y-auto p-4 space-y-4">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex gap-3 ${
-                message.isBot ? "" : "flex-row-reverse"
-              }`}
-            >
+          {/* Messages */}
+          <div className="h-[500px] overflow-y-auto p-4 space-y-4">
+            {messages.map((message) => (
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  message.isBot ? "bg-blue-100" : "bg-purple-100"
-                }`}
-              >
-                {message.isBot ? (
-                  <Bot size={18} className="text-blue-600" />
-                ) : (
-                  <User size={18} className="text-purple-600" />
-                )}
-              </div>
-              <div
-                className={`flex flex-col max-w-[80%] ${
-                  message.isBot ? "" : "items-end"
+                key={message.id}
+                className={`flex gap-3 ${
+                  message.isBot ? "" : "flex-row-reverse"
                 }`}
               >
                 <div
-                  className={`px-4 py-2 rounded-2xl ${
-                    message.isBot
-                      ? "bg-gray-100 rounded-tr-none"
-                      : "bg-blue-500 text-white rounded-tl-none"
+                  className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                    message.isBot ? "bg-blue-100" : "bg-purple-100"
                   }`}
                 >
-                  <p className="text-sm whitespace-pre-line">{message.text}</p>
+                  {message.isBot ? (
+                    <Bot size={18} className="text-blue-600" />
+                  ) : (
+                    <User size={18} className="text-purple-600" />
+                  )}
                 </div>
-                <span className="text-xs text-gray-400 mt-1">
-                  {message.timestamp}
-                </span>
+                <div
+                  className={`flex flex-col max-w-[80%] ${
+                    message.isBot ? "" : "items-end"
+                  }`}
+                >
+                  <div
+                    className={`px-4 py-2 rounded-2xl ${
+                      message.isBot
+                        ? "bg-gray-100 rounded-tr-none"
+                        : "bg-blue-500 text-white rounded-tl-none"
+                    }`}
+                  >
+                    <p className="text-sm whitespace-pre-line">
+                      {message.text}
+                    </p>
+                  </div>
+                  <span className="text-xs text-gray-400 mt-1">
+                    {message.timestamp}
+                  </span>
+                </div>
               </div>
-            </div>
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
 
-        {/* Input */}
-        <form
-          onSubmit={handleSubmit}
-          className="flex gap-2 p-4 border-t bg-white"
-        >
-          <button
-            type="submit"
-            className="p-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+          {/* Input */}
+          <form
+            onSubmit={handleSubmit}
+            className="flex gap-2 p-4 border-t bg-white"
           >
-            <Send size={20} className="rotate-180" />
-          </button>
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="اكتب رسالتك هنا..."
-            className="flex-1 px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-right"
-          />
-        </form>
+            <button
+              type="submit"
+              className="p-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+            >
+              <Send size={20} className="rotate-180" />
+            </button>
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="اكتب رسالتك هنا..."
+              className="flex-1 px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-right"
+            />
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

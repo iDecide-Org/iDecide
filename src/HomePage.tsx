@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Navbar from "./NavBar";
 import { Link } from "react-router-dom"; // Fixed incorrect import
 import { ArrowRight, Book, GraduationCap, Search } from "lucide-react";
@@ -6,51 +6,6 @@ import { ArrowRight, Book, GraduationCap, Search } from "lucide-react";
 const HomePage: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userName, setUserName] = useState("");
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/auth/user", {
-          credentials: "include", // Include cookies in the request
-        });
-
-        if (response.ok) {
-          const user = await response.json();
-          setIsLoggedIn(true);
-          setUserName(user.name);
-        } else {
-          setIsLoggedIn(false);
-          setUserName("");
-        }
-      } catch (error) {
-        console.error("Error fetching user:", error);
-        setIsLoggedIn(false);
-      }
-    };
-
-    fetchUser();
-  }, []);
-
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-  };
-
-  const handleLogout = async () => {
-    try {
-      await fetch("http://localhost:3000/auth/logout", {
-        method: "POST",
-        credentials: "include", // Include cookies in the request
-      });
-
-      setIsLoggedIn(false);
-      setUserName("");
-      setIsProfileOpen(false);
-    } catch (error) {
-      console.error("Error logging out:", error);
-    }
-  };
 
   return (
     <div className="bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col min-h-screen w-full overflow-x-hidden">
@@ -59,10 +14,6 @@ const HomePage: React.FC = () => {
         setIsMenuOpen={setIsMenuOpen}
         isProfileOpen={isProfileOpen}
         setIsProfileOpen={setIsProfileOpen}
-        isLoggedIn={isLoggedIn}
-        userName={userName}
-        handleLogin={handleLogin}
-        handleLogout={handleLogout}
       />
       {/* Mobile Menu */}
       {isMenuOpen && (
