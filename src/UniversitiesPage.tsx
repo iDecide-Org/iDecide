@@ -1,3 +1,17 @@
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  Search,
+  MapPin,
+  Heart,
+  Eye,
+  Calendar,
+  GraduationCap,
+  Building,
+  Clock,
+} from "lucide-react";
+import Navbar from "./NavBar";
+
 const universities = [
   {
     id: 1,
@@ -101,19 +115,6 @@ const universities = [
     establishment: "2002",
   },
 ];
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import {
-  Search,
-  MapPin,
-  Heart,
-  Eye,
-  Calendar,
-  GraduationCap,
-  Building,
-  Clock,
-} from "lucide-react";
-import Navbar from "./NavBar";
 
 const UniversitiesPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("الجامعات");
@@ -330,11 +331,11 @@ const UniversitiesPage: React.FC = () => {
           <h2 className="text-2xl font-semibold text-gray-800 mb-8 text-right">
             نتائج البحث : ({universities.length})
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 gap-y-6 justify-items-center">
             {universities.map((university) => (
               <div
                 key={university.id}
-                className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col w-full max-w-[300px]"
+                className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col w-full max-w-[350px]"
               >
                 <div className="relative">
                   <img
