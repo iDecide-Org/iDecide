@@ -76,32 +76,29 @@ const universities = [
     majors: "8",
     establishment: "2002",
   },
-
   {
     id: 7,
-    name: "جامعة المدينة بالقاهرة CUC",
-    location: "مدينة هليوبوليس الجديدة، طري....",
-    type: "الجامعات الخاصة",
-    image:
-      "https://www.propertyfinder.eg/blog/wp-content/uploads/2020/03/nile.jpg",
-    views: "4.8K",
-    date: "2024-09-17",
-    colleges: "0+",
-    majors: "0",
-    establishment: "2019",
+    name: "جامعة الملك سلمان الدولية",
+    location: "37 طريق القاهرة الإسماعيلية.....",
+    type: "الجامعات الأهلية",
+    image: "https://cdn.elwatannews.com/watan/840x473/10812096271660043610.jpg",
+    views: "10.3K",
+    date: "2024-08-13",
+    colleges: "3+",
+    majors: "8",
+    establishment: "2002",
   },
   {
     id: 8,
-    name: "الأكاديمية العربية للعلوم.....",
-    location: "مدينة العلمين العلمين، محاف...",
-    type: "الجامعات ذات الطبيعة الخاصة",
-    image:
-      "https://studyinegy.com/wp-content/uploads/2023/06/5AB2E0FB-B130-41D1-8F5B-7D754A3E3521.webp",
-    views: "7.5K",
-    date: "2024-09-24",
-    colleges: "4+",
-    majors: "14",
-    establishment: "2023",
+    name: "جامعة الملك سلمان الدولية",
+    location: "37 طريق القاهرة الإسماعيلية.....",
+    type: "الجامعات الأهلية",
+    image: "https://cdn.elwatannews.com/watan/840x473/10812096271660043610.jpg",
+    views: "10.3K",
+    date: "2024-08-13",
+    colleges: "3+",
+    majors: "8",
+    establishment: "2002",
   },
 ];
 import React, { useEffect, useState } from "react";
@@ -329,15 +326,15 @@ const UniversitiesPage: React.FC = () => {
       </section>
       {/* University Cards */}
       <section className="w-full flex-grow">
-        <div className="w-full px-4">
+        <div className="container mx-auto px-4">
           <h2 className="text-2xl font-semibold text-gray-800 mb-8 text-right">
             نتائج البحث : ({universities.length})
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
             {universities.map((university) => (
               <div
                 key={university.id}
-                className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col"
+                className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col w-full max-w-[300px]"
               >
                 <div className="relative">
                   <img
