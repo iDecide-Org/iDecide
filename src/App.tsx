@@ -1,13 +1,13 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import HomePage from "./HomePage";
-import LoginPage from "./LoginPage";
-import SignupPage from "./SignupPage";
-import UniversitiesPage from "./UniversitiesPage";
-import ProfilePage from "./ProfilePage";
-import FeedPage from "./FeedPage";
-import Chatbot from "./Chatbot";
-import UniversityDetails from "./UniversityDetails";
+import HomePage from "./components/HomePage";
+import LoginPage from "./components/LoginPage";
+import SignupPage from "./components/SignupPage";
+import UniversitiesPage from "./components/UniversitiesPage";
+import ProfilePage from "./components/ProfilePage";
+import FeedPage from "./components/FeedPage";
+import Chatbot from "./components/Chatbot";
+import UniversityDetails from "./components/UniversityDetails";
 import { AuthProvider } from "./AuthContext";
 
 const App: React.FC = () => {

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Mail, Lock, Book } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "./AuthContext"; // Import useAuth
+import { useAuth } from "../AuthContext"; // Import useAuth
 
 interface SigninFormInputs {
   email: string;

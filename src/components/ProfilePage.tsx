@@ -8,7 +8,7 @@ import {
   LogOut,
 } from "lucide-react";
 import Navbar from "./NavBar";
-import { useAuth } from "./AuthContext";
+import { useAuth } from "../AuthContext";
 
 const ProfilePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("البيانات الشخصية");
