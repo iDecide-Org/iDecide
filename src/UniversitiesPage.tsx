@@ -394,9 +394,12 @@ const UniversitiesPage: React.FC = () => {
                     </div>
                   </div>
                   <div className="mt-auto">
-                    <button className="bg-blue-600 text-white py-2 px-4 rounded-md w-full hover:bg-blue-700 transition duration-300">
-                      عرض تفاصيل
-                    </button>
+                    <Link to="/university-details">
+                      {" "}
+                      <button className="bg-blue-600 text-white py-2 px-4 rounded-md w-full hover:bg-blue-700 transition duration-300">
+                        عرض تفاصيل
+                      </button>
+                    </Link>
                   </div>
                 </div>
               </div>
