@@ -1,18 +1,8 @@
 // UniversitiesPage.js
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import {
-  Search,
-  MapPin,
-  Heart,
-  Eye,
-  Calendar,
-  GraduationCap,
-  Building,
-  Clock,
-} from "lucide-react";
-
+import { Search } from "lucide-react";
 import Navbar from "./NavBar";
+import UniversityCard from "./UniversityCard"; // Import the UniversityCard component
 
 const universities = [
   {
@@ -123,8 +113,6 @@ const UniversitiesPage: React.FC = () => {
   const [isCumulativeFilter, setIsCumulativeFilter] = useState(false);
   const [universityName, setUniversityName] = useState("");
 
-  // Use the useAuth hook to access authentication state and functions
-
   return (
     <div className="bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col min-h-screen w-full overflow-x-hidden">
       <Navbar />
@@ -231,7 +219,8 @@ const UniversitiesPage: React.FC = () => {
           </label>
         </div>
       </section>
-      {/* University Cards */}
+
+      {/* University Cards Section */}
       <section className="w-full flex-grow">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-semibold text-gray-800 mb-8 text-right">
@@ -239,80 +228,12 @@ const UniversitiesPage: React.FC = () => {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 gap-y-6 justify-items-center">
             {universities.map((university) => (
-              <div
-                key={university.id}
-                className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col w-full max-w-[350px]"
-              >
-                <div className="relative">
-                  <img
-                    src={university.image}
-                    alt={university.name}
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="absolute top-2 right-2 flex flex-col items-center">
-                    <button className="bg-white bg-opacity-70 rounded-full p-1 hover:bg-opacity-100 transition duration-300">
-                      <Heart className="w-5 h-5 text-gray-700" />
-                    </button>
-                    <button className="bg-white bg-opacity-70 rounded-full p-1 hover:bg-opacity-100 transition duration-300 mt-1">
-                      <GraduationCap className="w-5 h-5 text-blue-600" />
-                    </button>
-                  </div>
-                  <div className="absolute bottom-2 right-2 bg-white bg-opacity-70 rounded-md px-2 py-1">
-                    <span className="flex items-center text-xs text-gray-700">
-                      <Eye className="w-4 h-4 ml-1" />
-                      {university.views} مشاهدة
-                    </span>
-                  </div>
-                  <div className="absolute top-2 left-2 bg-blue-500 text-white rounded-md px-2 py-1">
-                    <span className="flex items-center text-xs">رائج الان</span>
-                  </div>
-                </div>
-
-                <div className="p-4 flex-grow flex flex-col">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-2 text-right">
-                    {university.name}
-                  </h3>
-                  <div className="flex items-center text-gray-600 text-sm mb-2 mr-0">
-                    <MapPin className="w-4 h-4 ml-1" />
-                    <span className="text-right">{university.location}</span>
-                  </div>
-                  <p className="text-gray-600 text-sm mb-2 text-right mr-0">
-                    {university.type}
-                  </p>
-                  <div className="flex items-center justify-between mt-2 mb-4 mr-0">
-                    <div className="text-gray-600 text-sm flex items-center">
-                      <Clock className="w-4 h-4 ml-1" />
-                      <span className="text-right">{university.date}</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <div className="flex items-center text-xs text-gray-600 mr-0">
-                        <Building className="w-4 h-4 ml-1" />
-                        <span>{university.colleges}</span>
-                      </div>
-                      <div className="flex items-center text-xs text-gray-600 mr-0">
-                        <GraduationCap className="w-4 h-4 ml-1" />
-                        <span>{university.majors}</span>
-                      </div>
-                      <div className="flex items-center text-xs text-gray-600 mr-0">
-                        <Calendar className="w-4 h-4 ml-1" />
-                        <span>{university.establishment}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-auto">
-                    <Link to="/university-details">
-                      {" "}
-                      <button className="bg-blue-600 text-white py-2 px-4 rounded-md w-full hover:bg-blue-700 transition duration-300">
-                        عرض تفاصيل
-                      </button>
-                    </Link>
-                  </div>
-                </div>
-              </div>
+              <UniversityCard key={university.id} university={university} />
             ))}
           </div>
         </div>
       </section>
+
       {/* Footer Note */}
       <footer className="text-center text-xs text-gray-500 py-4 w-full">
         © {new Date().getFullYear()} iDecide. All rights reserved.
