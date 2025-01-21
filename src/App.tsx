@@ -10,6 +10,7 @@ import Chatbot from "./components/Chatbot";
 import UniversityDetails from "./components/UniversityDetails";
 import { AuthProvider } from "./contexts/AuthContext";
 import About from "./components/About";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const App: React.FC = () => {
   return (
@@ -20,14 +21,36 @@ const App: React.FC = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/universities" element={<UniversitiesPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/feed" element={<FeedPage />} />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/feed"
+            element={
+              <ProtectedRoute>
+                <FeedPage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/about" element={<About />} />
-          <Route path="/chatbot" element={<Chatbot />} />
+          <Route
+            path="/chatbot"
+            element={
+              <ProtectedRoute>
+                <Chatbot />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/university-details" element={<UniversityDetails />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
   );
 };
+
 export default App;
