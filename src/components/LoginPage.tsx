@@ -27,7 +27,7 @@ const LoginPage: React.FC = () => {
 
     try {
       await handleLogin(data.email, data.password); // This updates the global state
-      navigate("/"); // Redirect to homepage
+      navigate("/feed");
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "An unexpected error occurred"

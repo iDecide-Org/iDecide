@@ -145,7 +145,16 @@ const FeedPage: React.FC = () => {
     <div className="bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col min-h-screen w-full overflow-x-hidden">
       <Navbar />
 
+      {/* Search and Filter Section */}
       <section className="bg-white p-6 border-b border-gray-200 w-full">
+        <h2 className="text-3xl font-semibold text-center text-gray-800 mb-4">
+          اكتشف أفضل الجامعات والكليات والتخصصات المتاحة.
+        </h2>
+        <p className="text-center text-gray-700 mb-6">
+          ابحث عن الجامعات والكليات والتخصصات التي تلبي طموحاتك الأكاديمية.
+        </p>
+
+        {/* Search and Filters */}
         <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4 mb-4">
           <div className="relative flex-grow w-full md:w-auto">
             <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -197,87 +206,91 @@ const FeedPage: React.FC = () => {
       </section>
 
       {/* University Cards Section */}
-      <section className="w-full flex-grow p-6">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-8 text-right">
-          الجامعات المقترحة لك : ({filteredUniversities.length})
-        </h2>
-        {filteredUniversities.length === 0 ? (
-          <div className="text-center text-gray-600">
-            لا توجد جامعات تطابق تفضيلاتك.
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredUniversities.map((university) => (
-              <div
-                key={university.id}
-                className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col hover:shadow-lg transition-shadow duration-300"
-              >
-                <div className="relative">
-                  <img
-                    src={university.image}
-                    alt={university.name}
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="absolute top-2 right-2 flex flex-col items-center">
-                    <button className="bg-white bg-opacity-70 rounded-full p-1 hover:bg-opacity-100 transition duration-300">
-                      <Heart className="w-5 h-5 text-gray-700" />
-                    </button>
-                    <button className="bg-white bg-opacity-70 rounded-full p-1 hover:bg-opacity-100 transition duration-300 mt-1">
-                      <GraduationCap className="w-5 h-5 text-blue-600" />
-                    </button>
+      <section className="w-full flex-grow">
+        <div className="container mx-auto px-4">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-8 text-right">
+            الجامعات المقترحة لك : ({filteredUniversities.length})
+          </h2>
+          {filteredUniversities.length === 0 ? (
+            <div className="text-center text-gray-600">
+              لا توجد جامعات تطابق تفضيلاتك.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 gap-y-6 justify-items-center">
+              {filteredUniversities.map((university) => (
+                <div
+                  key={university.id}
+                  className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col w-full max-w-[350px] hover:shadow-lg transition-shadow duration-300"
+                >
+                  <div className="relative">
+                    <img
+                      src={university.image}
+                      alt={university.name}
+                      className="w-full h-48 object-cover"
+                    />
+                    <div className="absolute top-2 right-2 flex flex-col items-center">
+                      <button className="bg-white bg-opacity-70 rounded-full p-1 hover:bg-opacity-100 transition duration-300">
+                        <Heart className="w-5 h-5 text-gray-700" />
+                      </button>
+                      <button className="bg-white bg-opacity-70 rounded-full p-1 hover:bg-opacity-100 transition duration-300 mt-1">
+                        <GraduationCap className="w-5 h-5 text-blue-600" />
+                      </button>
+                    </div>
+                    <div className="absolute bottom-2 right-2 bg-white bg-opacity-70 rounded-md px-2 py-1">
+                      <span className="flex items-center text-xs text-gray-700">
+                        <Eye className="w-4 h-4 ml-1" />
+                        {university.views} مشاهدة
+                      </span>
+                    </div>
+                    <div className="absolute top-2 left-2 bg-blue-500 text-white rounded-md px-2 py-1">
+                      <span className="flex items-center text-xs">
+                        رائج الان
+                      </span>
+                    </div>
                   </div>
-                  <div className="absolute bottom-2 right-2 bg-white bg-opacity-70 rounded-md px-2 py-1">
-                    <span className="flex items-center text-xs text-gray-700">
-                      <Eye className="w-4 h-4 ml-1" />
-                      {university.views} مشاهدة
-                    </span>
-                  </div>
-                  <div className="absolute top-2 left-2 bg-blue-500 text-white rounded-md px-2 py-1">
-                    <span className="flex items-center text-xs">رائج الان</span>
-                  </div>
-                </div>
 
-                <div className="p-4 flex-grow flex flex-col">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-2 text-right">
-                    {university.name}
-                  </h3>
-                  <div className="flex items-center text-gray-600 text-sm mb-2 mr-0">
-                    <MapPin className="w-4 h-4 ml-1" />
-                    <span className="text-right">{university.location}</span>
-                  </div>
-                  <p className="text-gray-600 text-sm mb-2 text-right mr-0">
-                    {university.type}
-                  </p>
-                  <div className="flex items-center justify-between mt-2 mb-4 mr-0">
-                    <div className="text-gray-600 text-sm flex items-center">
-                      <Clock className="w-4 h-4 ml-1" />
-                      <span className="text-right">{university.date}</span>
+                  <div className="p-4 flex-grow flex flex-col">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2 text-right">
+                      {university.name}
+                    </h3>
+                    <div className="flex items-center text-gray-600 text-sm mb-2 mr-0">
+                      <MapPin className="w-4 h-4 ml-1" />
+                      <span className="text-right">{university.location}</span>
                     </div>
-                    <div className="flex items-center space-x-1">
-                      <div className="flex items-center text-xs text-gray-600 mr-0">
-                        <Building className="w-4 h-4 ml-1" />
-                        <span>{university.colleges}</span>
+                    <p className="text-gray-600 text-sm mb-2 text-right mr-0">
+                      {university.type}
+                    </p>
+                    <div className="flex items-center justify-between mt-2 mb-4 mr-0">
+                      <div className="text-gray-600 text-sm flex items-center">
+                        <Clock className="w-4 h-4 ml-1" />
+                        <span className="text-right">{university.date}</span>
                       </div>
-                      <div className="flex items-center text-xs text-gray-600 mr-0">
-                        <GraduationCap className="w-4 h-4 ml-1" />
-                        <span>{university.majors}</span>
-                      </div>
-                      <div className="flex items-center text-xs text-gray-600 mr-0">
-                        <Calendar className="w-4 h-4 ml-1" />
-                        <span>{university.establishment}</span>
+                      <div className="flex items-center space-x-1">
+                        <div className="flex items-center text-xs text-gray-600 mr-0">
+                          <Building className="w-4 h-4 ml-1" />
+                          <span>{university.colleges}</span>
+                        </div>
+                        <div className="flex items-center text-xs text-gray-600 mr-0">
+                          <GraduationCap className="w-4 h-4 ml-1" />
+                          <span>{university.majors}</span>
+                        </div>
+                        <div className="flex items-center text-xs text-gray-600 mr-0">
+                          <Calendar className="w-4 h-4 ml-1" />
+                          <span>{university.establishment}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="mt-auto">
-                    <button className="bg-blue-600 text-white py-2 px-4 rounded-md w-full hover:bg-blue-700 transition duration-300">
-                      عرض تفاصيل
-                    </button>
+                    <div className="mt-auto">
+                      <button className="bg-blue-600 text-white py-2 px-4 rounded-md w-full hover:bg-blue-700 transition duration-300">
+                        عرض تفاصيل
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </section>
 
       {/* Footer Note */}

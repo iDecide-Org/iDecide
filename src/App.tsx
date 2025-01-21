@@ -9,6 +9,7 @@ import FeedPage from "./components/FeedPage";
 import Chatbot from "./components/Chatbot";
 import UniversityDetails from "./components/UniversityDetails";
 import { AuthProvider } from "./AuthContext";
+import About from "./components/About";
 
 const App: React.FC = () => {
   return (
@@ -21,6 +22,7 @@ const App: React.FC = () => {
           <Route path="/universities" element={<UniversitiesPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/feed" element={<FeedPage />} />
+          <Route path="/about" element={<About />} />
           <Route path="/chatbot" element={<Chatbot />} />
           <Route path="/university-details" element={<UniversityDetails />} />
         </Routes>
