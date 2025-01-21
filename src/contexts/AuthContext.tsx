@@ -1,5 +1,5 @@
 // AuthContext.tsx
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect } from "react";
 
 interface AuthContextType {
   isLoggedIn: boolean;
@@ -32,7 +32,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
         if (response.ok) {
           const user = await response.json();
-
           setIsLoggedIn(true);
           setUserName(user.name);
           setEmail(user.email);
@@ -83,7 +82,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         method: "POST",
         credentials: "include",
       });
-      setIsLoggedIn(false); // Update isLoggedIn state
+      setIsLoggedIn(false);
       setUserName("");
       setEmail("");
     } catch (error) {
@@ -109,10 +108,4 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
-};
+export default AuthContext;

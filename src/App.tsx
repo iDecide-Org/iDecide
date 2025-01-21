@@ -8,7 +8,7 @@ import ProfilePage from "./components/ProfilePage";
 import FeedPage from "./components/FeedPage";
 import Chatbot from "./components/Chatbot";
 import UniversityDetails from "./components/UniversityDetails";
-import { AuthProvider } from "./AuthContext";
+import { AuthProvider } from "./contexts/AuthContext";
 import About from "./components/About";
 
 const App: React.FC = () => {
