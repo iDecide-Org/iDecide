@@ -98,8 +98,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     } catch (error) {
       console.error("Error fetching user:", error);
-      setIsLoggedIn(false);
-      SetstundentExists(false);
     } finally {
       setIsLoading(false);
     }
