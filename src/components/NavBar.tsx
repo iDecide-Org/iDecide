@@ -62,12 +62,21 @@ const Navbar: React.FC = () => {
           >
             استكشف المسارات الوظيفية
           </Link>
-          <Link
-            to="/chatbot"
-            className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
-          >
-            اعرف نفسك
-          </Link>
+          {isLoggedIn ? (
+            <Link
+              to="/feed"
+              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
+            >
+              الصفحة الرئيسية
+            </Link>
+          ) : (
+            <Link
+              to="/chatbot"
+              className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
+            >
+              اعرف نفسك
+            </Link>
+          )}
         </div>
 
         {isLoggedIn ? (

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { MessageSquare, Send, User, Bot } from "lucide-react";
-import Navbar from "./NavBar";
 
 interface Message {
   id: number;
@@ -126,7 +125,6 @@ const Chatbot = () => {
   return (
     <>
       {" "}
-      <Navbar />
       <div
         className="min-h-screen bg-gray-50 flex items-center justify-center p-4"
         dir="rtl"

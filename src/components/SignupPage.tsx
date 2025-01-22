@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Book, GraduationCap, UserCircle2, Mail, Lock } from "lucide-react";
+import { useAuth } from "../contexts/useAuth";
+import { useNavigate } from "react-router";
 
 // Assuming UserType enum based on the DTO
 enum UserType {
@@ -20,6 +22,9 @@ const SignupPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const navigate = useNavigate();
+
+  const { handleSignup } = useAuth(); // Use the handleLogin function from AuthContext
 
   const {
     register,
@@ -32,20 +37,13 @@ const SignupPage: React.FC = () => {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:3000/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      await handleSignup(data); // Call handleSignup from context
+      setSuccess(true); // Show success message
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Signup failed");
-      }
-
-      setSuccess(true);
+      // Wait for 2 seconds before navigating
+      setTimeout(() => {
+        navigate("/chatbot");
+      }, 2000); // 2000 milliseconds = 2 seconds
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "An unexpected error occurred"

@@ -1,8 +1,19 @@
-// AuthContext.tsx
 import React, { createContext, useState, useEffect } from "react";
+interface SignupFormInputs {
+  name: string;
+  email: string;
+  password: string;
+  type: UserType;
+}
 
+// Define the UserType enum
+enum UserType {
+  STUDENT = "student",
+  ADVISOR = "advisor",
+}
 interface AuthContextType {
   isLoggedIn: boolean;
+  isSignedUp: boolean;
   userName: string;
   email: string;
   isLoading: boolean;
@@ -10,6 +21,7 @@ interface AuthContextType {
   setUserName: (value: string) => void;
   handleLogin: (email: string, password: string) => Promise<void>;
   handleLogout: () => Promise<void>;
+  handleSignup: (data: SignupFormInputs) => Promise<void>; // Add this line
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -18,6 +30,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isSignedUp, setIsSignedUp] = useState(false); // New state for signup
+
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -83,6 +97,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         credentials: "include",
       });
       setIsLoggedIn(false);
+      setIsSignedUp(false);
       setUserName("");
       setEmail("");
     } catch (error) {
@@ -90,10 +105,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const handleSignup = async (data: SignupFormInputs) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch("http://localhost:3000/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Signup failed");
+      }
+
+      setIsLoggedIn(true);
+      setIsSignedUp(true);
+    } catch (error) {
+      console.error("Error signing up:", error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
         isLoggedIn,
+        isSignedUp,
         userName,
         email,
         isLoading,
@@ -101,6 +144,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setUserName,
         handleLogin,
         handleLogout,
+        handleSignup,
       }}
     >
       {children}

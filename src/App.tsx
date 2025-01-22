@@ -8,48 +8,51 @@ import ProfilePage from "./components/ProfilePage";
 import FeedPage from "./components/FeedPage";
 import Chatbot from "./components/Chatbot";
 import UniversityDetails from "./components/UniversityDetails";
-import { AuthProvider } from "./contexts/AuthContext";
 import About from "./components/About";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { useAuth } from "./contexts/useAuth";
 
 const App: React.FC = () => {
+  const { isLoggedIn } = useAuth();
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
+    <BrowserRouter>
+      <Routes>
+        {isLoggedIn ? (
+          <Route path="/" element={<FeedPage />} />
+        ) : (
           <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/universities" element={<UniversitiesPage />} />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/feed"
-            element={
-              <ProtectedRoute>
-                <FeedPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/about" element={<About />} />
-          <Route
-            path="/chatbot"
-            element={
-              <ProtectedRoute>
-                <Chatbot />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/university-details" element={<UniversityDetails />} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+        )}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/universities" element={<UniversitiesPage />} />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/feed"
+          element={
+            <ProtectedRoute>
+              <FeedPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/about" element={<About />} />
+        <Route
+          path="/chatbot"
+          element={
+            <ProtectedRoute>
+              <Chatbot />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/university-details" element={<UniversityDetails />} />
+      </Routes>
+    </BrowserRouter>
   );
 };
 
