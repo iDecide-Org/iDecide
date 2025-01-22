@@ -26,8 +26,13 @@ const LoginPage: React.FC = () => {
     setError(null);
 
     try {
-      await handleLogin(data.email, data.password); // This updates the global state
-      navigate("/feed");
+      const loginStatus = await handleLogin(data.email, data.password); // Get the login status
+
+      if (loginStatus === "LOGGED_IN") {
+        navigate("/feed");
+      } else if (loginStatus === "STUDENT_EXISTS") {
+        navigate("/chatbot");
+      }
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "An unexpected error occurred"

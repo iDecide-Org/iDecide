@@ -13,12 +13,30 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./contexts/useAuth";
 
 const App: React.FC = () => {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, stundentExists, isLoading } = useAuth();
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={isLoggedIn ? <FeedPage /> : <HomePage />} />
+        <Route
+          path="/"
+          element={
+            isLoggedIn ? (
+              <FeedPage />
+            ) : stundentExists ? (
+              <Chatbot />
+            ) : (
+              <HomePage />
+            )
+          }
+        />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/universities" element={<UniversitiesPage />} />
@@ -42,9 +60,13 @@ const App: React.FC = () => {
         <Route
           path="/chatbot"
           element={
-            <ProtectedRoute>
+            isLoggedIn || stundentExists ? (
               <Chatbot />
-            </ProtectedRoute>
+            ) : (
+              <ProtectedRoute>
+                <Chatbot />
+              </ProtectedRoute>
+            )
           }
         />
         <Route path="/university-details" element={<UniversityDetails />} />
@@ -52,5 +74,4 @@ const App: React.FC = () => {
     </BrowserRouter>
   );
 };
-
 export default App;
