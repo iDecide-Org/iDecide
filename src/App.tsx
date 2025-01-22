@@ -13,15 +13,16 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./contexts/useAuth";
 
 const App: React.FC = () => {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <BrowserRouter>
       <Routes>
-        {isLoggedIn ? (
-          <Route path="/" element={<FeedPage />} />
-        ) : (
-          <Route path="/" element={<HomePage />} />
-        )}
+        <Route path="/" element={isLoggedIn ? <FeedPage /> : <HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/universities" element={<UniversitiesPage />} />
