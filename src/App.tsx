@@ -13,11 +13,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./contexts/useAuth";
 
 const App: React.FC = () => {
-  const { isLoggedIn, isLoading } = useAuth();
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  const { isLoggedIn } = useAuth();
 
   return (
     <BrowserRouter>
