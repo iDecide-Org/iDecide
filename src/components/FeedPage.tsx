@@ -1,112 +1,4 @@
-// Simulated Universities data
-const universities = [
-  {
-    id: 1,
-    name: "جامعة المدينة بالقاهرة CUC",
-    location: "مدينة هليوبوليس الجديدة، طري....",
-    type: "الجامعات الخاصة",
-    image:
-      "https://www.propertyfinder.eg/blog/wp-content/uploads/2020/03/nile.jpg",
-    views: "4.8K",
-    date: "2024-09-17",
-    colleges: "0+",
-    majors: "0",
-    establishment: "2019",
-  },
-  {
-    id: 2,
-    name: "الأكاديمية العربية للعلوم.....",
-    location: "مدينة العلمين العلمين، محاف...",
-    type: "الجامعات ذات الطبيعة الخاصة",
-    image:
-      "https://studyinegy.com/wp-content/uploads/2023/06/5AB2E0FB-B130-41D1-8F5B-7D754A3E3521.webp",
-    views: "7.5K",
-    date: "2024-09-24",
-    colleges: "4+",
-    majors: "14",
-    establishment: "2023",
-  },
-  {
-    id: 3,
-    name: "الجامعة الفرنسية في مصر UFE",
-    location: "37 طريق القاهرة الإسماعيلية.....",
-    type: "الجامعات الأهلية",
-    image:
-      "https://almasaraleqtsady.com/wp-content/uploads/2022/08/IMG-20220816-WA0036.jpg",
-    views: "10.3K",
-    date: "2024-08-13",
-    colleges: "3+",
-    majors: "8",
-    establishment: "2002",
-  },
-  {
-    id: 4,
-    name: "جامعة المدينة بالقاهرة CUC",
-    location: "مدينة هليوبوليس الجديدة، طري....",
-    type: "الجامعات الخاصة",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6KMlIVDSaa4JsLeDHDwUF7jpiRQvha6U_3A&s",
-    views: "4.8K",
-    date: "2024-09-17",
-    colleges: "0+",
-    majors: "0",
-    establishment: "2019",
-  },
-  {
-    id: 5,
-    name: "الجامعة المصرية للتعلم الالكتروني",
-    location: "مدينة العلمين العلمين، محاف...",
-    type: "الجامعات ذات الطبيعة الخاصة",
-    image:
-      "https://img.youm7.com/ArticleImgs/2020/8/5/359465-%D8%B1%D8%A6%D9%8A%D8%B3%D9%8A%D8%A9.jpeg",
-    views: "7.5K",
-    date: "2024-09-24",
-    colleges: "4+",
-    majors: "14",
-    establishment: "2023",
-  },
-  {
-    id: 6,
-    name: "جامعة الملك سلمان الدولية",
-    location: "37 طريق القاهرة الإسماعيلية.....",
-    type: "الجامعات الأهلية",
-    image: "https://cdn.elwatannews.com/watan/840x473/10812096271660043610.jpg",
-    views: "10.3K",
-    date: "2024-08-13",
-    colleges: "3+",
-    majors: "8",
-    establishment: "2002",
-  },
-
-  {
-    id: 7,
-    name: "جامعة المدينة بالقاهرة CUC",
-    location: "مدينة هليوبوليس الجديدة، طري....",
-    type: "الجامعات الخاصة",
-    image:
-      "https://www.propertyfinder.eg/blog/wp-content/uploads/2020/03/nile.jpg",
-    views: "4.8K",
-    date: "2024-09-17",
-    colleges: "0+",
-    majors: "0",
-    establishment: "2019",
-  },
-  {
-    id: 8,
-    name: "الأكاديمية العربية للعلوم.....",
-    location: "مدينة العلمين العلمين، محاف...",
-    type: "الجامعات ذات الطبيعة الخاصة",
-    image:
-      "https://studyinegy.com/wp-content/uploads/2023/06/5AB2E0FB-B130-41D1-8F5B-7D754A3E3521.webp",
-    views: "7.5K",
-    date: "2024-09-24",
-    colleges: "4+",
-    majors: "14",
-    establishment: "2023",
-  },
-];
-
-// FeedPage.tsx
+import universities from "../universitiesData";
 import React, { useState } from "react";
 import { BookOpen, Target, Brain, Trophy } from "lucide-react";
 import Navbar from "./NavBar";
@@ -207,7 +99,11 @@ const FeedPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Map through filtered universities based on activeSection */}
               {universities.slice(0, 3).map((university) => (
-                <UniversityCard key={university.id} university={university} />
+                <UniversityCard
+                  key={university.id}
+                  showFavoriteButton={true}
+                  university={university}
+                />
               ))}
             </div>
           </div>

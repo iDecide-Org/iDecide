@@ -24,9 +24,17 @@ interface UniversityCardProps {
     majors: string;
     establishment: string;
   };
+  showFavoriteButton?: boolean;
+  onFavoriteClick?: () => void;
+  isFavorite?: boolean;
 }
 
-const UniversityCard: React.FC<UniversityCardProps> = ({ university }) => {
+const UniversityCard: React.FC<UniversityCardProps> = ({
+  university,
+  showFavoriteButton = false,
+  onFavoriteClick,
+  isFavorite = false,
+}) => {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col w-full max-w-[350px] hover:shadow-lg transition-shadow duration-300">
       <div className="relative">
@@ -36,9 +44,18 @@ const UniversityCard: React.FC<UniversityCardProps> = ({ university }) => {
           className="w-full h-48 object-cover"
         />
         <div className="absolute top-2 right-2 flex flex-col items-center">
-          <button className="bg-white bg-opacity-70 rounded-full p-1 hover:bg-opacity-100 transition duration-300">
-            <Heart className="w-5 h-5 text-gray-700" />
-          </button>
+          {showFavoriteButton && (
+            <button
+              onClick={onFavoriteClick}
+              className="bg-white bg-opacity-70 rounded-full p-1 hover:bg-opacity-100 transition duration-300"
+            >
+              <Heart
+                className={`w-5 h-5 ${
+                  isFavorite ? "text-red-500 fill-current" : "text-gray-700"
+                }`}
+              />
+            </button>
+          )}
           <button className="bg-white bg-opacity-70 rounded-full p-1 hover:bg-opacity-100 transition duration-300 mt-1">
             <GraduationCap className="w-5 h-5 text-blue-600" />
           </button>
