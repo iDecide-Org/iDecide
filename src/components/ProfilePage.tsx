@@ -7,12 +7,14 @@ import {
   Bookmark,
   LogOut,
 } from "lucide-react";
+
 import Navbar from "./NavBar";
 import { useAuth } from "../contexts/useAuth";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
-
+import StarIcon from "../assets/star.svg";
 const ProfilePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("البيانات الشخصية");
+  const [showEditOptions, setShowEditOptions] = useState(false);
   const { userName, email, handleLogout } = useAuth();
   const navigate = useNavigate(); // Initialize useNavigate
 
@@ -23,6 +25,16 @@ const ProfilePage: React.FC = () => {
   const handleLogoutClick = async () => {
     await handleLogout(); // Call the logout function from context
     navigate("/"); // Navigate to the home page after logout
+  };
+
+  const handleManualEdit = () => {
+    // Handle manual edit logic here
+    setShowEditOptions(false);
+  };
+
+  const handleAIEdit = () => {
+    // Handle AI edit logic here
+    setShowEditOptions(false);
   };
 
   return (
@@ -258,9 +270,39 @@ const ProfilePage: React.FC = () => {
                     ))}
                   </div>
                 </div>
-                <button className="bg-blue-600 text-white py-3 px-6 rounded-md hover:bg-blue-700 transition duration-300">
-                  تعديل البيانات
-                </button>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowEditOptions(!showEditOptions)}
+                    className="bg-blue-600 text-white py-3 px-6 rounded-md hover:bg-blue-700 transition duration-300 w-full sm:w-auto"
+                  >
+                    تعديل البيانات
+                  </button>
+
+                  {showEditOptions && (
+                    <div className="absolute bottom-full mb-2 left-0 bg-white rounded-lg shadow-xl border border-gray-200 w-81 p-2 space-y-2">
+                      <button
+                        onClick={handleManualEdit}
+                        className="w-full text-right px-4 py-3 text-gray-700 hover:bg-blue-50 rounded-md transition duration-200 flex items-center gap-3"
+                      >
+                        <User className="w-5 h-5 flex-shrink-0" />
+                        <span className="flex-grow text-right">
+                          تعديل البيانات يدويا
+                        </span>
+                      </button>
+                      <button
+                        onClick={handleAIEdit}
+                        className="w-full text-right px-4 py-3 text-gray-700 hover:bg-blue-50 rounded-md transition duration-200 flex items-center gap-3"
+                      >
+                        <span className="text-xl flex-shrink-0">
+                          <img src={StarIcon} alt="Star Icon" />
+                        </span>
+                        <span className="flex-grow text-right">
+                          تعديل البيانات بواسطة الذكاء العربي
+                        </span>
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
             {activeTab === "استشارتي" && (
