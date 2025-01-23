@@ -111,6 +111,7 @@ import React, { useState } from "react";
 import { Search } from "lucide-react";
 import Navbar from "./NavBar";
 import UniversityCard from "./UniversityCard"; // Import the new component
+import Footer from "./Footer";
 
 const FeedPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -217,11 +218,7 @@ const FeedPage: React.FC = () => {
           )}
         </div>
       </section>
-
-      {/* Footer Note */}
-      <footer className="text-center text-xs text-gray-500 py-4 w-full">
-        © {new Date().getFullYear()} iDecide. All rights reserved.
-      </footer>
+      <Footer className="mt-10" />
     </div>
   );
 };

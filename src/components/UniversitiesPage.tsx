@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Search } from "lucide-react";
 import Navbar from "./NavBar";
 import UniversityCard from "./UniversityCard"; // Import the UniversityCard component
+import Footer from "./Footer";
 
 const universities = [
   {
@@ -234,10 +235,7 @@ const UniversitiesPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Footer Note */}
-      <footer className="text-center text-xs text-gray-500 py-4 w-full">
-        © {new Date().getFullYear()} iDecide. All rights reserved.
-      </footer>
+      <Footer className="mt-10"/>
     </div>
   );
 };

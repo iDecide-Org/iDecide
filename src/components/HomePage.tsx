@@ -1,6 +1,7 @@
 import Navbar from "./NavBar";
 import { Link } from "react-router-dom"; // Fixed incorrect import
 import { ArrowRight, Book, GraduationCap, Search } from "lucide-react";
+import Footer from "./Footer";
 
 const HomePage: React.FC = () => {
   return (
@@ -92,10 +93,7 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
-      {/* Footer Note */}
-      <footer className="text-center text-xs text-gray-500 py-4 w-full">
-        © {new Date().getFullYear()} iDecide. All rights reserved.
-      </footer>
+      <Footer />
     </div>
   );
 };
