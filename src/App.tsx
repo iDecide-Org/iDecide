@@ -13,7 +13,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./contexts/useAuth";
 
 const App: React.FC = () => {
-  const { isLoggedIn, stundentExists, isLoading } = useAuth();
+  const { isLoggedIn, isStudentPendingChatbot, isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -30,7 +30,7 @@ const App: React.FC = () => {
           element={
             isLoggedIn ? (
               <FeedPage />
-            ) : stundentExists ? (
+            ) : isStudentPendingChatbot ? (
               <Chatbot />
             ) : (
               <HomePage />
@@ -60,7 +60,7 @@ const App: React.FC = () => {
         <Route
           path="/chatbot"
           element={
-            isLoggedIn || stundentExists ? (
+            isLoggedIn || isStudentPendingChatbot ? (
               <Chatbot />
             ) : (
               <ProtectedRoute>

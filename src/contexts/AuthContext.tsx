@@ -13,8 +13,7 @@ enum UserType {
 }
 interface AuthContextType {
   isLoggedIn: boolean;
-
-  stundentExists: boolean;
+  isStudentPendingChatbot: boolean;
   userName: string;
   email: string;
   isLoading: boolean;
@@ -34,9 +33,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  //user state for the user of type student that create or login to the app but not complete the chatbot
-  const [stundentExists, SetstundentExists] = useState(false);
 
+  const [isStudentPendingChatbot, setIsStudentPendingChatbot] = useState(false);
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -87,7 +85,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           setUserName(user.name);
           setEmail(user.email);
         } else if (user.type === UserType.STUDENT && !user.chatbotCompleted) {
-          SetstundentExists(true);
+          setIsStudentPendingChatbot(true);
         } else if (user.type === UserType.ADVISOR) {
           setIsLoggedIn(true);
           setUserName(user.name);
@@ -137,7 +135,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       });
       setIsLoggedIn(false);
 
-      SetstundentExists(false); // Reset stundentExists
+      setIsStudentPendingChatbot(false);
       setUserName("");
       setEmail("");
     } catch (error) {
@@ -161,9 +159,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         throw new Error(errorData.message || "Signup failed");
       }
 
-      // Set stundentExists for students
       if (data.type === UserType.STUDENT) {
-        SetstundentExists(true);
+        setIsStudentPendingChatbot(true);
       }
     } catch (error) {
       console.error("Error signing up:", error);
@@ -175,8 +172,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     <AuthContext.Provider
       value={{
         isLoggedIn,
-
-        stundentExists,
+        isStudentPendingChatbot,
         userName,
         email,
         isLoading,
