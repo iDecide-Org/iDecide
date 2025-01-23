@@ -7,16 +7,21 @@ import {
   Bookmark,
   LogOut,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import Navbar from "./NavBar";
 import { useAuth } from "../contexts/useAuth";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import StarIcon from "../assets/star.svg";
+import UniversityCard from "./UniversityCard";
+import universities from "../universitiesData";
+
 const ProfilePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("البيانات الشخصية");
   const [showEditOptions, setShowEditOptions] = useState(false);
   const { userName, email, handleLogout } = useAuth();
   const navigate = useNavigate(); // Initialize useNavigate
+  const [likedUniversities, setLikedUniversities] = useState(universities);
 
   const handleTabClick = (tab: string) => {
     setActiveTab(tab);
@@ -35,6 +40,11 @@ const ProfilePage: React.FC = () => {
   const handleAIEdit = () => {
     // Handle AI edit logic here
     setShowEditOptions(false);
+  };
+
+  const handleRemoveFromFavorites = (id: number) => {
+    setLikedUniversities((prev) => prev.filter((uni) => uni.id !== id));
+    console.log(`Removing university with id: ${id}`);
   };
 
   return (
@@ -309,7 +319,82 @@ const ProfilePage: React.FC = () => {
               <p className="text-gray-600 p-4">This is the استشارتي content.</p>
             )}
             {activeTab === "المفضلة" && (
-              <p className="text-gray-600 p-4">This is the المفضلة content.</p>
+              <div className="space-y-6">
+                <div className="flex justify-between items-center mb-8">
+                  <div className="flex items-center space-x-2">
+                    <select className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      <option>تصفية حسب النوع</option>
+                      <option>الجامعات الخاصة</option>
+                      <option>الجامعات الأهلية</option>
+                      <option>الجامعات الحكومية</option>
+                    </select>
+                    <select className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      <option>ترتيب حسب</option>
+                      <option>الأحدث</option>
+                      <option>الأقدم</option>
+                      <option>المشاهدات</option>
+                    </select>
+                  </div>
+                  <div className="text-gray-600">
+                    <span className="font-semibold">12</span> جامعة في المفضلة
+                  </div>
+                </div>
+
+                {/* Empty State */}
+                {likedUniversities.length === 0 ? (
+                  <div className="text-center py-16 bg-gray-50 rounded-lg">
+                    <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                      لا توجد جامعات في المفضلة
+                    </h3>
+                    <p className="text-gray-500 mb-6">
+                      ابدأ في استكشاف الجامعات وأضف ما يعجبك إلى المفضلة
+                    </p>
+                    <Link
+                      to="/universities"
+                      className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300"
+                    >
+                      استكشف الجامعات
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {likedUniversities.map((university) => (
+                      <div key={university.id} className="relative group">
+                        <UniversityCard
+                          university={university}
+                          showFavoriteButton={true}
+                          onFavoriteClick={() =>
+                            handleRemoveFromFavorites(university.id)
+                          }
+                          isFavorite={true}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Pagination */}
+                {likedUniversities.length > 0 && (
+                  <div className="flex justify-center mt-8 space-x-2">
+                    <button className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50">
+                      السابق
+                    </button>
+                    <button className="px-4 py-2 bg-blue-600 text-white rounded-md">
+                      1
+                    </button>
+                    <button className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50">
+                      2
+                    </button>
+                    <button className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50">
+                      3
+                    </button>
+                    <button className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50">
+                      التالي
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
             {activeTab === "طلباتي" && (
               <p className="text-gray-600 p-4">This is the طلباتي content.</p>
