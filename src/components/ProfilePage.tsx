@@ -9,14 +9,20 @@ import {
 } from "lucide-react";
 import Navbar from "./NavBar";
 import { useAuth } from "../contexts/useAuth";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const ProfilePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("البيانات الشخصية");
-
   const { userName, email, handleLogout } = useAuth();
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const handleTabClick = (tab: string) => {
     setActiveTab(tab);
+  };
+
+  const handleLogoutClick = async () => {
+    await handleLogout(); // Call the logout function from context
+    navigate("/"); // Navigate to the home page after logout
   };
 
   return (
@@ -56,7 +62,7 @@ const ProfilePage: React.FC = () => {
             ))}
           </ul>
           <button
-            onClick={handleLogout}
+            onClick={handleLogoutClick} // Use the new logout handler
             className="flex items-center mt-4 space-x-2 p-2 rounded-md w-full justify-start text-gray-700 hover:bg-red-50 hover:text-red-600 transition duration-200 focus:outline-none"
           >
             <LogOut className="w-4 h-4" />

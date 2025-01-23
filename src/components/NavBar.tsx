@@ -1,6 +1,5 @@
-// Navbar.tsx
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
 import { User, Menu, X, LogOut, Settings } from "lucide-react";
 import { useAuth } from "../contexts/useAuth";
 
@@ -8,6 +7,12 @@ const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { isLoggedIn, userName, handleLogout } = useAuth();
+  const navigate = useNavigate(); // Initialize useNavigate
+
+  const handleLogoutClick = async () => {
+    await handleLogout(); // Call the logout function from context
+    navigate("/"); // Navigate to the home page after logout
+  };
 
   return (
     <nav className="bg-white p-4 border-b border-gray-200 flex justify-between items-center w-full">
@@ -108,7 +113,7 @@ const Navbar: React.FC = () => {
                 </Link>
                 <button
                   className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  onClick={handleLogout}
+                  onClick={handleLogoutClick} // Use the new logout handler
                 >
                   <LogOut className="inline-block w-4 h-4 mr-2" />
                   تسجيل الخروج
