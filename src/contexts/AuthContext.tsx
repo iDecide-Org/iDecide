@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
+
 interface SignupFormInputs {
   name: string;
   email: string;
@@ -128,6 +129,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const handleLogout = async () => {
+    setIsLoading(true);
     try {
       await fetch("http://localhost:3000/auth/logout", {
         method: "POST",
@@ -140,6 +142,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setEmail("");
     } catch (error) {
       console.error("Error logging out:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
