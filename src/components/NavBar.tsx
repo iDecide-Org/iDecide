@@ -62,7 +62,7 @@ const Navbar: React.FC = () => {
             استكشف التخصصات
           </Link>
           <Link
-            to="/universities"
+            to="/jobs"
             className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
           >
             استكشف المسارات الوظيفية
