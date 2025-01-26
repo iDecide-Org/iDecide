@@ -76,6 +76,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const response = await fetch("http://localhost:3000/auth/user", {
         credentials: "include",
       });
+      if (response.status === 401) {
+        console.log("[Expected] User not authenticated");
+        setIsLoading(false);
+        return;
+      }
 
       if (response.ok) {
         const user = await response.json();
