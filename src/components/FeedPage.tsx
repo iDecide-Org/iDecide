@@ -96,8 +96,7 @@ const FeedPage: React.FC = () => {
             <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-right">
               توصيات مخصصة لك
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Map through filtered universities based on activeSection */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 justify-items-center">
               {universities.slice(0, 3).map((university) => (
                 <UniversityCard
                   key={university.id}
