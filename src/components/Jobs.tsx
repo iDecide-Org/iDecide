@@ -9,10 +9,12 @@ import {
   TrendingUp,
   Filter,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Jobs: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedField, setSelectedField] = useState("");
+  const navigate = useNavigate();
 
   const jobFields = [
     {
@@ -46,6 +48,9 @@ const Jobs: React.FC = () => {
         "https://www.lawsonstate.edu/_resources/assets/img/sciencebanner.jpg", // Science image
     },
   ];
+  const handleJobClick = (job: { id: string | number }) => {
+    navigate(`/jobs/${job.id}`, { state: { job } });
+  };
 
   const filteredJobs = jobs.filter((job) => {
     const matchesSearch =
@@ -140,7 +145,8 @@ const Jobs: React.FC = () => {
             {filteredJobs.map((job) => (
               <div
                 key={job.id}
-                className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition duration-300"
+                onClick={() => handleJobClick(job)}
+                className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition duration-300 cursor-pointer"
               >
                 <div className="flex justify-between items-start mb-4">
                   <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm">

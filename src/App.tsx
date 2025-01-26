@@ -12,6 +12,7 @@ import About from "./components/About";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./contexts/useAuth";
 import Jobs from "./components/Jobs";
+import JobDetails from "./components/JobDetails";
 
 const App: React.FC = () => {
   const { isLoggedIn, isStudentPendingChatbot, isLoading } = useAuth();
@@ -72,6 +73,7 @@ const App: React.FC = () => {
         />
         <Route path="/university-details" element={<UniversityDetails />} />
         <Route path="/jobs" element={<Jobs />} />
+        <Route path="/jobs/:id" element={<JobDetails />} />
       </Routes>
     </BrowserRouter>
   );
