@@ -4,7 +4,7 @@ import { Search } from "lucide-react";
 import Navbar from "./NavBar";
 import UniversityCard from "./UniversityCard"; // Import the UniversityCard component
 import Footer from "./Footer";
-import universities from "../universitiesData";
+import universities from "../data/universitiesData";
 
 const UniversitiesPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("الجامعات");

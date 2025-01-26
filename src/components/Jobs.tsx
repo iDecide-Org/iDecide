@@ -1,129 +1,7 @@
-const jobs: Job[] = [
-  {
-    id: 1,
-    title: "مهندس برمجيات",
-    field: "تكنولوجيا المعلومات",
-    description: "تطوير وصيانة تطبيقات البرمجيات وأنظمة الحاسوب",
-    skills: ["Java", "Python", "JavaScript", "SQL"],
-    salary: "20,000 - 35,000 جنيه",
-    education: "بكالوريوس علوم حاسب",
-    growth: "15% سنوياً",
-  },
-  {
-    id: 2,
-    title: "طبيب أسنان",
-    field: "الطب والرعاية الصحية",
-    description: "تشخيص وعلاج مشاكل الأسنان والفم",
-    skills: ["مهارات يدوية", "تشخيص", "رعاية المرضى"],
-    salary: "30,000 - 50,000 جنيه",
-    education: "بكالوريوس طب أسنان",
-    growth: "12% سنوياً",
-  },
-  {
-    id: 3,
-    title: "مدير مشروع",
-    field: "الأعمال والإدارة",
-    description: "تخطيط وتنفيذ المشاريع وإدارة الفرق",
-    skills: ["التخطيط", "التنظيم", "التواصل"],
-    salary: "25,000 - 40,000 جنيه",
-    education: "بكالوريوس إدارة الأعمال",
-    growth: "10% سنوياً",
-  },
-  {
-    id: 4,
-    title: "معلم رياضيات",
-    field: "التعليم",
-    description: "تدريس مواد الرياضيات للطلاب",
-    skills: ["التواصل", "التحفيز", "التحليل"],
-    salary: "15,000 - 25,000 جنيه",
-    education: "بكالوريوس تربية",
-    growth: "5% سنوياً",
-  },
-  {
-    id: 5,
-    title: "مهندس مدني",
-    field: "الهندسة",
-    description: "تصميم وتنفيذ المشاريع الهندسية",
-    skills: ["الرسم الهندسي", "التصميم", "التنفيذ"],
-    salary: "20,000 - 35,000 جنيه",
-    education: "بكالوريوس هندسة مدنية",
-    growth: "8% سنوياً",
-  },
-  {
-    id: 6,
-    title: "عالم أبحاث",
-    field: "العلوم",
-    description: "إجراء الأبحاث العلمية وتحليل البيانات",
-    skills: ["البحث", "التحليل", "التقرير"],
-    salary: "25,000 - 40,000 جنيه",
-    education: "دكتوراه علوم",
-    growth: "7% سنوياً",
-  },
-  {
-    id: 7,
-    title: "محلل بيانات",
-    field: "تكنولوجيا المعلومات",
-    description: "تحليل البيانات واستخراج الرؤى لتوجيه القرارات",
-    skills: ["SQL", "Python", "تحليل البيانات", "التصور"],
-    salary: "22,000 - 38,000 جنيه",
-    education: "بكالوريوس علوم حاسب",
-    growth: "14% سنوياً",
-  },
-  {
-    id: 8,
-    title: "مهندس كهرباء",
-    field: "الهندسة",
-    description: "تصميم وصيانة الأنظمة الكهربائية",
-    skills: ["الرسم الهندسي", "التصميم", "التحليل"],
-    salary: "20,000 - 35,000 جنيه",
-    education: "بكالوريوس هندسة كهربائية",
-    growth: "9% سنوياً",
-  },
-  {
-    id: 9,
-    title: "ممرض",
-    field: "الطب والرعاية الصحية",
-    description: "تقديم الرعاية الصحية للمرضى",
-    skills: ["الرعاية الصحية", "التواصل", "التعاطف"],
-    salary: "18,000 - 30,000 جنيه",
-    education: "بكالوريوس تمريض",
-    growth: "11% سنوياً",
-  },
-  {
-    id: 10,
-    title: "مدرس لغة إنجليزية",
-    field: "التعليم",
-    description: "تدريس اللغة الإنجليزية للطلاب",
-    skills: ["التواصل", "التدريس", "التحفيز"],
-    salary: "15,000 - 25,000 جنيه",
-    education: "بكالوريوس تربية",
-    growth: "6% سنوياً",
-  },
-  {
-    id: 11,
-    title: "محاسب",
-    field: "الأعمال والإدارة",
-    description: "إدارة الحسابات والميزانيات",
-    skills: ["المحاسبة", "التحليل المالي", "التنظيم"],
-    salary: "20,000 - 32,000 جنيه",
-    education: "بكالوريوس محاسبة",
-    growth: "8% سنوياً",
-  },
-  {
-    id: 12,
-    title: "عالم بيئة",
-    field: "العلوم",
-    description: "دراسة البيئة وتقديم الحلول البيئية",
-    skills: ["البحث", "التحليل", "التقرير"],
-    salary: "23,000 - 37,000 جنيه",
-    education: "بكالوريوس علوم بيئية",
-    growth: "7% سنوياً",
-  },
-];
-
 import React, { useState } from "react";
 import Navbar from "./NavBar";
 import Footer from "./Footer";
+import jobs from "../data/jobs";
 import {
   Search,
   Briefcase,
@@ -132,28 +10,41 @@ import {
   Filter,
 } from "lucide-react";
 
-interface Job {
-  id: number;
-  title: string;
-  field: string;
-  description: string;
-  skills: string[];
-  salary: string;
-  education: string;
-  growth: string;
-}
-
 const Jobs: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedField, setSelectedField] = useState("");
 
   const jobFields = [
-    "تكنولوجيا المعلومات",
-    "الهندسة",
-    "الطب والرعاية الصحية",
-    "التعليم",
-    "الأعمال والإدارة",
-    "العلوم",
+    {
+      name: "تكنولوجيا المعلومات",
+      image:
+        "https://www.rasmussen.edu/images/rasmussenlibraries/blogs/work-from-home-tech-jobs-s.jpg", // Technology/IT image
+    },
+    {
+      name: "الهندسة",
+      image:
+        "https://storables.com/wp-content/uploads/2023/11/why-is-it-called-civil-engineering-1699953005.jpg", // Engineering image
+    },
+    {
+      name: "الطب والرعاية الصحية",
+      image:
+        "https://cdn.prod.website-files.com/6466101d017ab9d60c8d0137/65df25f0a339915ec6c00de7_Out%20of%20Hospital%20Costs_Savings%20for%20Medical%20Schemes.jpg", // Healthcare image
+    },
+    {
+      name: "التعليم",
+      image:
+        "https://education.illinoisstate.edu/images/academics/teaching-learning/teacher-learning-hero.jpg", // Education image
+    },
+    {
+      name: "الأعمال والإدارة",
+      image:
+        "https://cloudinary.hbs.edu/hbsit/image/upload/s--GpBHn1g1--/f_auto,c_fill,h_375,w_750,/v20200101/DDB997885D475494DB0A0440F658772C.jpg", // Business image
+    },
+    {
+      name: "العلوم",
+      image:
+        "https://www.lawsonstate.edu/_resources/assets/img/sciencebanner.jpg", // Science image
+    },
   ];
 
   const filteredJobs = jobs.filter((job) => {
@@ -210,18 +101,29 @@ const Jobs: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {jobFields.map((field) => (
               <button
-                key={field}
+                key={field.name}
                 onClick={() =>
-                  setSelectedField((prev) => (prev === field ? "" : field))
+                  setSelectedField((prev) =>
+                    prev === field.name ? "" : field.name
+                  )
                 }
-                className={`p-6 rounded-xl text-right transition duration-300 ${
-                  selectedField === field
+                className={`p-6 rounded-xl text-right transition duration-300 relative overflow-hidden group ${
+                  selectedField === field.name
                     ? "bg-blue-600 text-white"
                     : "bg-white hover:bg-blue-50"
                 }`}
               >
-                <h3 className="text-xl font-semibold mb-2">{field}</h3>
-                <p className="text-sm opacity-80">اكتشف الوظائف المتاحة</p>
+                <div className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <img
+                    src={field.image}
+                    alt={field.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="relative z-10">
+                  <h3 className="text-xl font-semibold mb-2">{field.name}</h3>
+                  <p className="text-sm opacity-80">اكتشف الوظائف المتاحة</p>
+                </div>
               </button>
             ))}
           </div>

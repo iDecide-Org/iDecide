@@ -1,4 +1,4 @@
-import universities from "../universitiesData";
+import universities from "../data/universitiesData";
 import React, { useState } from "react";
 import { BookOpen, Target, Brain, Trophy } from "lucide-react";
 import Navbar from "./NavBar";

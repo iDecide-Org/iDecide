@@ -14,7 +14,7 @@ import { useAuth } from "../contexts/useAuth";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import StarIcon from "../assets/star.svg";
 import UniversityCard from "./UniversityCard";
-import universities from "../universitiesData";
+import universities from "../data/universitiesData";
 
 const ProfilePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("البيانات الشخصية");
