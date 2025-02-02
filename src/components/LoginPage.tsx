@@ -81,7 +81,7 @@ const LoginPage: React.FC = () => {
                     message: "Enter a valid email address",
                   },
                 })}
-                className="w-full text-right text-white pl-10 pr-3 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition duration-300"
+                className="w-full text-right text-gray-800 pl-10 pr-3 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition duration-300"
               />
               {errors.email && (
                 <p className="text-red-500 text-xs mt-1">
@@ -107,7 +107,7 @@ const LoginPage: React.FC = () => {
                     message: "Password must be at least 6 characters",
                   },
                 })}
-                className="w-full text-right text-white pl-10 pr-3 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition duration-300"
+                className="w-full text-right text-gray-800 pl-10 pr-3 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition duration-300"
               />
               {errors.password && (
                 <p className="text-red-500 text-xs mt-1">
