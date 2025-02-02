@@ -13,6 +13,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./contexts/useAuth";
 import Jobs from "./components/Jobs";
 import JobDetails from "./components/JobDetails";
+import NotFoundPage from "./components/NotFoundPage";
 
 const App: React.FC = () => {
   const { isLoggedIn, isStudentPendingChatbot, isLoading } = useAuth();
@@ -74,6 +75,7 @@ const App: React.FC = () => {
         <Route path="/university-details" element={<UniversityDetails />} />
         <Route path="/jobs" element={<Jobs />} />
         <Route path="/jobs/:id" element={<JobDetails />} />
+        <Route path="*" element={<NotFoundPage />} /> // 404 page
       </Routes>
     </BrowserRouter>
   );
