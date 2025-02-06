@@ -164,7 +164,7 @@ const Chatbot = () => {
                   <div
                     className={`px-4 py-2 rounded-2xl ${
                       message.isBot
-                        ? "bg-gray-100 rounded-tr-none"
+                        ? "bg-gray-400 rounded-tr-none"
                         : "bg-blue-500 text-white rounded-tl-none"
                     }`}
                   >
@@ -197,7 +197,7 @@ const Chatbot = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="اكتب رسالتك هنا..."
-              className="flex-1 px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-right"
+              className="flex-1 px-4 py-2 rounded-full border border-gray-300 text-black focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-right"
             />
           </form>
         </div>
