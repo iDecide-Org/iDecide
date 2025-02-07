@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { MessageSquare, Send, User, Bot } from "lucide-react";
+import axios from 'axios'; // Import axios
 
 interface Message {
   id: number;
@@ -52,21 +53,14 @@ const Chatbot = () => {
     setMessages((prev) => [...prev, newMessage]);
 
     try {
-      // Updated URL to match FastAPI endpoint
-      const response = await fetch("http://localhost:8000/chat/", {
-        // Note the trailing slash
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message: text }),
+      // Use axios for the request, and include withCredentials
+      const response = await axios.post("http://localhost:8000/chat/", {
+        message: text,
+      }, {
+        withCredentials: true, // Important for cookies!
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data: ChatResponse = await response.json();
+      const data: ChatResponse = response.data;  // Access data directly from response
 
       // Add bot response
       const botResponse: Message = {
@@ -100,10 +94,25 @@ const Chatbot = () => {
       }
     } catch (error) {
       console.error("Error:", error);
-      // Add error message
+      // More specific error handling with axios
+      let errorMessageText = "عذراً، حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى.";
+      if (axios.isAxiosError(error)) { // Check if it's an Axios error
+          if (error.response) {
+              // The request was made and the server responded with a status code
+              // that falls out of the range of 2xx
+              errorMessageText = `Error: ${error.response.status} - ${error.response.data.detail || "Server Error"}`; // Use server's detail if available
+          } else if (error.request) {
+              // The request was made but no response was received
+              errorMessageText = "No response received from the server.";
+          } else {
+              // Something happened in setting up the request that triggered an Error
+              errorMessageText = `Request setup error: ${error.message}`;
+          }
+      }
+
       const errorMessage: Message = {
         id: newMessage.id + 1,
-        text: "عذراً، حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى.",
+        text: errorMessageText,
         isBot: true,
         timestamp: new Date().toLocaleTimeString([], {
           hour: "2-digit",
