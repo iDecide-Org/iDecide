@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { MessageSquare, Send, User, Bot } from "lucide-react";
 import axios from 'axios'; // Import axios
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useAuth } from "../contexts/useAuth"; // Import useAuth
+import Cookies from 'js-cookie'; // Import js-cookie
 
 interface Message {
   id: number;
@@ -12,12 +15,15 @@ interface Message {
 interface ChatResponse {
   response: string;
   recommended_college_majors?: string[];
+  chatbot_completed: boolean; // Add the new field
 }
 
 const Chatbot = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate(); // Initialize useNavigate
+  const { setIsStudentPendingChatbot, fetchUser } = useAuth(); // Get fetchUser
 
   useEffect(() => {
     // Initialize chat with first bot message
@@ -38,6 +44,30 @@ const Chatbot = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  const handleChatbotCompletion = async () => {
+    try {
+      // Call NestJS backend to update chatbot status
+      const response = await axios.post(
+        "http://localhost:3000/auth/chatbot-status",
+        { status: true },
+        { withCredentials: true }
+      );
+
+      if (response.status === 200) {
+        setIsStudentPendingChatbot(false); // Update context
+        // Clear the chat_session cookie *AFTER* successful status update.
+        Cookies.remove('chat_session'); // Remove the cookie
+        await fetchUser(); // Refresh user data, setting isLoggedIn
+        // Redirect immediately
+        navigate("/");
+      } else {
+        console.error("Failed to update chatbot status:", response);
+      }
+    } catch (error) {
+      console.error("Error updating chatbot status:", error);
+    }
+  };
 
   const handleSendMessage = async (text: string) => {
     const newMessage: Message = {
@@ -91,6 +121,10 @@ const Chatbot = () => {
           }),
         };
         setMessages((prev) => [...prev, majorsMessage]);
+      }
+      // Check for chatbot completion and redirect
+      if (data.chatbot_completed) {
+        await handleChatbotCompletion(); // Call the completion handler
       }
     } catch (error) {
       console.error("Error:", error);

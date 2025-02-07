@@ -25,7 +25,10 @@ interface AuthContextType {
     password: string
   ) => Promise<"STUDENT_EXISTS" | "LOGGED_IN">;
   handleLogout: () => Promise<void>;
-  handleSignup: (data: SignupFormInputs) => Promise<void>; // Add this line
+  handleSignup: (data: SignupFormInputs) => Promise<void>;
+  setIsStudentPendingChatbot: (value: boolean) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fetchUser: () => Promise<any>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -190,6 +193,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         handleLogin,
         handleLogout,
         handleSignup,
+        setIsStudentPendingChatbot,
+        fetchUser,
       }}
     >
       {children}
