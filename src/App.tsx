@@ -14,6 +14,8 @@ import { useAuth } from "./contexts/useAuth";
 import Jobs from "./components/Jobs";
 import JobDetails from "./components/JobDetails";
 import NotFoundPage from "./components/NotFoundPage";
+import Scholarships from "./components/Scholarships";
+import ScholarshipDetails from "./components/ScholarshipDetails";
 
 const App: React.FC = () => {
   const { isLoggedIn, isStudentPendingChatbot, isLoading } = useAuth();
@@ -75,7 +77,9 @@ const App: React.FC = () => {
         <Route path="/university-details" element={<UniversityDetails />} />
         <Route path="/jobs" element={<Jobs />} />
         <Route path="/jobs/:id" element={<JobDetails />} />
-        <Route path="*" element={<NotFoundPage />} /> // 404 page
+        <Route path="/scholarships" element={<Scholarships />} />
+        <Route path="/scholarships/:id" element={<ScholarshipDetails />} />
+        <Route path="*" element={<NotFoundPage />} /> {/* 404 page */}
       </Routes>
     </BrowserRouter>
   );

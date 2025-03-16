@@ -56,10 +56,10 @@ const Navbar: React.FC = () => {
             استكشف الجامعات
           </Link>
           <Link
-            to="/universities"
+            to="/scholarships"
             className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
           >
-            استكشف التخصصات
+            المنح الدراسية
           </Link>
           <Link
             to="/jobs"
@@ -158,14 +158,14 @@ const Navbar: React.FC = () => {
               استكشف الجامعات
             </Link>
             <Link
-              to="/universities"
+              to="/scholarships"
               className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
               onClick={() => setIsMenuOpen(false)}
             >
-              استكشف التخصصات
+              المنح الدراسية
             </Link>
             <Link
-              to="/universities"
+              to="/jobs"
               className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
               onClick={() => setIsMenuOpen(false)}
             >

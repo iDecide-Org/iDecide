@@ -9,7 +9,7 @@ import {
   Clock,
   Calendar,
 } from "lucide-react";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 
 interface UniversityCardProps {
   university: {
