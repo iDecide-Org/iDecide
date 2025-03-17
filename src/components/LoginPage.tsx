@@ -13,7 +13,7 @@ const LoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { handleLogin } = useAuth(); // Use the handleLogin function from AuthContext
+  const { handleLogin, fetchUser } = useAuth(); // Add fetchUser
 
   const {
     register,
@@ -26,10 +26,18 @@ const LoginPage: React.FC = () => {
     setError(null);
 
     try {
-      const loginStatus = await handleLogin(data.email, data.password); // Get the login status
+      const loginStatus = await handleLogin(data.email, data.password);
 
       if (loginStatus === "LOGGED_IN") {
-        navigate("/feed");
+        // Fetch the latest user data to get the correct user type
+        const userData = await fetchUser();
+
+        // Use the userData to determine the redirect
+        if (userData && userData.type === "advisor") {
+          navigate("/"); // Navigate to advisor dashboard
+        } else {
+          navigate("/feed"); // Navigate to feed for students
+        }
       } else if (loginStatus === "STUDENT_EXISTS") {
         navigate("/chatbot");
       }

@@ -18,6 +18,8 @@ interface AuthContextType {
   userName: string;
   email: string;
   isLoading: boolean;
+  userType: UserType | null; // Add user type to context
+  isAdvisor: boolean; // Helper flag to easily check if user is an advisor
   setIsLoggedIn: (value: boolean) => void;
   setUserName: (value: string) => void;
   handleLogin: (
@@ -37,37 +39,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
   const [isStudentPendingChatbot, setIsStudentPendingChatbot] = useState(false);
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-
-  // const setChatbotCompleted = async (status: boolean) => {
-  //   try {
-  //     const response = await fetch(
-  //       "http://localhost:3000/auth/chatbot-status",
-  //       {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         credentials: "include",
-  //         body: JSON.stringify({ status }),
-  //       }
-  //     );
-
-  //     if (!response.ok) {
-  //       const errorData = await response.json();
-  //       throw new Error(errorData.message || "Update chatbot status failed");
-  //     }
-
-  //     setChatbotCompletedState(status);
-  //   } catch (error) {
-  //     console.error("Error updating chatbot status:", error);
-  //     throw error;
-  //   }
-  // };
+  const [userType, setUserType] = useState<UserType | null>(null); // New state for user type
+  const [isAdvisor, setIsAdvisor] = useState(false); // New state to easily check if user is advisor
 
   useEffect(() => {
     fetchUser();
@@ -88,17 +65,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       if (response.ok) {
         const user = await response.json();
 
+        // Store user type regardless of type
+        setUserType(user.type);
+
         if (user.type === UserType.STUDENT && user.chatbotCompleted) {
           setIsLoggedIn(true);
-
           setUserName(user.name);
           setEmail(user.email);
+          setIsAdvisor(false);
         } else if (user.type === UserType.STUDENT && !user.chatbotCompleted) {
           setIsStudentPendingChatbot(true);
+          setIsAdvisor(false);
         } else if (user.type === UserType.ADVISOR) {
           setIsLoggedIn(true);
           setUserName(user.name);
           setEmail(user.email);
+          setIsAdvisor(true); // Set advisor flag
         }
 
         return user;
@@ -109,6 +91,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsLoading(false);
     }
   };
+
   const handleLogin = async (email: string, password: string) => {
     try {
       const response = await fetch("http://localhost:3000/auth/signin", {
@@ -188,6 +171,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         userName,
         email,
         isLoading,
+        userType, // Add user type to context
+        isAdvisor, // Add advisor flag to context
         setIsLoggedIn,
         setUserName,
         handleLogin,

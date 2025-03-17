@@ -17,8 +17,23 @@ import NotFoundPage from "./components/NotFoundPage";
 import Scholarships from "./components/Scholarships";
 import ScholarshipDetails from "./components/ScholarshipDetails";
 
+// Import advisor-specific components
+// Use type assertion to help TypeScript understand these are valid React components
+const AdvisorDashboard = React.lazy(
+  () => import("./components/advisor/Dashboard")
+) as unknown as React.ComponentType;
+
+const AddUniversity = React.lazy(
+  () => import("./components/advisor/AddUniversity")
+) as unknown as React.ComponentType;
+
+const ManageUniversities = React.lazy(
+  () => import("./components/advisor/ManageUniversities")
+) as unknown as React.ComponentType;
+
 const App: React.FC = () => {
-  const { isLoggedIn, isStudentPendingChatbot, isLoading } = useAuth();
+  const { isLoggedIn, isStudentPendingChatbot, isLoading, isAdvisor } =
+    useAuth();
 
   if (isLoading) {
     return (
@@ -27,6 +42,36 @@ const App: React.FC = () => {
       </div>
     );
   }
+
+  // Render different route sets based on user type
+  if (isLoggedIn && isAdvisor) {
+    // Advisor routes
+    return (
+      <BrowserRouter>
+        <React.Suspense
+          fallback={
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          }
+        >
+          <Routes>
+            <Route path="/" element={<AdvisorDashboard />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/universities/add" element={<AddUniversity />} />
+            <Route
+              path="/universities/manage"
+              element={<ManageUniversities />}
+            />
+            <Route path="/about" element={<About />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </React.Suspense>
+      </BrowserRouter>
+    );
+  }
+
+  // Student or not logged in routes (the original routes)
   return (
     <BrowserRouter>
       <Routes>
@@ -79,9 +124,10 @@ const App: React.FC = () => {
         <Route path="/jobs/:id" element={<JobDetails />} />
         <Route path="/scholarships" element={<Scholarships />} />
         <Route path="/scholarships/:id" element={<ScholarshipDetails />} />
-        <Route path="*" element={<NotFoundPage />} /> {/* 404 page */}
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   );
 };
+
 export default App;
