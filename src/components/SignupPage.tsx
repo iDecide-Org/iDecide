@@ -24,7 +24,7 @@ const SignupPage: React.FC = () => {
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
 
-  const { handleSignup } = useAuth(); // Use the handleLogin function from AuthContext
+  const { handleSignup, fetchUser } = useAuth(); // Use the handleLogin function from AuthContext
 
   const {
     register,
@@ -41,8 +41,13 @@ const SignupPage: React.FC = () => {
       setSuccess(true); // Show success message
 
       // Wait for 2 seconds before navigating
-      setTimeout(() => {
-        navigate("/chatbot");
+      setTimeout(async () => {
+        await fetchUser();
+        if (data.type === UserType.ADVISOR) {
+          navigate("/");
+        } else {
+          navigate("/chatbot");
+        }
       }, 2000); // 2000 milliseconds = 2 seconds
     } catch (err) {
       setError(

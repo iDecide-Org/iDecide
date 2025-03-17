@@ -64,6 +64,8 @@ const App: React.FC = () => {
               element={<ManageUniversities />}
             />
             <Route path="/about" element={<About />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </React.Suspense>
