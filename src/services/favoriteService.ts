@@ -1,6 +1,6 @@
-import axios from 'axios';
-import { authHeader } from './authHeader';
-import { University } from './universityService';
+import axios from "axios";
+import { authHeader } from "./authHeader";
+import { University } from "./universityService";
 
 // Define interfaces for favorite items
 export interface FavoriteUniversity {
@@ -20,7 +20,7 @@ export interface FavoriteScholarship {
 }
 
 // Base URL for API calls
-const API_URL = 'http://localhost:3000/api/favorites';
+const API_URL = "http://localhost:3000/api/favorites";
 
 // --- University Favorites ---
 
@@ -32,7 +32,7 @@ export const getFavoriteUniversities = async () => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error fetching favorite universities:', error);
+    console.error("Error fetching favorite universities:", error);
     throw error;
   }
 };
@@ -40,12 +40,19 @@ export const getFavoriteUniversities = async () => {
 // Add a university to favorites
 export const addFavoriteUniversity = async (universityId: string) => {
   try {
-    const response = await axios.post(`${API_URL}/universities/${universityId}`, {}, {
-      withCredentials: true,
-    });
+    const response = await axios.post(
+      `${API_URL}/universities/${universityId}`,
+      {},
+      {
+        withCredentials: true,
+      }
+    );
     return response.data;
   } catch (error) {
-    console.error(`Error adding university ${universityId} to favorites:`, error);
+    console.error(
+      `Error adding university ${universityId} to favorites:`,
+      error
+    );
     throw error;
   }
 };
@@ -57,22 +64,35 @@ export const removeFavoriteUniversity = async (universityId: string) => {
       withCredentials: true,
     });
   } catch (error) {
-    console.error(`Error removing university ${universityId} from favorites:`, error);
+    console.error(
+      `Error removing university ${universityId} from favorites:`,
+      error
+    );
     throw error;
   }
 };
 
 // Check if a specific university is in favorites
-export const isUniversityInFavorites = async (universityId: string): Promise<boolean> => {
+export const isUniversityInFavorites = async (
+  universityId: string
+): Promise<boolean> => {
   try {
-    const response = await axios.get(`${API_URL}/universities/check/${universityId}`, {
-      withCredentials: true,
-    });
+    const response = await axios.get(
+      `${API_URL}/universities/check/${universityId}`,
+      {
+        withCredentials: true,
+      }
+    );
     return response.data.isFavorite;
   } catch (error) {
-    console.error(`Error checking if university ${universityId} is in favorites:`, error);
+    console.error(
+      `Error checking if university ${universityId} is in favorites:`,
+      error
+    );
     if (axios.isAxiosError(error) && error.response?.status === 401) {
-      console.warn('Unauthorized check for favorite status - assuming not favorite.');
+      console.warn(
+        "Unauthorized check for favorite status - assuming not favorite."
+      );
       return false;
     }
     throw error;
@@ -89,7 +109,7 @@ export const getFavoriteScholarships = async () => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error fetching favorite scholarships:', error);
+    console.error("Error fetching favorite scholarships:", error);
     throw error;
   }
 };
@@ -97,12 +117,19 @@ export const getFavoriteScholarships = async () => {
 // Add a scholarship to favorites
 export const addFavoriteScholarship = async (scholarshipId: string) => {
   try {
-    const response = await axios.post(`${API_URL}/scholarships/${scholarshipId}`, {}, {
-      withCredentials: true,
-    });
+    const response = await axios.post(
+      `${API_URL}/scholarships/${scholarshipId}`,
+      {},
+      {
+        withCredentials: true,
+      }
+    );
     return response.data;
   } catch (error) {
-    console.error(`Error adding scholarship ${scholarshipId} to favorites:`, error);
+    console.error(
+      `Error adding scholarship ${scholarshipId} to favorites:`,
+      error
+    );
     throw error;
   }
 };
@@ -114,7 +141,10 @@ export const removeFavoriteScholarship = async (scholarshipId: string) => {
       withCredentials: true,
     });
   } catch (error) {
-    console.error(`Error removing scholarship ${scholarshipId} from favorites:`, error);
+    console.error(
+      `Error removing scholarship ${scholarshipId} from favorites:`,
+      error
+    );
     throw error;
   }
 };

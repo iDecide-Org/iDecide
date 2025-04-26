@@ -25,9 +25,12 @@ const UniversityCard: React.FC<UniversityCardProps> = ({
   onFavoriteClick,
   isFavorite = false,
 }) => {
-  const placeholderImageUrl = 'https://via.placeholder.com/300x200?text=No+Image';
+  const placeholderImageUrl =
+    "https://via.placeholder.com/300x200?text=No+Image";
 
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+  const handleImageError = (
+    e: React.SyntheticEvent<HTMLImageElement, Event>
+  ) => {
     e.currentTarget.src = placeholderImageUrl;
   };
 
@@ -82,7 +85,11 @@ const UniversityCard: React.FC<UniversityCardProps> = ({
         <div className="flex items-center justify-between mt-2 mb-4 mr-0">
           <div className="text-gray-600 text-sm flex items-center">
             <Clock className="w-4 h-4 ml-1" />
-            <span className="text-right">{new Date(university.createdAt || Date.now()).toLocaleDateString("ar-EG")}</span>
+            <span className="text-right">
+              {new Date(university.createdAt || Date.now()).toLocaleDateString(
+                "ar-EG"
+              )}
+            </span>
           </div>
           <div className="flex items-center space-x-1">
             <div className="flex items-center text-xs text-gray-600 mr-0">

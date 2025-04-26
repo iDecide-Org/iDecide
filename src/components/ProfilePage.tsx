@@ -40,7 +40,8 @@ interface ProfileFormData {
 }
 
 const ProfilePage: React.FC = () => {
-  const { user, userName, email, handleLogout, userType, fetchUser } = useAuth();
+  const { user, userName, email, handleLogout, userType, fetchUser } =
+    useAuth();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState<ProfileFormData>({
@@ -62,7 +63,9 @@ const ProfilePage: React.FC = () => {
   const [updateSuccess, setUpdateSuccess] = useState<string | null>(null);
   const [updateError, setUpdateError] = useState<string | null>(null);
 
-  const [likedUniversities, setLikedUniversities] = useState<FavoriteUniversity[]>([]);
+  const [likedUniversities, setLikedUniversities] = useState<
+    FavoriteUniversity[]
+  >([]);
   const [isLoadingFavorites, setIsLoadingFavorites] = useState(false);
   const [favoritesError, setFavoritesError] = useState<string | null>(null);
 
@@ -73,7 +76,7 @@ const ProfilePage: React.FC = () => {
     setFavoritesError(null);
     try {
       const response = await axios.get<FavoriteUniversity[]>(
-        "http://localhost:3000/favorites/universities",
+        "http://localhost:3000/api/favorites/universities",
         { withCredentials: true }
       );
       setLikedUniversities(response.data);
@@ -92,7 +95,9 @@ const ProfilePage: React.FC = () => {
   }, [activeTab, fetchFavorites]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -125,7 +130,7 @@ const ProfilePage: React.FC = () => {
 
     try {
       const response = await axios.put(
-        "http://localhost:3000/auth/profile",
+        "http://localhost:3000/api/auth/profile",
         payload,
         { withCredentials: true }
       );
@@ -150,22 +155,28 @@ const ProfilePage: React.FC = () => {
     }
   };
 
-  const handleRemoveFromFavorites = useCallback(async (universityId: string) => {
-    setLikedUniversities((prev) =>
-      prev.filter((fav) => fav.universityId !== universityId)
-    );
-
-    try {
-      await axios.delete(
-        `http://localhost:3000/favorites/universities/${universityId}`,
-        { withCredentials: true }
+  const handleRemoveFromFavorites = useCallback(
+    async (universityId: string) => {
+      setLikedUniversities((prev) =>
+        prev.filter((fav) => fav.universityId !== universityId)
       );
-    } catch (error) {
-      setFavoritesError("فشل في إزالة الجامعة من المفضلة.");
-      console.error(`Error removing university ${universityId} from favorites:`, error);
-      fetchFavorites();
-    }
-  }, [fetchFavorites]);
+
+      try {
+        await axios.delete(
+          `http://localhost:3000/api/favorites/universities/${universityId}`,
+          { withCredentials: true }
+        );
+      } catch (error) {
+        setFavoritesError("فشل في إزالة الجامعة من المفضلة.");
+        console.error(
+          `Error removing university ${universityId} from favorites:`,
+          error
+        );
+        fetchFavorites();
+      }
+    },
+    [fetchFavorites]
+  );
 
   const handleLogoutClick = useCallback(async () => {
     await handleLogout();
@@ -228,8 +239,8 @@ const ProfilePage: React.FC = () => {
             ) : (
               <div className="bg-white rounded-lg shadow-lg p-8">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-8 text-right">
-                  {sidebarItems.find((item) => item.name === activeTab)?.label ||
-                    "الصفحة الشخصية"}
+                  {sidebarItems.find((item) => item.name === activeTab)
+                    ?.label || "الصفحة الشخصية"}
                 </h2>
 
                 {updateSuccess && (
