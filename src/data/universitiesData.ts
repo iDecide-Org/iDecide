@@ -11,6 +11,7 @@ const universities = [
     colleges: "0+",
     majors: "0",
     establishment: "2019",
+    description: "No description provided.",
   },
   {
     id: 2,
@@ -24,6 +25,7 @@ const universities = [
     colleges: "4+",
     majors: "14",
     establishment: "2023",
+    description: "No description provided.",
   },
   {
     id: 3,
@@ -37,6 +39,7 @@ const universities = [
     colleges: "3+",
     majors: "8",
     establishment: "2002",
+    description: "No description provided.",
   },
   {
     id: 4,
@@ -50,6 +53,7 @@ const universities = [
     colleges: "0+",
     majors: "0",
     establishment: "2019",
+    description: "No description provided.",
   },
   {
     id: 5,
@@ -57,12 +61,13 @@ const universities = [
     location: "مدينة العلمين العلمين، محاف...",
     type: "الجامعات ذات الطبيعة الخاصة",
     image:
-      "https://img.youm7.com/ArticleImgs/2020/8/5/359465-%D8%B1%D8%A6%D9%8A%D8%B3%D9%8A%D8%A9.jpeg",
+      "https://img.youm7.com/ArticleImgs/2020/8/5/359465-%D8%B1%D8%A6%D9%8A%D8%A9.jpeg",
     views: "7.5K",
     date: "2024-09-24",
     colleges: "4+",
     majors: "14",
     establishment: "2023",
+    description: "No description provided.",
   },
   {
     id: 6,
@@ -75,6 +80,7 @@ const universities = [
     colleges: "3+",
     majors: "8",
     establishment: "2002",
+    description: "No description provided.",
   },
   {
     id: 7,
@@ -87,6 +93,7 @@ const universities = [
     colleges: "3+",
     majors: "8",
     establishment: "2002",
+    description: "No description provided.",
   },
   {
     id: 8,
@@ -99,6 +106,7 @@ const universities = [
     colleges: "3+",
     majors: "8",
     establishment: "2002",
+    description: "No description provided.",
   },
 ];
 

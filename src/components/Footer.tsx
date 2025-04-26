@@ -30,28 +30,32 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
               منصتك الشاملة لاتخاذ القرارات التعليمية الذكية واكتشاف مستقبلك
               الأكاديمي والمهني
             </p>
-            <div className="flex space-x-4">
+            <div className="flex space-x-4 rtl:space-x-reverse">
               <a
                 href="#"
                 className="text-gray-400 hover:text-blue-600 transition-colors"
+                aria-label="Facebook"
               >
                 <Facebook className="w-5 h-5" />
               </a>
               <a
                 href="#"
                 className="text-gray-400 hover:text-blue-600 transition-colors"
+                aria-label="Twitter"
               >
                 <Twitter className="w-5 h-5" />
               </a>
               <a
                 href="#"
                 className="text-gray-400 hover:text-blue-600 transition-colors"
+                aria-label="Instagram"
               >
                 <Instagram className="w-5 h-5" />
               </a>
               <a
                 href="#"
                 className="text-gray-400 hover:text-blue-600 transition-colors"
+                aria-label="LinkedIn"
               >
                 <Linkedin className="w-5 h-5" />
               </a>
@@ -139,7 +143,7 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
             <div className="text-gray-600 text-sm">
               © {new Date().getFullYear()} iDecide. جميع الحقوق محفوظة
             </div>
-            <div className="flex space-x-6">
+            <div className="flex space-x-6 rtl:space-x-reverse">
               <a
                 href="#"
                 className="text-gray-600 hover:text-blue-600 text-sm transition-colors"

@@ -1,51 +1,182 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { useAuth } from "../contexts/useAuth";
+import { useNavigate, Link } from "react-router-dom";
 import {
   UserCircle,
-  User,
-  CheckCircle,
-  Heart,
-  Bookmark,
   LogOut,
+  MessageSquare,
+  Heart,
+  Loader2,
+  Check,
+  AlertTriangle,
 } from "lucide-react";
-import { Link } from "react-router-dom";
-
 import Navbar from "./NavBar";
-import { useAuth } from "../contexts/useAuth";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
-import StarIcon from "../assets/star.svg";
 import UniversityCard from "./UniversityCard";
-import universities from "../data/universitiesData";
+import ChatInterface from "./ChatInterface";
+import axios from "axios";
+import { University as ServiceUniversity } from "../services/universityService";
+
+interface FavoriteUniversity {
+  id: string;
+  userId: string;
+  universityId: string;
+  university: ServiceUniversity;
+}
+
+interface ProfileFormData {
+  name: string;
+  email: string;
+  password?: string;
+  dateOfBirth?: string;
+  government?: string;
+  district?: string;
+  city?: string;
+  phoneNumber?: string;
+  gender?: string;
+  preferredCommunication?: string;
+  certificateType?: string;
+  totalScore?: number;
+  nationality?: string;
+}
 
 const ProfilePage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState("البيانات الشخصية");
-  const [showEditOptions, setShowEditOptions] = useState(false);
-  const { userName, email, handleLogout } = useAuth();
-  const navigate = useNavigate(); // Initialize useNavigate
-  const [likedUniversities, setLikedUniversities] = useState(universities);
+  const { user, userName, email, handleLogout, userType, fetchUser } = useAuth();
+  const navigate = useNavigate();
 
-  const handleTabClick = (tab: string) => {
-    setActiveTab(tab);
+  const [formData, setFormData] = useState<ProfileFormData>({
+    name: userName || "",
+    email: email || "",
+    password: "",
+    dateOfBirth: user?.dateOfBirth
+      ? new Date(user.dateOfBirth).toISOString().split("T")[0]
+      : "",
+    government: user?.government || "",
+    district: user?.district || "",
+    city: user?.city || "",
+    phoneNumber: user?.phoneNumber || "",
+    gender: user?.gender || "",
+    preferredCommunication: user?.preferredCommunication || "",
+  });
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [updateSuccess, setUpdateSuccess] = useState<string | null>(null);
+  const [updateError, setUpdateError] = useState<string | null>(null);
+
+  const [likedUniversities, setLikedUniversities] = useState<FavoriteUniversity[]>([]);
+  const [isLoadingFavorites, setIsLoadingFavorites] = useState(false);
+  const [favoritesError, setFavoritesError] = useState<string | null>(null);
+
+  const [activeTab, setActiveTab] = useState("profile");
+
+  const fetchFavorites = useCallback(async () => {
+    setIsLoadingFavorites(true);
+    setFavoritesError(null);
+    try {
+      const response = await axios.get<FavoriteUniversity[]>(
+        "http://localhost:3000/favorites/universities",
+        { withCredentials: true }
+      );
+      setLikedUniversities(response.data);
+    } catch (error) {
+      setFavoritesError("فشل في تحميل المفضلة.");
+      console.error("Error fetching favorites:", error);
+    } finally {
+      setIsLoadingFavorites(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === "favorites") {
+      fetchFavorites();
+    }
+  }, [activeTab, fetchFavorites]);
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setIsEditing(true);
+    setUpdateSuccess(null);
+    setUpdateError(null);
   };
 
-  const handleLogoutClick = async () => {
-    await handleLogout(); // Call the logout function from context
-    navigate("/"); // Navigate to the home page after logout
+  const handleNumberInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value === "" ? undefined : parseFloat(value),
+    }));
+    setIsEditing(true);
+    setUpdateSuccess(null);
+    setUpdateError(null);
   };
 
-  const handleManualEdit = () => {
-    // Handle manual edit logic here
-    setShowEditOptions(false);
+  const handleProfileUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setUpdateSuccess(null);
+    setUpdateError(null);
+
+    const payload: Partial<ProfileFormData> = { ...formData };
+    if (!payload.password) {
+      delete payload.password;
+    }
+
+    try {
+      const response = await axios.put(
+        "http://localhost:3000/auth/profile",
+        payload,
+        { withCredentials: true }
+      );
+
+      if (response.status === 200) {
+        setUpdateSuccess("تم تحديث الملف الشخصي بنجاح!");
+        setIsEditing(false);
+        await fetchUser();
+        setTimeout(() => setUpdateSuccess(null), 3000);
+      } else {
+        setUpdateError(response.data.message || "فشل تحديث الملف الشخصي.");
+      }
+    } catch (error) {
+      let message = "فشل تحديث الملف الشخصي.";
+      if (axios.isAxiosError(error) && error.response) {
+        message = error.response.data.message || message;
+      }
+      setUpdateError(message);
+      console.error("Error updating profile:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleAIEdit = () => {
-    // Handle AI edit logic here
-    setShowEditOptions(false);
-  };
+  const handleRemoveFromFavorites = useCallback(async (universityId: string) => {
+    setLikedUniversities((prev) =>
+      prev.filter((fav) => fav.universityId !== universityId)
+    );
 
-  const handleRemoveFromFavorites = (id: number) => {
-    setLikedUniversities((prev) => prev.filter((uni) => uni.id !== id));
-    console.log(`Removing university with id: ${id}`);
-  };
+    try {
+      await axios.delete(
+        `http://localhost:3000/favorites/universities/${universityId}`,
+        { withCredentials: true }
+      );
+    } catch (error) {
+      setFavoritesError("فشل في إزالة الجامعة من المفضلة.");
+      console.error(`Error removing university ${universityId} from favorites:`, error);
+      fetchFavorites();
+    }
+  }, [fetchFavorites]);
+
+  const handleLogoutClick = useCallback(async () => {
+    await handleLogout();
+    navigate("/");
+  }, [handleLogout, navigate]);
+
+  const sidebarItems = [
+    { name: "profile", label: "حسابي الشخصي", icon: <UserCircle size={20} /> },
+    { name: "chat", label: "محادثاتي", icon: <MessageSquare size={20} /> },
+    { name: "favorites", label: "المفضلة", icon: <Heart size={20} /> },
+  ];
 
   return (
     <div className="bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col min-h-screen">
@@ -63,346 +194,383 @@ const ProfilePage: React.FC = () => {
             </div>
           </div>
           <ul className="space-y-2">
-            {[
-              { tab: "البيانات الشخصية", icon: <User className="w-4 h-4" /> },
-              { tab: "استشارتي", icon: <CheckCircle className="w-4 h-4" /> },
-              { tab: "المفضلة", icon: <Heart className="w-4 h-4" /> },
-              { tab: "طلباتي", icon: <Bookmark className="w-4 h-4" /> },
-            ].map((item) => (
-              <li
-                key={item.tab}
-                className={`flex items-center space-x-2 p-2 rounded-md cursor-pointer transition duration-200 ${
-                  activeTab === item.tab
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-700 hover:bg-blue-50"
-                }`}
-                onClick={() => handleTabClick(item.tab)}
-              >
-                {item.icon}
-                <span>{item.tab}</span>
+            {sidebarItems.map((item) => (
+              <li key={item.name}>
+                <button
+                  className={`flex items-center space-x-2 w-full p-3 rounded-md text-right justify-end ${
+                    activeTab === item.name
+                      ? "bg-blue-500 text-white"
+                      : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                  }`}
+                  onClick={() => setActiveTab(item.name)}
+                >
+                  <span>{item.label}</span>
+                  {item.icon}
+                </button>
               </li>
             ))}
+            <li>
+              <button
+                onClick={handleLogoutClick}
+                className="flex items-center mt-6 space-x-2 p-3 rounded-md w-full justify-end text-gray-700 hover:bg-red-50 hover:text-red-600 transition duration-200 focus:outline-none"
+              >
+                <span>تسجيل الخروج</span>
+                <LogOut className="w-5 h-5" />
+              </button>
+            </li>
           </ul>
-          <button
-            onClick={handleLogoutClick} // Use the new logout handler
-            className="flex items-center mt-4 space-x-2 p-2 rounded-md w-full justify-start text-gray-700 hover:bg-red-50 hover:text-red-600 transition duration-200 focus:outline-none"
-          >
-            <LogOut className="w-4 h-4" />
-            <span>تسجيل الخروج</span>
-          </button>
         </aside>
 
         <main className="flex-1 p-8">
           <div className="container mx-auto">
-            <div className="bg-white rounded-lg shadow-lg p-8">
-              <h2 className="text-2xl font-semibold text-gray-800 mb-8">
-                حسابي الشخصي
-              </h2>
-              {activeTab === "البيانات الشخصية" && (
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label
-                        htmlFor="firstName"
-                        className="block text-sm font-medium text-gray-700 mb-2"
-                      >
-                        الاسم الاول
-                      </label>
-                      <input
-                        type="text"
-                        id="firstName"
-                        value={userName}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
-                        dir="rtl"
-                      />
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="lastName"
-                        className="block text-sm font-medium text-gray-700 mb-2"
-                      >
-                        الاسم الاخير
-                      </label>
-                      <input
-                        type="text"
-                        id="lastName"
-                        value={userName}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
-                        dir="rtl"
-                      />
-                    </div>
+            {activeTab === "chat" ? (
+              <ChatInterface />
+            ) : (
+              <div className="bg-white rounded-lg shadow-lg p-8">
+                <h2 className="text-2xl font-semibold text-gray-800 mb-8 text-right">
+                  {sidebarItems.find((item) => item.name === activeTab)?.label ||
+                    "الصفحة الشخصية"}
+                </h2>
+
+                {updateSuccess && (
+                  <div className="bg-green-50 border border-green-200 text-green-700 p-4 rounded-lg mb-6 flex items-center justify-end">
+                    <span>{updateSuccess}</span>
+                    <Check className="w-5 h-5 mr-2" />
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                )}
+                {updateError && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg mb-6 flex items-center justify-end">
+                    <span>{updateError}</span>
+                    <AlertTriangle className="w-5 h-5 mr-2" />
+                  </div>
+                )}
+
+                {activeTab === "profile" && (
+                  <form onSubmit={handleProfileUpdate} className="space-y-6">
+                    <div>
+                      <label
+                        htmlFor="name"
+                        className="block text-sm font-medium text-gray-700 mb-2 text-right"
+                      >
+                        الاسم بالكامل
+                      </label>
+                      <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 text-right"
+                        dir="rtl"
+                      />
+                    </div>
+
                     <div>
                       <label
                         htmlFor="email"
-                        className="block text-sm font-medium text-gray-700 mb-2"
+                        className="block text-sm font-medium text-gray-700 mb-2 text-right"
                       >
                         البريد الالكتروني
                       </label>
                       <input
                         type="email"
                         id="email"
-                        value={email}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 text-right"
                         dir="rtl"
                       />
                     </div>
+
                     <div>
                       <label
                         htmlFor="password"
-                        className="block text-sm font-medium text-gray-700 mb-2"
+                        className="block text-sm font-medium text-gray-700 mb-2 text-right"
                       >
-                        الباسورد
+                        كلمة السر (اتركها فارغة لعدم التغيير)
                       </label>
                       <input
                         type="password"
                         id="password"
-                        placeholder="الباسورد"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleInputChange}
+                        placeholder="********"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 text-right"
                         dir="rtl"
                       />
                     </div>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
                     <div>
                       <label
-                        htmlFor="phoneNumber"
-                        className="block text-sm font-medium text-gray-700 mb-2"
+                        htmlFor="dateOfBirth"
+                        className="block text-sm font-medium text-gray-700 mb-2 text-right"
                       >
-                        رقم الهاتف
+                        تاريخ الميلاد
                       </label>
-                      <div className="flex items-center">
-                        <select className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700">
-                          <option>مصر</option>
-                        </select>
+                      <input
+                        type="date"
+                        id="dateOfBirth"
+                        name="dateOfBirth"
+                        value={formData.dateOfBirth}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 text-right"
+                        dir="rtl"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div>
+                        <label
+                          htmlFor="government"
+                          className="block text-sm font-medium text-gray-700 mb-2 text-right"
+                        >
+                          المحافظة
+                        </label>
                         <input
-                          type="tel"
-                          id="phoneNumber"
-                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                          type="text"
+                          id="government"
+                          name="government"
+                          value={formData.government}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-md text-right"
+                          dir="rtl"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="district"
+                          className="block text-sm font-medium text-gray-700 mb-2 text-right"
+                        >
+                          المركز/الحي
+                        </label>
+                        <input
+                          type="text"
+                          id="district"
+                          name="district"
+                          value={formData.district}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-md text-right"
+                          dir="rtl"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="city"
+                          className="block text-sm font-medium text-gray-700 mb-2 text-right"
+                        >
+                          المدينة/القرية
+                        </label>
+                        <input
+                          type="text"
+                          id="city"
+                          name="city"
+                          value={formData.city}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-md text-right"
                           dir="rtl"
                         />
                       </div>
                     </div>
-                    <div>
-                      <label
-                        htmlFor="gender"
-                        className="block text-sm font-medium text-gray-700 mb-2"
-                      >
-                        النوع
-                      </label>
-                      <select
-                        id="gender"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
-                        dir="rtl"
-                      >
-                        <option>اختار</option>
-                        <option>ذكر</option>
-                        <option>انثي</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label
-                        htmlFor="gradeType"
-                        className="block text-sm font-medium text-gray-700 mb-2"
-                      >
-                        نوع الشهاده
-                      </label>
-                      <select
-                        id="gradeType"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
-                        dir="rtl"
-                      >
-                        <option>شهاده الثانويه المصريه</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="gradePercentage"
-                        className="block text-sm font-medium text-gray-700 mb-2"
-                      >
-                        النسبه الحاصله عليها
-                      </label>
-                      <input
-                        type="number"
-                        id="gradePercentage"
-                        placeholder="0.00"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
-                        dir="rtl"
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label
-                        htmlFor="nationality"
-                        className="block text-sm font-medium text-gray-700 mb-2"
-                      >
-                        الجنسيه
-                      </label>
-                      <select
-                        id="nationality"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
-                        dir="rtl"
-                      >
-                        <option>مصري</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="country"
-                        className="block text-sm font-medium text-gray-700 mb-2"
-                      >
-                        الدوله
-                      </label>
-                      <select
-                        id="country"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
-                        dir="rtl"
-                      >
-                        <option>اختار</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-700 mb-2">
-                      أفضل طريقة للتواصل ؟
-                    </p>
-                    <div className="flex space-x-2">
-                      {["هاتف", "بريد الإلكتروني", "واتساب"].map((method) => (
-                        <button
-                          key={method}
-                          className="p-2 border border-gray-300 rounded-md bg-white hover:bg-gray-50 transition duration-200 flex items-center justify-center"
-                        >
-                          {method}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="relative">
-                    <button
-                      onClick={() => setShowEditOptions(!showEditOptions)}
-                      className="bg-blue-600 text-white py-3 px-6 rounded-md hover:bg-blue-700 transition duration-300 w-full sm:w-auto"
-                    >
-                      تعديل البيانات
-                    </button>
 
-                    {showEditOptions && (
-                      <div className="absolute bottom-full mb-2 left-0 bg-white rounded-lg shadow-xl border border-gray-200 w-81 p-2 space-y-2">
-                        <button
-                          onClick={handleManualEdit}
-                          className="w-full text-right px-4 py-3 text-gray-700 hover:bg-blue-50 rounded-md transition duration-200 flex items-center gap-3"
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label
+                          htmlFor="phoneNumber"
+                          className="block text-sm font-medium text-gray-700 mb-2 text-right"
                         >
-                          <User className="w-5 h-5 flex-shrink-0" />
-                          <span className="flex-grow text-right">
-                            تعديل البيانات يدويا
-                          </span>
-                        </button>
-                        <button
-                          onClick={handleAIEdit}
-                          className="w-full text-right px-4 py-3 text-gray-700 hover:bg-blue-50 rounded-md transition duration-200 flex items-center gap-3"
+                          رقم الهاتف
+                        </label>
+                        <input
+                          type="tel"
+                          id="phoneNumber"
+                          name="phoneNumber"
+                          value={formData.phoneNumber}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-md text-right"
+                          dir="rtl"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="gender"
+                          className="block text-sm font-medium text-gray-700 mb-2 text-right"
                         >
-                          <span className="text-xl flex-shrink-0">
-                            <img src={StarIcon} alt="Star Icon" />
-                          </span>
-                          <span className="flex-grow text-right">
-                            تعديل البيانات بواسطة الذكاء العربي
-                          </span>
-                        </button>
+                          النوع
+                        </label>
+                        <select
+                          id="gender"
+                          name="gender"
+                          value={formData.gender}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-md text-right"
+                          dir="rtl"
+                        >
+                          <option value="">اختر</option>
+                          <option value="male">ذكر</option>
+                          <option value="female">انثى</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {userType === "student" && (
+                      <>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div>
+                            <label
+                              htmlFor="certificateType"
+                              className="block text-sm font-medium text-gray-700 mb-2 text-right"
+                            >
+                              نوع الشهادة
+                            </label>
+                            <select
+                              id="certificateType"
+                              name="certificateType"
+                              value={formData.certificateType}
+                              onChange={handleInputChange}
+                              className="w-full px-4 py-2 border border-gray-300 rounded-md text-right"
+                              dir="rtl"
+                            >
+                              <option value="">اختر</option>
+                              <option value="egyptian_high_school">
+                                شهادة الثانوية المصرية
+                              </option>
+                            </select>
+                          </div>
+                          <div>
+                            <label
+                              htmlFor="totalScore"
+                              className="block text-sm font-medium text-gray-700 mb-2 text-right"
+                            >
+                              المجموع/النسبة
+                            </label>
+                            <input
+                              type="number"
+                              step="0.01"
+                              id="totalScore"
+                              name="totalScore"
+                              value={formData.totalScore ?? ""}
+                              onChange={handleNumberInputChange}
+                              placeholder="0.00"
+                              className="w-full px-4 py-2 border border-gray-300 rounded-md text-right"
+                              dir="rtl"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label
+                            htmlFor="nationality"
+                            className="block text-sm font-medium text-gray-700 mb-2 text-right"
+                          >
+                            الجنسية
+                          </label>
+                          <input
+                            type="text"
+                            id="nationality"
+                            name="nationality"
+                            value={formData.nationality}
+                            onChange={handleInputChange}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md text-right"
+                            dir="rtl"
+                          />
+                        </div>
+                      </>
+                    )}
+
+                    <div>
+                      <label
+                        htmlFor="preferredCommunication"
+                        className="block text-sm font-medium text-gray-700 mb-2 text-right"
+                      >
+                        أفضل طريقة للتواصل؟
+                      </label>
+                      <select
+                        id="preferredCommunication"
+                        name="preferredCommunication"
+                        value={formData.preferredCommunication}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md text-right"
+                        dir="rtl"
+                      >
+                        <option value="">اختر</option>
+                        <option value="phone">هاتف</option>
+                        <option value="email">بريد إلكتروني</option>
+                        <option value="whatsapp">واتساب</option>
+                      </select>
+                    </div>
+
+                    <div className="flex justify-start pt-4">
+                      <button
+                        type="submit"
+                        disabled={!isEditing || isSubmitting}
+                        className="bg-blue-600 text-white py-3 px-6 rounded-md hover:bg-blue-700 transition duration-300 disabled:opacity-50 flex items-center justify-center"
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 className="w-5 h-5 animate-spin ml-2" />
+                            جاري الحفظ...
+                          </>
+                        ) : (
+                          "حفظ التغييرات"
+                        )}
+                      </button>
+                    </div>
+                  </form>
+                )}
+
+                {activeTab === "favorites" && (
+                  <div className="space-y-6">
+                    {favoritesError && (
+                      <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg flex items-center justify-end">
+                        <span>{favoritesError}</span>
+                        <AlertTriangle className="w-5 h-5 mr-2" />
+                      </div>
+                    )}
+
+                    {isLoadingFavorites ? (
+                      <div className="flex justify-center items-center py-16">
+                        <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+                        <span className="ml-2 text-gray-600">
+                          جاري تحميل المفضلة...
+                        </span>
+                      </div>
+                    ) : likedUniversities.length === 0 ? (
+                      <div className="text-center py-16 bg-gray-50 rounded-lg">
+                        <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                        <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                          لا توجد جامعات في المفضلة
+                        </h3>
+                        <p className="text-gray-500 mb-6">
+                          ابدأ في استكشاف الجامعات وأضف ما يعجبك إلى المفضلة
+                        </p>
+                        <Link
+                          to="/universities"
+                          className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300"
+                        >
+                          استكشف الجامعات
+                        </Link>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {likedUniversities.map((fav) => (
+                          <div key={fav.id} className="relative group">
+                            <UniversityCard
+                              university={fav.university}
+                              showFavoriteButton={true}
+                              onFavoriteClick={() =>
+                                handleRemoveFromFavorites(fav.universityId)
+                              }
+                              isFavorite={true}
+                            />
+                          </div>
+                        ))}
                       </div>
                     )}
                   </div>
-                </div>
-              )}
-              {activeTab === "استشارتي" && (
-                <p className="text-gray-600 p-4">
-                  This is the استشارتي content.
-                </p>
-              )}
-              {activeTab === "المفضلة" && (
-                <div className="space-y-6">
-                  <div className="flex justify-between items-center mb-8">
-                    <div className="flex items-center space-x-2">
-                      <select className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option>تصفية حسب النوع</option>
-                        <option>الجامعات الخاصة</option>
-                        <option>الجامعات الأهلية</option>
-                        <option>الجامعات الحكومية</option>
-                      </select>
-                      <select className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option>ترتيب حسب</option>
-                        <option>الأحدث</option>
-                        <option>الأقدم</option>
-                        <option>المشاهدات</option>
-                      </select>
-                    </div>
-                    <div className="text-gray-600">
-                      <span className="font-semibold">12</span> جامعة في المفضلة
-                    </div>
-                  </div>
-
-                  {/* Empty State */}
-                  {likedUniversities.length === 0 ? (
-                    <div className="text-center py-16 bg-gray-50 rounded-lg">
-                      <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                      <h3 className="text-xl font-semibold text-gray-700 mb-2">
-                        لا توجد جامعات في المفضلة
-                      </h3>
-                      <p className="text-gray-500 mb-6">
-                        ابدأ في استكشاف الجامعات وأضف ما يعجبك إلى المفضلة
-                      </p>
-                      <Link
-                        to="/universities"
-                        className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300"
-                      >
-                        استكشف الجامعات
-                      </Link>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {likedUniversities.map((university) => (
-                        <div key={university.id} className="relative group">
-                          <UniversityCard
-                            university={university}
-                            showFavoriteButton={true}
-                            onFavoriteClick={() =>
-                              handleRemoveFromFavorites(university.id)
-                            }
-                            isFavorite={true}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Pagination */}
-                  {likedUniversities.length > 0 && (
-                    <div className="flex justify-center mt-8 space-x-2">
-                      <button className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50">
-                        السابق
-                      </button>
-                      <button className="px-4 py-2 bg-blue-600 text-white rounded-md">
-                        1
-                      </button>
-                      <button className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50">
-                        2
-                      </button>
-                      <button className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50">
-                        3
-                      </button>
-                      <button className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50">
-                        التالي
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-              {activeTab === "طلباتي" && (
-                <p className="text-gray-600 p-4">This is the طلباتي content.</p>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </div>
         </main>
       </div>

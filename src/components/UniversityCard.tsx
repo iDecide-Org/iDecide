@@ -10,20 +10,10 @@ import {
   Calendar,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { University, getImageUrl } from "../services/universityService";
 
 interface UniversityCardProps {
-  university: {
-    id: number;
-    name: string;
-    location: string;
-    type: string;
-    image: string;
-    views: string;
-    date: string;
-    colleges: string;
-    majors: string;
-    establishment: string;
-  };
+  university: University;
   showFavoriteButton?: boolean;
   onFavoriteClick?: () => void;
   isFavorite?: boolean;
@@ -35,13 +25,20 @@ const UniversityCard: React.FC<UniversityCardProps> = ({
   onFavoriteClick,
   isFavorite = false,
 }) => {
+  const placeholderImageUrl = 'https://via.placeholder.com/300x200?text=No+Image';
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    e.currentTarget.src = placeholderImageUrl;
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col w-full max-w-[350px] hover:shadow-lg transition-shadow duration-300">
       <div className="relative">
         <img
-          src={university.image}
+          src={getImageUrl(university.image)}
           alt={university.name}
           className="w-full h-48 object-cover"
+          onError={handleImageError}
         />
         <div className="absolute top-2 right-2 flex flex-col items-center">
           {showFavoriteButton && (
@@ -63,7 +60,7 @@ const UniversityCard: React.FC<UniversityCardProps> = ({
         <div className="absolute bottom-2 right-2 bg-white bg-opacity-70 rounded-md px-2 py-1">
           <span className="flex items-center text-xs text-gray-700">
             <Eye className="w-4 h-4 ml-1" />
-            {university.views} مشاهدة
+            {university.views || "0"} مشاهدة
           </span>
         </div>
         <div className="absolute top-2 left-2 bg-blue-500 text-white rounded-md px-2 py-1">
@@ -85,16 +82,16 @@ const UniversityCard: React.FC<UniversityCardProps> = ({
         <div className="flex items-center justify-between mt-2 mb-4 mr-0">
           <div className="text-gray-600 text-sm flex items-center">
             <Clock className="w-4 h-4 ml-1" />
-            <span className="text-right">{university.date}</span>
+            <span className="text-right">{new Date(university.createdAt || Date.now()).toLocaleDateString("ar-EG")}</span>
           </div>
           <div className="flex items-center space-x-1">
             <div className="flex items-center text-xs text-gray-600 mr-0">
               <Building className="w-4 h-4 ml-1" />
-              <span>{university.colleges}</span>
+              <span>{university.collegesCount || 0}+</span>
             </div>
             <div className="flex items-center text-xs text-gray-600 mr-0">
               <GraduationCap className="w-4 h-4 ml-1" />
-              <span>{university.majors}</span>
+              <span>{university.majorsCount || 0}</span>
             </div>
             <div className="flex items-center text-xs text-gray-600 mr-0">
               <Calendar className="w-4 h-4 ml-1" />
@@ -103,7 +100,7 @@ const UniversityCard: React.FC<UniversityCardProps> = ({
           </div>
         </div>
         <div className="mt-auto">
-          <Link to="/university-details">
+          <Link to={`/university-details/${university.id}`}>
             <button className="bg-blue-600 text-white py-2 px-4 rounded-md w-full hover:bg-blue-700 transition duration-300">
               عرض تفاصيل
             </button>

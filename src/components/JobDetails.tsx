@@ -27,14 +27,14 @@ const JobDetails: React.FC = () => {
 
   if (!job) {
     return (
-      <div className="bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen flex items-center justify-center">
+      <div className="bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen flex items-center justify-center" dir="rtl">
         <div className="text-2xl text-gray-600">الوظيفة غير موجودة</div>
       </div>
     );
   }
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen">
+    <div className="bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen" dir="rtl">
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 py-12">

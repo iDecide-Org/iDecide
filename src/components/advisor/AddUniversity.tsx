@@ -1,313 +1,305 @@
-import React, { useState } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Save, ChevronLeft, AlertTriangle, Check } from "lucide-react";
 import Navbar from "../NavBar";
-import { Upload, Check, AlertTriangle } from "lucide-react";
-
-interface UniversityFormInputs {
-  name: string;
-  location: string;
-  type: string;
-  establishment: string;
-  description: string;
-  collegesCount: string;
-  majorsCount: string;
-  image: FileList;
-}
+import Footer from "../Footer";
+import { createUniversity } from "../../services/universityService";
+import { useAuth } from "../../contexts/useAuth";
 
 const AddUniversity: React.FC = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const { isAdvisor } = useAuth();
+  
+  const [universityData, setUniversityData] = useState({
+    name: "",
+    type: "",
+    location: "",
+    description: "",
+    establishment: new Date().getFullYear().toString(),
+    collegesCount: "1",
+    majorsCount: "1",
+  });
+  
+  const [image, setImage] = useState<File | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    reset,
-    formState: { errors },
-  } = useForm<UniversityFormInputs>();
-
-  const watchImage = watch("image");
-
-  // Handle image preview
-  React.useEffect(() => {
-    if (watchImage && watchImage[0]) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result as string);
-      };
-      reader.readAsDataURL(watchImage[0]);
+  // Check if user is advisor
+  useEffect(() => {
+    if (!isAdvisor) {
+      navigate("/");
     }
-  }, [watchImage]);
+  }, [isAdvisor, navigate]);
 
-  const onSubmit: SubmitHandler<UniversityFormInputs> = async (data) => {
-    setIsSubmitting(true);
-    setSubmitSuccess(false);
-    setSubmitError(null);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setUniversityData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!image) {
+      setError("يرجى اختيار صورة للجامعة");
+      return;
+    }
+    
+    setSubmitting(true);
+    setError(null);
+    
     try {
-      // Here you would normally send the data to your API
-      console.log("Form data to submit:", data);
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // On success
-      setSubmitSuccess(true);
-      reset();
-      setPreviewImage(null);
-    } catch (error) {
-      setSubmitError("حدث خطأ أثناء إضافة الجامعة. الرجاء المحاولة مرة أخرى.");
-      console.error("Error submitting university data:", error);
+      // Create FormData object for file upload
+      const formData = new FormData();
+      
+      // Append text fields
+      Object.entries(universityData).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
+      
+      // Append image
+      formData.append('image', image);
+      
+      // Create university
+      const newUniversity = await createUniversity(formData);
+      setSuccess("تم إضافة الجامعة بنجاح");
+      
+      // Clear form after successful submission
+      setUniversityData({
+        name: "",
+        type: "",
+        location: "",
+        description: "",
+        establishment: new Date().getFullYear().toString(),
+        collegesCount: "1",
+        majorsCount: "1",
+      });
+      setImage(null);
+      
+      // Navigate to the university list after a brief delay
+      setTimeout(() => {
+        navigate(`/universities/edit/${newUniversity.id}`);
+      }, 2000);
+    } catch (err) {
+      console.error("Error creating university:", err);
+      setError("فشل في إضافة الجامعة");
     } finally {
-      setIsSubmitting(false);
+      setSubmitting(false);
     }
   };
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col">
       <Navbar />
-
-      <div className="max-w-4xl mx-auto p-4 py-8">
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden p-8">
-          <h1 className="text-3xl font-bold text-right mb-2">
-            إضافة جامعة جديدة
-          </h1>
-          <p className="text-gray-600 text-right mb-6">
-            قم بإدخال بيانات الجامعة التي تريد إضافتها
-          </p>
-
-          {submitSuccess && (
-            <div className="bg-green-50 border border-green-200 text-green-700 p-4 rounded-lg mb-6 flex items-center">
-              <Check className="w-5 h-5 ml-2" />
-              <span>تمت إضافة الجامعة بنجاح!</span>
+      
+      <div className="container mx-auto px-4 py-8 flex-grow">
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="p-6 bg-blue-600 text-white">
+            <h1 className="text-2xl font-bold text-right">إضافة جامعة جديدة</h1>
+          </div>
+          
+          {error && (
+            <div className="m-6 bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg flex items-center">
+              <AlertTriangle className="w-5 h-5 mr-2" />
+              <p>{error}</p>
             </div>
           )}
-
-          {submitError && (
-            <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg mb-6 flex items-center">
-              <AlertTriangle className="w-5 h-5 ml-2" />
-              <span>{submitError}</span>
+          
+          {success && (
+            <div className="m-6 bg-green-50 border border-green-200 text-green-700 p-4 rounded-lg flex items-center">
+              <Check className="w-5 h-5 mr-2" />
+              <p>{success}</p>
             </div>
           )}
-
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          
+          <form onSubmit={handleSubmit} className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-700 mb-2 text-right"
-                >
-                  اسم الجامعة
+              {/* University Name */}
+              <div className="col-span-2">
+                <label className="block text-gray-700 text-sm font-semibold mb-2 text-right">
+                  اسم الجامعة *
                 </label>
                 <input
-                  id="name"
                   type="text"
-                  dir="rtl"
-                  {...register("name", { required: "اسم الجامعة مطلوب" })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  name="name"
+                  required
+                  value={universityData.name}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-md py-2 px-3 text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                {errors.name && (
-                  <p className="text-red-500 text-xs mt-1 text-right">
-                    {errors.name.message}
-                  </p>
-                )}
               </div>
-
+              
+              {/* University Type */}
               <div>
-                <label
-                  htmlFor="location"
-                  className="block text-sm font-medium text-gray-700 mb-2 text-right"
-                >
-                  الموقع
-                </label>
-                <input
-                  id="location"
-                  type="text"
-                  dir="rtl"
-                  {...register("location", { required: "موقع الجامعة مطلوب" })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                {errors.location && (
-                  <p className="text-red-500 text-xs mt-1 text-right">
-                    {errors.location.message}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <label
-                  htmlFor="type"
-                  className="block text-sm font-medium text-gray-700 mb-2 text-right"
-                >
-                  نوع الجامعة
+                <label className="block text-gray-700 text-sm font-semibold mb-2 text-right">
+                  نوع الجامعة *
                 </label>
                 <select
-                  id="type"
-                  dir="rtl"
-                  {...register("type", { required: "نوع الجامعة مطلوب" })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  name="type"
+                  required
+                  value={universityData.type}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-md py-2 px-3 text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="">اختر النوع</option>
-                  <option value="حكومية">جامعة حكومية</option>
-                  <option value="خاصة">جامعة خاصة</option>
-                  <option value="أهلية">جامعة أهلية</option>
+                  <option value="">اختر نوع الجامعة</option>
+                  <option value="حكومية">حكومية</option>
+                  <option value="خاصة">خاصة</option>
+                  <option value="أهلية">أهلية</option>
                 </select>
-                {errors.type && (
-                  <p className="text-red-500 text-xs mt-1 text-right">
-                    {errors.type.message}
-                  </p>
-                )}
               </div>
-
+              
+              {/* Location */}
               <div>
-                <label
-                  htmlFor="collegesCount"
-                  className="block text-sm font-medium text-gray-700 mb-2 text-right"
-                >
-                  عدد الكليات
+                <label className="block text-gray-700 text-sm font-semibold mb-2 text-right">
+                  الموقع *
                 </label>
                 <input
-                  id="collegesCount"
-                  type="number"
-                  dir="rtl"
-                  {...register("collegesCount", {
-                    required: "عدد الكليات مطلوب",
-                  })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  type="text"
+                  name="location"
+                  required
+                  value={universityData.location}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-md py-2 px-3 text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                {errors.collegesCount && (
-                  <p className="text-red-500 text-xs mt-1 text-right">
-                    {errors.collegesCount.message}
-                  </p>
-                )}
               </div>
-
+              
+              {/* Establishment Year */}
               <div>
-                <label
-                  htmlFor="establishment"
-                  className="block text-sm font-medium text-gray-700 mb-2 text-right"
-                >
-                  سنة التأسيس
+                <label className="block text-gray-700 text-sm font-semibold mb-2 text-right">
+                  سنة التأسيس *
                 </label>
                 <input
-                  id="establishment"
                   type="number"
-                  dir="rtl"
-                  {...register("establishment", {
-                    required: "سنة التأسيس مطلوبة",
-                  })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  name="establishment"
+                  required
+                  min="1800"
+                  max={new Date().getFullYear()}
+                  value={universityData.establishment}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-md py-2 px-3 text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                {errors.establishment && (
-                  <p className="text-red-500 text-xs mt-1 text-right">
-                    {errors.establishment.message}
-                  </p>
-                )}
               </div>
-            </div>
-
-            <div>
-              <label
-                htmlFor="majorsCount"
-                className="block text-sm font-medium text-gray-700 mb-2 text-right"
-              >
-                عدد التخصصات
-              </label>
-              <input
-                id="majorsCount"
-                type="number"
-                dir="rtl"
-                {...register("majorsCount", { required: "عدد التخصصات مطلوب" })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              {errors.majorsCount && (
-                <p className="text-red-500 text-xs mt-1 text-right">
-                  {errors.majorsCount.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label
-                htmlFor="description"
-                className="block text-sm font-medium text-gray-700 mb-2 text-right"
-              >
-                وصف الجامعة
-              </label>
-              <textarea
-                id="description"
-                rows={4}
-                dir="rtl"
-                {...register("description", { required: "وصف الجامعة مطلوب" })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              {errors.description && (
-                <p className="text-red-500 text-xs mt-1 text-right">
-                  {errors.description.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2 text-right">
-                صورة الجامعة
-              </label>
-              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                <div className="space-y-1 text-center">
-                  {previewImage ? (
-                    <div>
+              
+              {/* Colleges Count */}
+              <div>
+                <label className="block text-gray-700 text-sm font-semibold mb-2 text-right">
+                  عدد الكليات *
+                </label>
+                <input
+                  type="number"
+                  name="collegesCount"
+                  required
+                  min="1"
+                  value={universityData.collegesCount}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-md py-2 px-3 text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              
+              {/* Majors Count */}
+              <div>
+                <label className="block text-gray-700 text-sm font-semibold mb-2 text-right">
+                  عدد التخصصات *
+                </label>
+                <input
+                  type="number"
+                  name="majorsCount"
+                  required
+                  min="1"
+                  value={universityData.majorsCount}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-md py-2 px-3 text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              
+              {/* Description */}
+              <div className="col-span-2">
+                <label className="block text-gray-700 text-sm font-semibold mb-2 text-right">
+                  وصف الجامعة *
+                </label>
+                <textarea
+                  name="description"
+                  required
+                  rows={5}
+                  value={universityData.description}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-md py-2 px-3 text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              
+              {/* Image Upload */}
+              <div className="col-span-2">
+                <label className="block text-gray-700 text-sm font-semibold mb-2 text-right">
+                  صورة الجامعة *
+                </label>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                  <input
+                    type="file"
+                    id="image"
+                    required
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor="image"
+                    className="bg-blue-50 text-blue-600 py-2 px-4 rounded-lg cursor-pointer hover:bg-blue-100 inline-block"
+                  >
+                    اختيار صورة
+                  </label>
+                  <p className="text-sm text-gray-500 mt-2">
+                    {image ? `تم اختيار: ${image.name}` : "يرجى اختيار صورة للجامعة"}
+                  </p>
+                  {image && (
+                    <div className="mt-4 max-h-60 overflow-hidden">
                       <img
-                        src={previewImage}
+                        src={URL.createObjectURL(image)}
                         alt="Preview"
-                        className="mx-auto h-48 object-cover"
+                        className="h-full w-auto mx-auto object-contain rounded-lg"
                       />
                     </div>
-                  ) : (
-                    <Upload className="mx-auto h-12 w-12 text-gray-400" />
                   )}
-                  <div className="flex text-sm text-gray-600 justify-center">
-                    <label
-                      htmlFor="image-upload"
-                      className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none"
-                    >
-                      <span>اختر صورة</span>
-                      <input
-                        id="image-upload"
-                        type="file"
-                        className="sr-only"
-                        accept="image/*"
-                        {...register("image", {
-                          required: "صورة الجامعة مطلوبة",
-                        })}
-                      />
-                    </label>
-                  </div>
-                  <p className="text-xs text-gray-500">PNG أو JPG</p>
                 </div>
               </div>
-              {errors.image && (
-                <p className="text-red-500 text-xs mt-1 text-right">
-                  {errors.image.message}
-                </p>
-              )}
             </div>
-
-            <div className="flex justify-center pt-4">
+            
+            {/* Form Actions */}
+            <div className="mt-8 flex justify-between">
+              <button
+                type="button"
+                onClick={() => navigate("/universities/manage")}
+                className="bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors flex items-center"
+              >
+                <ChevronLeft className="w-5 h-5 ml-1" />
+                العودة
+              </button>
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition duration-300 disabled:opacity-50"
+                disabled={submitting || !image}
+                className="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? "جاري الإضافة..." : "إضافة الجامعة"}
+                {submitting ? (
+                  <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white ml-2"></div>
+                ) : (
+                  <Save className="w-5 h-5 ml-2" />
+                )}
+                إضافة الجامعة
               </button>
             </div>
           </form>
         </div>
       </div>
+      
+      <Footer />
     </div>
   );
 };

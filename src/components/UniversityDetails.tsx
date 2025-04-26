@@ -1,266 +1,357 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom"; // Import useNavigate
 import {
-  MapPin,
-  GraduationCap,
-  Share2,
-  Heart,
-  ChevronRight,
-  ChevronLeft,
-  Eye,
   Calendar,
+  MapPin,
   Building,
+  GraduationCap,
+  Share,
+  MessageSquare,
+  Heart,
+  AlertTriangle,
+  Check,
 } from "lucide-react";
 import Navbar from "./NavBar";
+import Footer from "./Footer";
+import { getUniversityById, getImageUrl } from "../services/universityService";
+import { addFavoriteUniversity, removeFavoriteUniversity, isUniversityInFavorites } from "../services/favoriteService";
+import { useAuth } from "../contexts/useAuth";
 
 const UniversityDetails: React.FC = () => {
-  // State management
-
-  const [activeTab, setActiveTab] = useState("عن الجامعة");
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate(); // Initialize useNavigate
+  const [university, setUniversity] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const { isLoggedIn, isAdvisor } = useAuth(); // Get isAdvisor from useAuth
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-  // Images array
-  const images = [
-    "https://pokonline.com/wp-content/uploads/2023/10/%D8%A7%D9%84%D8%A3%D9%83%D8%A7%D8%AF%D9%8A%D9%85%D9%8A%D8%A9-%D8%A7%D9%84%D8%B9%D8%B1%D8%A8%D9%8A%D8%A9-%D9%84%D9%84%D8%B9%D9%84%D9%88%D9%85-%D9%88%D8%A7%D9%84%D8%AA%D9%83%D9%86%D9%88%D9%84%D9%88%D8%AC%D9%8A%D8%A7-%D9%88%D8%A7%D9%84%D9%86%D9%82%D9%84-%D8%A7%D9%84%D8%A8%D8%AD%D8%B1%D9%89.jpeg",
-    "https://lh3.googleusercontent.com/p/AF1QipPhln6TnMPq3R_JbUJCZs-c2A-P7MPOAdZMPnzF=s1360-w1360-h1020",
-    "https://lh3.googleusercontent.com/p/AF1QipNtjbr2-XmWZvfaULJI6jJlqsYBdf9EDihGu6JR=s1360-w1360-h1020",
-  ];
+    const fetchUniversity = async () => {
+      if (!id) return;
 
-  const nextImage = () => {
-    if (isTransitioning) return; // Prevent rapid clicking
-    setIsTransitioning(true);
-    setCurrentImageIndex((prev) => (prev + 1) % images.length);
-    setTimeout(() => setIsTransitioning(false), 500); // Match duration with CSS
+      setLoading(true);
+      try {
+        const data = await getUniversityById(id);
+        setUniversity(data);
+
+        // Check if the university is in favorites
+        if (isLoggedIn) {
+          const favorite = await isUniversityInFavorites(id);
+          setIsFavorite(favorite);
+        }
+
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching university:", err);
+        setError("فشل في تحميل بيانات الجامعة");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUniversity();
+  }, [id, isLoggedIn]);
+
+  const handleToggleFavorite = async () => {
+    if (!isLoggedIn || !id) return;
+
+    try {
+      if (isFavorite) {
+        await removeFavoriteUniversity(id);
+        setIsFavorite(false);
+        setSuccessMessage("تمت إزالة الجامعة من المفضلة");
+      } else {
+        await addFavoriteUniversity(id);
+        setIsFavorite(true);
+        setSuccessMessage("تمت إضافة الجامعة إلى المفضلة");
+      }
+
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (error) {
+      console.error("Error toggling favorite status:", error);
+      setError("حدث خطأ أثناء تحديث المفضلة");
+    }
   };
 
-  const prevImage = () => {
-    if (isTransitioning) return; // Prevent rapid clicking
-    setIsTransitioning(true);
-    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
-    setTimeout(() => setIsTransitioning(false), 500); // Match duration with CSS
+  // Function to handle starting a chat
+  const handleStartChat = () => {
+    if (!isLoggedIn || isAdvisor || !university?.advisor?.id) return;
+    // Navigate to the chat page with the advisor's ID
+    navigate(`/chat/${university.advisor.id}`);
   };
 
-  // Tabs array
-  const tabs = [
-    "عن الجامعة",
-    "الكليات",
-    "شروط القبول",
-    "متطلبات التقدم",
-    "التواصل",
-    "المصروفات",
-  ];
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col">
+        <Navbar />
+        <div className="flex-grow flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error || !university) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col">
+        <Navbar />
+        <div className="container mx-auto px-4 py-8 flex-grow">
+          <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg">
+            <div className="flex items-center">
+              <AlertTriangle className="w-5 h-5 mr-2" />
+              <p>{error || "لم يتم العثور على الجامعة المطلوبة"}</p>
+            </div>
+            <div className="mt-4">
+              <Link to="/universities" className="text-blue-600 hover:underline">
+                العودة إلى صفحة الجامعات
+              </Link>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-gradient-to-br from-blue-50/50 to-blue-100/50 min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col">
       <Navbar />
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Main Content Card */}
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden backdrop-blur-sm border border-gray-100">
-          {/* Image Slider */}
-          <div className="relative h-[600px] overflow-hidden">
-            {images.map((image, index) => (
-              <img
-                key={index}
-                src={image}
-                alt={`University ${index + 1}`}
-                className={`absolute w-full h-full object-cover transition-all duration-500 ease-in-out
-                  ${
-                    index === currentImageIndex
-                      ? "opacity-100 translate-x-0"
-                      : index < currentImageIndex
-                      ? "opacity-0 translate-x-full"
-                      : "opacity-0 -translate-x-full"
-                  }`}
-              />
-            ))}
-
-            {/* Navigation Arrows */}
-            <button
-              onClick={prevImage}
-              disabled={isTransitioning}
-              className={`absolute left-6 top-1/2 transform -translate-y-1/2 
-                bg-white/20 backdrop-blur-md p-4 rounded-full 
-                hover:bg-white/90 transition-all duration-300 group
-                ${
-                  isTransitioning
-                    ? "cursor-not-allowed opacity-50"
-                    : "cursor-pointer"
-                }`}
-            >
-              <ChevronLeft className="w-6 h-6 text-white group-hover:text-gray-800" />
-            </button>
-
-            <button
-              onClick={nextImage}
-              disabled={isTransitioning}
-              className={`absolute right-6 top-1/2 transform -translate-y-1/2 
-                bg-white/20 backdrop-blur-md p-4 rounded-full 
-                hover:bg-white/90 transition-all duration-300 group
-                ${
-                  isTransitioning
-                    ? "cursor-not-allowed opacity-50"
-                    : "cursor-pointer"
-                }`}
-            >
-              <ChevronRight className="w-6 h-6 text-white group-hover:text-gray-800" />
-            </button>
-
-            {/* Optional: Add slide indicators */}
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-              {images.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => {
-                    if (!isTransitioning) {
-                      setIsTransitioning(true);
-                      setCurrentImageIndex(index);
-                      setTimeout(() => setIsTransitioning(false), 500);
-                    }
-                  }}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 
-                    ${
-                      currentImageIndex === index
-                        ? "bg-white w-4"
-                        : "bg-white/50 hover:bg-white/75"
-                    }`}
-                  disabled={isTransitioning}
-                />
-              ))}
-            </div>
-
-            {/* Action Buttons */}
-            <div className="absolute top-6 right-6 flex space-x-3">
-              <button className="bg-white/20 backdrop-blur-md p-3 rounded-full hover:bg-white/90 transition-all duration-300 group">
-                <Heart className="w-5 h-5 text-white group-hover:text-red-500" />
-              </button>
-              <button className="bg-white/20 backdrop-blur-md p-3 rounded-full hover:bg-white/90 transition-all duration-300 group">
-                <Share2 className="w-5 h-5 text-white group-hover:text-blue-500" />
-              </button>
-            </div>
-
-            {/* University Info Overlay */}
-            <div className="absolute bottom-0 right-0 left-0 p-10 text-white backdrop-blur-sm bg-black/20">
-              <h1 className="text-5xl font-bold mb-6 leading-tight">
-                الأكاديمية العربية للعلوم والتكنولوجيا والنقل البحري
-              </h1>
-              <div className="flex items-center space-x-8">
-                <div className="flex items-center bg-white/10 rounded-full px-4 py-2">
-                  <MapPin className="w-5 h-5 ml-2" />
-                  <span>مدينة العلمين، محافظة مطروح</span>
-                </div>
-                <div className="flex items-center bg-white/10 rounded-full px-4 py-2">
-                  <Eye className="w-5 h-5 ml-2" />
-                  <span>4.8K مشاهدة</span>
-                </div>
-              </div>
-            </div>
+      <div className="container mx-auto px-4 py-8">
+        {successMessage && (
+          <div className="mb-4 bg-green-50 border border-green-200 text-green-700 p-4 rounded-lg flex items-center">
+            <Check className="w-5 h-5 mr-2" />
+            <p>{successMessage}</p>
           </div>
+        )}
 
-          {/* Stats Section */}
-          <div className="grid grid-cols-3 gap-8 p-8 bg-gray-50/50">
-            <div className="flex items-center justify-center space-x-4 p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100">
-              <div className="bg-blue-50 p-3 rounded-full">
-                <GraduationCap className="w-8 h-8 text-blue-600" />
-              </div>
-              <div className="text-center">
-                <span className="block text-3xl font-bold text-gray-800 mb-1">
-                  25+
-                </span>
-                <span className="text-sm text-gray-600">برنامج دراسي</span>
-              </div>
-            </div>
-            <div className="flex items-center justify-center space-x-4 p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100">
-              <Building className="w-8 h-8 text-blue-600" />
-              <div className="text-center">
-                <span className="block text-3xl font-bold text-gray-800 mb-1">
-                  10+
-                </span>
-                <span className="text-sm text-gray-600">كلية</span>
-              </div>
-            </div>
-            <div className="flex items-center justify-center space-x-4 p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100">
-              <Calendar className="w-8 h-8 text-blue-600" />
-              <div className="text-center">
-                <span className="block text-3xl font-bold text-gray-800 mb-1">
-                  2019
-                </span>
-                <span className="text-sm text-gray-600">سنة التأسيس</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Tabs Navigation */}
-          <div className="border-b bg-white sticky top-0 z-10 backdrop-blur-md">
-            <div className="flex justify-center space-x-8 px-4">
-              {tabs.map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`py-4 px-6 -mb-px transition-all duration-300 ${
-                    activeTab === tab
-                      ? "border-b-2 border-blue-600 text-blue-600 font-semibold scale-105"
-                      : "text-gray-500 hover:text-gray-700 hover:bg-gray-50/50"
-                  }`}
-                >
-                  {tab}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Tab Content */}
-          <div className="p-10">
-            {activeTab === "عن الجامعة" && (
-              <div className="space-y-10">
-                <div className="prose max-w-none">
-                  <p className="text-gray-600 leading-relaxed text-lg">
-                    تعتبر الأكاديمية العربية للعلوم والتكنولوجيا والنقل البحري
-                    مركزاً تعليمياً رائداً في الوطن العربي، حيث تقدم برامج
-                    دراسية متميزة متوافقة دولياً. وتجمع بين التعليم النظري
-                    والتدريب العملي.
-                  </p>
+        {/* University Hero Section */}
+        <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8">
+          <div className="relative h-64 md:h-96">
+            <img
+              src={getImageUrl(university.image)}
+              alt={university.name}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+            <div className="absolute bottom-0 w-full p-6 text-white">
+              <div className="flex justify-between items-end">
+                <div>
+                  <h1 className="text-3xl md:text-4xl font-bold">{university.name}</h1>
+                  <div className="flex items-center mt-2">
+                    <MapPin className="w-5 h-5 mr-1" />
+                    <span>{university.location}</span>
+                  </div>
                 </div>
-
-                <div className="grid grid-cols-2 gap-6">
-                  {[
-                    "الحرم الجامعي يوفر بيئة تعليمية حديثة ومتكاملة",
-                    "برامج بكالوريوس مزدوجة مع جامعات عالمية مرموقة",
-                    "تخصصات متعددة تشمل طب الأسنان، الصيدلة، الذكاء الاصطناعي",
-                    "رؤية متكاملة تدعم التنمية المستدامة وتناسب سوق العمل",
-                  ].map((feature) => (
-                    <div
-                      key={feature}
-                      className="flex items-start space-x-4 p-6 bg-gray-50/50 rounded-xl hover:bg-gray-50 transition-all duration-300"
+                <div className="flex space-x-2">
+                  {isLoggedIn && (
+                    <button
+                      onClick={handleToggleFavorite}
+                      className="bg-white bg-opacity-20 hover:bg-opacity-30 p-2 rounded-full backdrop-blur-sm transition duration-300"
                     >
-                      <div className="w-3 h-3 bg-blue-600 rounded-full mt-2 ml-3" />
-                      <span className="text-gray-700">{feature}</span>
-                    </div>
-                  ))}
+                      <Heart
+                        className={`w-5 h-5 ${
+                          isFavorite ? "fill-current text-red-500" : "text-white"
+                        }`}
+                      />
+                    </button>
+                  )}
+                  <button className="bg-white bg-opacity-20 hover:bg-opacity-30 p-2 rounded-full backdrop-blur-sm transition duration-300">
+                    <Share className="w-5 h-5 text-white" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Info Bar */}
+          <div className="bg-blue-600 text-white p-4">
+            <div className="container mx-auto">
+              <div className="flex flex-wrap justify-center md:justify-between gap-4 md:gap-0">
+                <div className="flex items-center">
+                  <Building className="w-5 h-5 mr-2" />
+                  <span>{university.type}</span>
+                </div>
+                <div className="flex items-center">
+                  <Calendar className="w-5 h-5 mr-2" />
+                  <span>تأسست عام {university.establishment}</span>
+                </div>
+                <div className="flex items-center">
+                  <Building className="w-5 h-5 mr-2" />
+                  <span>{university.collegesCount} كلية</span>
+                </div>
+                <div className="flex items-center">
+                  <GraduationCap className="w-5 h-5 mr-2" />
+                  <span>{university.majorsCount} تخصص</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Description Column */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-xl shadow-md p-6 mb-8">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4 text-right">
+                عن الجامعة
+              </h2>
+              <div className="prose max-w-none text-right">
+                <p className="text-gray-700">{university.description || 'لا يوجد وصف متاح حالياً.'}</p>
+              </div>
+            </div>
+
+            {/* Colleges Section - Placeholder for now */}
+            <div className="bg-white rounded-xl shadow-md p-6 mb-8">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4 text-right">
+                الكليات والتخصصات
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <h3 className="text-lg font-semibold mb-2 text-right">كلية الهندسة</h3>
+                  <ul className="list-disc list-inside text-gray-700 space-y-1 text-right">
+                    <li>هندسة البرمجيات</li>
+                    <li>هندسة الاتصالات</li>
+                    <li>هندسة مدنية</li>
+                  </ul>
+                </div>
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <h3 className="text-lg font-semibold mb-2 text-right">كلية الطب</h3>
+                  <ul className="list-disc list-inside text-gray-700 space-y-1 text-right">
+                    <li>طب بشري</li>
+                    <li>طب أسنان</li>
+                    <li>صيدلة</li>
+                  </ul>
+                </div>
+              </div>
+              <div className="mt-4 text-center">
+                <button className="bg-blue-50 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-100 transition duration-300">
+                  عرض كل الكليات والتخصصات
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Contact and Request Info Card */}
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-4 text-right">
+                تواصل مع الجامعة
+              </h3>
+              <div className="space-y-4">
+                <div className="bg-blue-50 text-blue-700 p-4 rounded-lg text-center">
+                  <p className="mb-2">هل تريد معلومات إضافية عن الجامعة؟</p>
+                  <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300 w-full">
+                    طلب معلومات
+                  </button>
+                </div>
+
+                {/* Show chat button only for logged-in students and if advisor exists */}
+                {isLoggedIn && !isAdvisor && university?.advisor && (
+                  <div className="bg-blue-50 text-blue-700 p-4 rounded-lg text-center mt-4">
+                    <p className="mb-2">هل لديك أسئلة محددة؟</p>
+                    <button 
+                      onClick={handleStartChat} // Use the new handler
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300 w-full flex items-center justify-center"
+                    >
+                      <MessageSquare className="w-4 h-4 mr-2" />
+                      <span>دردشة مع المرشد الأكاديمي</span>
+                    </button>
+                  </div>
+                )}
+
+                <div className="border-t border-gray-200 pt-4">
+                  <h4 className="font-semibold mb-2 text-right">معلومات الاتصال</h4>
+                  <ul className="space-y-2 text-gray-700 text-right">
+                    <li>الموقع الإلكتروني: www.university-website.edu</li>
+                    <li>البريد الإلكتروني: admissions@university-website.edu</li>
+                    <li>الهاتف: +20 123 456 7890</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Advisor Card - Show if advisor exists (regardless of login status for info) */}
+            {university?.advisor && (
+              <div className="bg-white rounded-xl shadow-md p-6">
+                <h3 className="text-xl font-bold text-gray-800 mb-4 text-right">
+                  المرشد الأكاديمي المسؤول
+                </h3>
+                <div className="flex items-center">
+                  <div className="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+                    {/* Placeholder for advisor image if available */}
+                    <span className="text-xl font-semibold">
+                      {university.advisor.name ? university.advisor.name.charAt(0).toUpperCase() : "A"}
+                    </span>
+                  </div>
+                  <div className="ml-4 text-right flex-grow">
+                    <p className="font-semibold">{university.advisor.name || "مرشد أكاديمي"}</p>
+                    <p className="text-gray-600 text-sm">
+                      أضاف هذه الجامعة
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
-          </div>
 
-          {/* CTA Section */}
-          <div className="p-16 bg-gradient-to-br from-blue-50 to-blue-100 border-t">
-            <div className="max-w-2xl mx-auto text-center">
-              <h3 className="text-3xl font-bold text-gray-800 mb-6">
-                هل أنت مستعد للانضمام إلينا؟
+            {/* Similar Universities */}
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-4 text-right">
+                جامعات مشابهة
               </h3>
-              <p className="text-gray-600 mb-8 text-lg">
-                اكتشف المزيد عن برامجنا وابدأ رحلتك الأكاديمية معنا.
-              </p>
-              <button className="bg-blue-600 text-white py-4 px-10 rounded-xl hover:bg-blue-700 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1">
-                معلومات التقديم
-              </button>
+              <div className="space-y-4">
+                <div className="flex">
+                  <div className="h-14 w-14 bg-gray-200 rounded-md flex-shrink-0">
+                    <img
+                      src="https://via.placeholder.com/56"
+                      alt="University"
+                      className="h-full w-full object-cover rounded-md"
+                    />
+                  </div>
+                  <div className="ml-4 text-right">
+                    <p className="font-semibold">جامعة العلوم الحديثة</p>
+                    <p className="text-gray-600 text-sm">القاهرة، مصر</p>
+                  </div>
+                </div>
+                <div className="flex">
+                  <div className="h-14 w-14 bg-gray-200 rounded-md flex-shrink-0">
+                    <img
+                      src="https://via.placeholder.com/56"
+                      alt="University"
+                      className="h-full w-full object-cover rounded-md"
+                    />
+                  </div>
+                  <div className="ml-4 text-right">
+                    <p className="font-semibold">جامعة التكنولوجيا</p>
+                    <p className="text-gray-600 text-sm">الإسكندرية، مصر</p>
+                  </div>
+                </div>
+                <div className="flex">
+                  <div className="h-14 w-14 bg-gray-200 rounded-md flex-shrink-0">
+                    <img
+                      src="https://via.placeholder.com/56"
+                      alt="University"
+                      className="h-full w-full object-cover rounded-md"
+                    />
+                  </div>
+                  <div className="ml-4 text-right">
+                    <p className="font-semibold">جامعة المستقبل</p>
+                    <p className="text-gray-600 text-sm">الجيزة، مصر</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      <Footer className="mt-auto" />
     </div>
   );
 };

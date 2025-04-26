@@ -11,10 +11,34 @@ interface SignupFormInputs {
 enum UserType {
   STUDENT = "student",
   ADVISOR = "advisor",
+  ADMIN = "admin", // Add admin type
 }
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  type: UserType;
+  token?: string;
+  chatbotCompleted?: boolean;
+  // ...other optional profile fields...
+  password?: string;
+  dateOfBirth?: string;
+  government?: string;
+  district?: string;
+  city?: string;
+  phoneNumber?: string;
+  gender?: string;
+  preferredCommunication?: string;
+  certificateType?: string;
+  totalScore?: number;
+  nationality?: string;
+}
+
 interface AuthContextType {
   isLoggedIn: boolean;
   isStudentPendingChatbot: boolean;
+  user: User | null; // User object or null if not logged in
   userName: string;
   email: string;
   isLoading: boolean;
@@ -41,6 +65,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isStudentPendingChatbot, setIsStudentPendingChatbot] = useState(false);
   const [userName, setUserName] = useState("");
+  const [user, setUser] = useState<User | null>(null);
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [userType, setUserType] = useState<UserType | null>(null); // New state for user type
@@ -53,7 +78,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const fetchUser = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch("http://localhost:3000/auth/user", {
+      const response = await fetch("http://localhost:3000/api/auth/user", {
         credentials: "include",
       });
       if (response.status === 401) {
@@ -63,30 +88,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       if (response.ok) {
-        const user = await response.json();
+        const fetchedUser = await response.json();
+        console.log('[AuthContext] User fetched successfully:', fetchedUser); // Log fetched user
+        setUser(fetchedUser);
 
         // Store user type regardless of type
-        setUserType(user.type);
+        setUserType(fetchedUser.type);
 
-        if (user.type === UserType.STUDENT && user.chatbotCompleted) {
+        if (fetchedUser.type === UserType.STUDENT && fetchedUser.chatbotCompleted) {
+          console.log('[AuthContext] Setting state for logged-in student.'); // Log state change
           setIsLoggedIn(true);
-          setUserName(user.name);
-          setEmail(user.email);
+          setUserName(fetchedUser.name);
+          setEmail(fetchedUser.email);
           setIsAdvisor(false);
-        } else if (user.type === UserType.STUDENT && !user.chatbotCompleted) {
+        } else if (fetchedUser.type === UserType.STUDENT && !fetchedUser.chatbotCompleted) {
+          console.log('[AuthContext] Setting state for student pending chatbot.'); // Log state change
           setIsStudentPendingChatbot(true);
           setIsAdvisor(false);
-        } else if (user.type === UserType.ADVISOR) {
+        } else if (fetchedUser.type === UserType.ADVISOR) {
+          console.log('[AuthContext] Setting state for logged-in advisor.'); // Log state change
           setIsLoggedIn(true);
-          setUserName(user.name);
-          setEmail(user.email);
+          setUserName(fetchedUser.name);
+          setEmail(fetchedUser.email);
           setIsAdvisor(true); // Set advisor flag
+        } else if (fetchedUser.type === UserType.ADMIN) {
+          setIsLoggedIn(true);
+          setUserName(fetchedUser.name);
+          setEmail(fetchedUser.email);
+          setIsAdvisor(false);
         }
 
-        return user;
+        return fetchedUser;
       }
     } catch (error) {
-      console.error("Error fetching user:", error);
+      console.error("[AuthContext] Error fetching user:", error); // Log error
     } finally {
       setIsLoading(false);
     }
@@ -94,7 +129,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const handleLogin = async (email: string, password: string) => {
     try {
-      const response = await fetch("http://localhost:3000/auth/signin", {
+      const response = await fetch("http://localhost:3000/api/auth/signin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -122,7 +157,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const handleLogout = async () => {
     setIsLoading(true);
     try {
-      await fetch("http://localhost:3000/auth/logout", {
+      await fetch("http://localhost:3000/api/auth/logout", {
         method: "POST",
         credentials: "include",
       });
@@ -140,7 +175,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const handleSignup = async (data: SignupFormInputs) => {
     try {
-      const response = await fetch("http://localhost:3000/auth/signup", {
+      const response = await fetch("http://localhost:3000/api/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -168,6 +203,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         isLoggedIn,
         isStudentPendingChatbot,
+        user,
         userName,
         email,
         isLoading,
