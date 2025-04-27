@@ -9,7 +9,7 @@ import { useAuth } from "../../contexts/useAuth";
 const AddUniversity: React.FC = () => {
   const navigate = useNavigate();
   const { isAdvisor } = useAuth();
-  
+
   const [universityData, setUniversityData] = useState({
     name: "",
     type: "",
@@ -19,7 +19,7 @@ const AddUniversity: React.FC = () => {
     collegesCount: "1",
     majorsCount: "1",
   });
-  
+
   const [image, setImage] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -32,11 +32,15 @@ const AddUniversity: React.FC = () => {
     }
   }, [isAdvisor, navigate]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
-    setUniversityData(prev => ({
+    setUniversityData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -48,31 +52,32 @@ const AddUniversity: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!image) {
-      setError("يرجى اختيار صورة للجامعة");
-      return;
-    }
-    
+
+    // if (!image) {
+    //   setError("يرجى اختيار صورة للجامعة");
+    //   return;
+    // }
+
     setSubmitting(true);
     setError(null);
-    
+
     try {
       // Create FormData object for file upload
       const formData = new FormData();
-      
+
       // Append text fields
       Object.entries(universityData).forEach(([key, value]) => {
         formData.append(key, value);
       });
-      
+
       // Append image
-      formData.append('image', image);
-      
+      if (image) {
+        formData.append("image", image);
+      }
       // Create university
       const newUniversity = await createUniversity(formData);
       setSuccess("تم إضافة الجامعة بنجاح");
-      
+
       // Clear form after successful submission
       setUniversityData({
         name: "",
@@ -84,7 +89,7 @@ const AddUniversity: React.FC = () => {
         majorsCount: "1",
       });
       setImage(null);
-      
+
       // Navigate to the university list after a brief delay
       setTimeout(() => {
         navigate(`/universities/edit/${newUniversity.id}`);
@@ -100,27 +105,27 @@ const AddUniversity: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col">
       <Navbar />
-      
+
       <div className="container mx-auto px-4 py-8 flex-grow">
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="p-6 bg-blue-600 text-white">
             <h1 className="text-2xl font-bold text-right">إضافة جامعة جديدة</h1>
           </div>
-          
+
           {error && (
             <div className="m-6 bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg flex items-center">
               <AlertTriangle className="w-5 h-5 mr-2" />
               <p>{error}</p>
             </div>
           )}
-          
+
           {success && (
             <div className="m-6 bg-green-50 border border-green-200 text-green-700 p-4 rounded-lg flex items-center">
               <Check className="w-5 h-5 mr-2" />
               <p>{success}</p>
             </div>
           )}
-          
+
           <form onSubmit={handleSubmit} className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* University Name */}
@@ -137,7 +142,7 @@ const AddUniversity: React.FC = () => {
                   className="w-full border border-gray-300 rounded-md py-2 px-3 text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-              
+
               {/* University Type */}
               <div>
                 <label className="block text-gray-700 text-sm font-semibold mb-2 text-right">
@@ -156,7 +161,7 @@ const AddUniversity: React.FC = () => {
                   <option value="أهلية">أهلية</option>
                 </select>
               </div>
-              
+
               {/* Location */}
               <div>
                 <label className="block text-gray-700 text-sm font-semibold mb-2 text-right">
@@ -171,7 +176,7 @@ const AddUniversity: React.FC = () => {
                   className="w-full border border-gray-300 rounded-md py-2 px-3 text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-              
+
               {/* Establishment Year */}
               <div>
                 <label className="block text-gray-700 text-sm font-semibold mb-2 text-right">
@@ -188,7 +193,7 @@ const AddUniversity: React.FC = () => {
                   className="w-full border border-gray-300 rounded-md py-2 px-3 text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-              
+
               {/* Colleges Count */}
               <div>
                 <label className="block text-gray-700 text-sm font-semibold mb-2 text-right">
@@ -204,7 +209,7 @@ const AddUniversity: React.FC = () => {
                   className="w-full border border-gray-300 rounded-md py-2 px-3 text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-              
+
               {/* Majors Count */}
               <div>
                 <label className="block text-gray-700 text-sm font-semibold mb-2 text-right">
@@ -220,7 +225,7 @@ const AddUniversity: React.FC = () => {
                   className="w-full border border-gray-300 rounded-md py-2 px-3 text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-              
+
               {/* Description */}
               <div className="col-span-2">
                 <label className="block text-gray-700 text-sm font-semibold mb-2 text-right">
@@ -235,17 +240,16 @@ const AddUniversity: React.FC = () => {
                   className="w-full border border-gray-300 rounded-md py-2 px-3 text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-              
+
               {/* Image Upload */}
               <div className="col-span-2">
                 <label className="block text-gray-700 text-sm font-semibold mb-2 text-right">
-                  صورة الجامعة *
+                  صورة الجامعة
                 </label>
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                   <input
                     type="file"
                     id="image"
-                    required
                     accept="image/*"
                     onChange={handleImageChange}
                     className="hidden"
@@ -257,7 +261,9 @@ const AddUniversity: React.FC = () => {
                     اختيار صورة
                   </label>
                   <p className="text-sm text-gray-500 mt-2">
-                    {image ? `تم اختيار: ${image.name}` : "يرجى اختيار صورة للجامعة"}
+                    {image
+                      ? `تم اختيار: ${image.name}`
+                      : "يرجى اختيار صورة للجامعة"}
                   </p>
                   {image && (
                     <div className="mt-4 max-h-60 overflow-hidden">
@@ -271,7 +277,7 @@ const AddUniversity: React.FC = () => {
                 </div>
               </div>
             </div>
-            
+
             {/* Form Actions */}
             <div className="mt-8 flex justify-between">
               <button
@@ -284,7 +290,7 @@ const AddUniversity: React.FC = () => {
               </button>
               <button
                 type="submit"
-                disabled={submitting || !image}
+                disabled={submitting}
                 className="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitting ? (
@@ -298,7 +304,7 @@ const AddUniversity: React.FC = () => {
           </form>
         </div>
       </div>
-      
+
       <Footer />
     </div>
   );

@@ -12,6 +12,11 @@ import Navbar from "../NavBar";
 import Footer from "../Footer";
 import { MapPin, Save, Trash2, ArrowRight } from "lucide-react";
 
+enum UniversityType {
+  GOVERNMENTAL = "حكومية",
+  PRIVATE = "خاصة",
+  NATIONAL = "أهلية", // Ahleya
+}
 const EditUniversity = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -23,6 +28,10 @@ const EditUniversity = () => {
   const [university, setUniversity] = useState({
     id: "",
     name: "",
+    type: "" as UniversityType | string, // Initialize with empty string or a default enum value like UniversityType.PRIVATE
+    establishment: Number(""),
+    collagesCount: 10,
+    majorsCount: 50,
     nameAr: "",
     location: "",
     description: "",
@@ -48,18 +57,23 @@ const EditUniversity = () => {
           setError("غير مصرح لك بتعديل هذه الجامعة");
           return;
         }
+        console.log(data);
 
         // Map service data to component state shape
         setUniversity({
           id: data.id,
           name: data.name,
+          type: data.type ?? "",
+          establishment: data.establishment ?? 2000,
+          collagesCount: data.collegesCount ?? 20,
+          majorsCount: data.majorsCount ?? 50,
+          image: data.image ?? "",
           nameAr: data.nameAr ?? "",
           location: data.location,
           description: data.description,
           website: data.website ?? "",
           tuitionFees: data.tuitionFees ?? "",
           admissionRequirements: data.admissionRequirements ?? "",
-          image: data.image ?? "",
           majors: data.majors ?? [],
           advisorId: data.advisorId ?? "",
         });
@@ -112,24 +126,29 @@ const EditUniversity = () => {
       // Prepare form data for update
       const formData = new FormData();
       formData.append("name", university.name);
-      formData.append("nameAr", university.nameAr);
+      // formData.append("nameAr", university.nameAr);
       formData.append("location", university.location);
       formData.append("description", university.description);
-      formData.append("website", university.website);
-      formData.append("tuitionFees", university.tuitionFees);
-      formData.append(
-        "admissionRequirements",
-        university.admissionRequirements
-      );
+      formData.append("type", university.type);
+      formData.append("establishment", university.establishment.toString());
+      formData.append("collegesCount", university.collagesCount.toString());
+      formData.append("majorsCount", university.majorsCount.toString());
       formData.append("image", university.image);
+
+      // formData.append("website", university.website);
+      // formData.append("tuitionFees", university.tuitionFees);
+      // formData.append(
+      //   "admissionRequirements",
+      //   university.admissionRequirements
+      // );
       // Append majors as JSON string
-      formData.append("majors", JSON.stringify(university.majors));
+      // formData.append("majors", JSON.stringify(university.majors));
       await updateUniversity(university.id, formData);
       setSuccess("تم تحديث بيانات الجامعة بنجاح");
 
       // Redirect after a short delay
       setTimeout(() => {
-        navigate("/advisor/universities");
+        navigate("/universities/manage");
       }, 2000);
     } catch (err) {
       console.error("Error updating university:", err);
@@ -214,7 +233,7 @@ const EditUniversity = () => {
                   htmlFor="name"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  اسم الجامعة (بالإنجليزية)
+                  اسم الجامعة
                 </label>
                 <input
                   type="text"
@@ -230,18 +249,18 @@ const EditUniversity = () => {
               {/* University Name (Arabic) */}
               <div>
                 <label
-                  htmlFor="nameAr"
+                  htmlFor="type"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  اسم الجامعة (بالعربية)
+                  نوع الجامعة
                 </label>
                 <input
                   type="text"
-                  id="nameAr"
-                  name="nameAr"
-                  value={university.nameAr}
+                  id="type"
+                  name="type"
+                  value={university.type}
                   onChange={handleChange}
-                  required
+                  // required
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
@@ -268,59 +287,77 @@ const EditUniversity = () => {
                 </div>
               </div>
 
-              {/* Website */}
+              {/* establishment */}
               <div>
                 <label
-                  htmlFor="website"
+                  htmlFor="establishment"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  الموقع الإلكتروني
-                </label>
-                <input
-                  type="url"
-                  id="website"
-                  name="website"
-                  value={university.website}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-
-              {/* Tuition Fees */}
-              <div>
-                <label
-                  htmlFor="tuitionFees"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  الرسوم الدراسية
+                  تأسست عام
                 </label>
                 <input
                   type="text"
-                  id="tuitionFees"
-                  name="tuitionFees"
-                  value={university.tuitionFees}
+                  id="establishment"
+                  name="establishment"
+                  value={university.establishment}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
 
-              {/* Image */}
+              {/* collagesCount */}
               <div>
                 <label
-                  htmlFor="image"
+                  htmlFor="collagesCount"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  رابط الصورة
+                  عدد الكليات
                 </label>
                 <input
-                  type="url"
-                  id="image"
-                  name="image"
-                  value={university.image}
+                  type="text"
+                  id="collagesCount"
+                  name="collagesCount"
+                  value={university.collagesCount}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
+
+              {/* majorsCount */}
+              <div>
+                <label
+                  htmlFor="majorsCount"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  عدد التخصصات
+                </label>
+                <input
+                  type="text"
+                  id="majorsCount"
+                  name="majorsCount"
+                  value={university.majorsCount}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="image"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                رابط الصورة
+              </label>
+
+              <input
+                type="url"
+                id="image"
+                name="image"
+                value={university.image}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              />
             </div>
 
             {/* Description */}
@@ -356,7 +393,7 @@ const EditUniversity = () => {
                 value={university.admissionRequirements}
                 onChange={handleChange}
                 rows={4}
-                required
+                // required
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -375,7 +412,7 @@ const EditUniversity = () => {
                 value={university.majors.join(", ")}
                 onChange={handleMajorsChange}
                 rows={3}
-                required
+                // required
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
