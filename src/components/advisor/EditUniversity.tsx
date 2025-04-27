@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 // Import getImageUrl from universityService
-import { getUniversityById, updateUniversity, deleteUniversity, getImageUrl } from "../../services/universityService";
+import {
+  getUniversityById,
+  updateUniversity,
+  deleteUniversity,
+  getImageUrl,
+} from "../../services/universityService";
 import { useAuth } from "../../contexts/useAuth";
 import Navbar from "../NavBar";
 import Footer from "../Footer";
@@ -26,23 +31,24 @@ const EditUniversity = () => {
     admissionRequirements: "",
     image: "",
     majors: [] as string[],
-    advisorId: ""
+    advisorId: "",
   });
 
   useEffect(() => {
     const fetchUniversity = async () => {
       if (!id) return;
-      
+
       try {
         setLoading(true);
         const data = await getUniversityById(id);
-        
+
         // Check if advisor is authorized to edit this university
+
         if (data.advisorId !== user?.id) {
           setError("غير مصرح لك بتعديل هذه الجامعة");
           return;
         }
-        
+
         // Map service data to component state shape
         setUniversity({
           id: data.id,
@@ -55,7 +61,7 @@ const EditUniversity = () => {
           admissionRequirements: data.admissionRequirements ?? "",
           image: data.image ?? "",
           majors: data.majors ?? [],
-          advisorId: data.advisorId ?? ""
+          advisorId: data.advisorId ?? "",
         });
 
         // Use 'image' instead of 'imageUrl'
@@ -73,49 +79,54 @@ const EditUniversity = () => {
     fetchUniversity();
   }, [id, user?.id]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setUniversity(prev => ({
+    setUniversity((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleMajorsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const majorsArray = e.target.value
       .split(",")
-      .map(major => major.trim())
+      .map((major) => major.trim())
       .filter(Boolean);
-    
-    setUniversity(prev => ({
+
+    setUniversity((prev) => ({
       ...prev,
-      majors: majorsArray
+      majors: majorsArray,
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       setLoading(true);
       setError("");
       setSuccess("");
-      
+
       // Prepare form data for update
       const formData = new FormData();
-      formData.append('name', university.name);
-      formData.append('nameAr', university.nameAr);
-      formData.append('location', university.location);
-      formData.append('description', university.description);
-      formData.append('website', university.website);
-      formData.append('tuitionFees', university.tuitionFees);
-      formData.append('admissionRequirements', university.admissionRequirements);
-      formData.append('image', university.image);
+      formData.append("name", university.name);
+      formData.append("nameAr", university.nameAr);
+      formData.append("location", university.location);
+      formData.append("description", university.description);
+      formData.append("website", university.website);
+      formData.append("tuitionFees", university.tuitionFees);
+      formData.append(
+        "admissionRequirements",
+        university.admissionRequirements
+      );
+      formData.append("image", university.image);
       // Append majors as JSON string
-      formData.append('majors', JSON.stringify(university.majors));
+      formData.append("majors", JSON.stringify(university.majors));
       await updateUniversity(university.id, formData);
       setSuccess("تم تحديث بيانات الجامعة بنجاح");
-      
+
       // Redirect after a short delay
       setTimeout(() => {
         navigate("/advisor/universities");
@@ -129,10 +140,14 @@ const EditUniversity = () => {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm("هل أنت متأكد من حذف هذه الجامعة؟ هذا الإجراء لا يمكن التراجع عنه.")) {
+    if (
+      !window.confirm(
+        "هل أنت متأكد من حذف هذه الجامعة؟ هذا الإجراء لا يمكن التراجع عنه."
+      )
+    ) {
       return;
     }
-    
+
     try {
       setLoading(true);
       await deleteUniversity(university.id);
@@ -157,9 +172,12 @@ const EditUniversity = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100" dir="rtl">
+    <div
+      className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100"
+      dir="rtl"
+    >
       <Navbar />
-      
+
       <div className="max-w-5xl mx-auto px-4 py-12">
         <div className="mb-6 flex items-center">
           <button
@@ -170,29 +188,32 @@ const EditUniversity = () => {
             العودة للجامعات
           </button>
         </div>
-        
+
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="p-6 bg-blue-600 text-white">
             <h1 className="text-2xl font-bold">تعديل بيانات الجامعة</h1>
           </div>
-          
+
           {error && (
             <div className="bg-red-50 text-red-600 p-4 border-r-4 border-red-600">
               {error}
             </div>
           )}
-          
+
           {success && (
             <div className="bg-green-50 text-green-600 p-4 border-r-4 border-green-600">
               {success}
             </div>
           )}
-          
+
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* University Name (English) */}
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   اسم الجامعة (بالإنجليزية)
                 </label>
                 <input
@@ -205,10 +226,13 @@ const EditUniversity = () => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-              
+
               {/* University Name (Arabic) */}
               <div>
-                <label htmlFor="nameAr" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="nameAr"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   اسم الجامعة (بالعربية)
                 </label>
                 <input
@@ -221,10 +245,13 @@ const EditUniversity = () => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-              
+
               {/* Location */}
               <div>
-                <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="location"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   الموقع
                 </label>
                 <div className="relative">
@@ -240,10 +267,13 @@ const EditUniversity = () => {
                   <MapPin className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                 </div>
               </div>
-              
+
               {/* Website */}
               <div>
-                <label htmlFor="website" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="website"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   الموقع الإلكتروني
                 </label>
                 <input
@@ -255,10 +285,13 @@ const EditUniversity = () => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-              
+
               {/* Tuition Fees */}
               <div>
-                <label htmlFor="tuitionFees" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="tuitionFees"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   الرسوم الدراسية
                 </label>
                 <input
@@ -270,10 +303,13 @@ const EditUniversity = () => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-              
+
               {/* Image */}
               <div>
-                <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="image"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   رابط الصورة
                 </label>
                 <input
@@ -286,10 +322,13 @@ const EditUniversity = () => {
                 />
               </div>
             </div>
-            
+
             {/* Description */}
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 وصف الجامعة
               </label>
               <textarea
@@ -302,10 +341,13 @@ const EditUniversity = () => {
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
-            
+
             {/* Admission Requirements */}
             <div>
-              <label htmlFor="admissionRequirements" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="admissionRequirements"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 متطلبات القبول
               </label>
               <textarea
@@ -318,10 +360,13 @@ const EditUniversity = () => {
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
-            
+
             {/* Majors */}
             <div>
-              <label htmlFor="majors" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="majors"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 التخصصات (مفصولة بفواصل)
               </label>
               <textarea
@@ -348,7 +393,7 @@ const EditUniversity = () => {
                 />
               </div>
             )}
-            
+
             <div className="flex justify-between pt-4">
               <button
                 type="button"
@@ -359,7 +404,7 @@ const EditUniversity = () => {
                 <Trash2 className="ml-2 h-5 w-5" />
                 حذف الجامعة
               </button>
-              
+
               <button
                 type="submit"
                 className="px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center"
@@ -376,7 +421,7 @@ const EditUniversity = () => {
           </form>
         </div>
       </div>
-      
+
       <Footer />
     </div>
   );

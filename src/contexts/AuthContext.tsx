@@ -88,7 +88,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (response.ok) {
         const fetchedUser = await response.json();
-        console.log("[AuthContext] User fetched successfully:", fetchedUser); // Log fetched user
+        // console.log("[AuthContext] User fetched successfully:", fetchedUser); // Log fetched user
         setUser(fetchedUser);
 
         // Store user type regardless of type
