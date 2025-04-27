@@ -181,7 +181,7 @@ const EditUniversity = () => {
       <div className="max-w-5xl mx-auto px-4 py-12">
         <div className="mb-6 flex items-center">
           <button
-            onClick={() => navigate("/advisor/universities")}
+            onClick={() => navigate("/universities/manage")}
             className="text-blue-600 hover:text-blue-800 flex items-center transition-colors"
           >
             <ArrowRight className="ml-1 h-5 w-5" />
