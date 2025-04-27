@@ -21,11 +21,10 @@ interface User {
   type: UserType;
   token?: string;
   chatbotCompleted?: boolean;
-  // ...other optional profile fields...
   password?: string;
-  dateOfBirth?: string;
-  government?: string;
-  district?: string;
+  DateOfBirth?: Date;
+  Government?: string;
+  District?: string;
   city?: string;
   phoneNumber?: string;
   gender?: string;
@@ -89,24 +88,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (response.ok) {
         const fetchedUser = await response.json();
-        console.log('[AuthContext] User fetched successfully:', fetchedUser); // Log fetched user
+        console.log("[AuthContext] User fetched successfully:", fetchedUser); // Log fetched user
         setUser(fetchedUser);
 
         // Store user type regardless of type
         setUserType(fetchedUser.type);
 
-        if (fetchedUser.type === UserType.STUDENT && fetchedUser.chatbotCompleted) {
-          console.log('[AuthContext] Setting state for logged-in student.'); // Log state change
+        if (
+          fetchedUser.type === UserType.STUDENT &&
+          fetchedUser.chatbotCompleted
+        ) {
+          console.log("[AuthContext] Setting state for logged-in student."); // Log state change
           setIsLoggedIn(true);
           setUserName(fetchedUser.name);
           setEmail(fetchedUser.email);
           setIsAdvisor(false);
-        } else if (fetchedUser.type === UserType.STUDENT && !fetchedUser.chatbotCompleted) {
-          console.log('[AuthContext] Setting state for student pending chatbot.'); // Log state change
+        } else if (
+          fetchedUser.type === UserType.STUDENT &&
+          !fetchedUser.chatbotCompleted
+        ) {
+          console.log(
+            "[AuthContext] Setting state for student pending chatbot."
+          ); // Log state change
           setIsStudentPendingChatbot(true);
           setIsAdvisor(false);
         } else if (fetchedUser.type === UserType.ADVISOR) {
-          console.log('[AuthContext] Setting state for logged-in advisor.'); // Log state change
+          console.log("[AuthContext] Setting state for logged-in advisor."); // Log state change
           setIsLoggedIn(true);
           setUserName(fetchedUser.name);
           setEmail(fetchedUser.email);

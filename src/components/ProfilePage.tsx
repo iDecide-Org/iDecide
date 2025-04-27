@@ -42,22 +42,34 @@ interface ProfileFormData {
 const ProfilePage: React.FC = () => {
   const { user, userName, email, handleLogout, userType, fetchUser } =
     useAuth();
+  console.log("this is user", user);
+
+  // i want to conver DateOfBirth to string and set it to the form
+  // loData
+
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState<ProfileFormData>({
     name: userName || "",
     email: email || "",
     password: "",
-    dateOfBirth: user?.dateOfBirth
-      ? new Date(user.dateOfBirth).toISOString().split("T")[0]
-      : "",
-    government: user?.government || "",
-    district: user?.district || "",
+    // convert DateOfBirth to string
+    dateOfBirth: user?.DateOfBirth
+      ? new Date(user.DateOfBirth).toISOString().split("T")[0]
+      : undefined,
+    government: user?.Government || "",
+    district: user?.District || "",
     city: user?.city || "",
     phoneNumber: user?.phoneNumber || "",
     gender: user?.gender || "",
     preferredCommunication: user?.preferredCommunication || "",
+    // i want here conditionally set the values based on userType
+    certificateType:
+      userType === "student" ? user?.certificateType || "" : undefined,
+    totalScore: user?.totalScore || undefined,
+    nationality: user?.nationality || "",
   });
+
   const [isEditing, setIsEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [updateSuccess, setUpdateSuccess] = useState<string | null>(null);
@@ -100,6 +112,7 @@ const ProfilePage: React.FC = () => {
     >
   ) => {
     const { name, value } = e.target;
+
     setFormData((prev) => ({ ...prev, [name]: value }));
     setIsEditing(true);
     setUpdateSuccess(null);
