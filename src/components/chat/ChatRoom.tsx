@@ -32,7 +32,9 @@ const ChatRoom: React.FC = () => {
         `[ChatRoom] Fetching initial messages for user ${otherUserId}`
       );
       // Fetch messages - ensure senderId and receiverId are populated
+
       const fetchedMessages = await chatService.getMessages(otherUserId);
+
       console.log("[ChatRoom] Fetched messages:", fetchedMessages); // Log fetched messages
       setMessages(fetchedMessages);
 
@@ -71,6 +73,7 @@ const ChatRoom: React.FC = () => {
 
     // Define the room name
     const roomName = getRoomName(currentUser.id, otherUserId);
+
     currentRoom.current = roomName;
     console.log(`[ChatRoom] Joining room: ${roomName}`);
     chatService.joinRoom(roomName);
@@ -207,6 +210,8 @@ const ChatRoom: React.FC = () => {
             messages.map((message) => {
               // CRITICAL FIX: Ensure currentUser.id is compared correctly
               const isCurrentUserSender = message.senderId === currentUser?.id;
+              console.log("this current sender ", isCurrentUserSender);
+
               // console.log(`Message ID: ${message.id}, Sender ID: ${message.senderId}, Current User ID: ${currentUser?.id}, Is Sender: ${isCurrentUserSender}`); // Debug log
               return (
                 <div
