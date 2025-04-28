@@ -171,9 +171,9 @@ const ChatRoom: React.FC = () => {
   }, [fetchInitialData, otherUserId, currentUser]); // Rerun if users change
 
   // Auto-scroll to bottom
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  // useEffect(() => {
+  //   messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  // }, [messages]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     // Make async
