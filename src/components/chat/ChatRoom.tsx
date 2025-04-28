@@ -1,24 +1,24 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { useAuth } from '../../contexts/useAuth';
-import { chatService, Message } from '../../services/chatService';
-import { Send, ArrowLeft, User, Bot } from 'lucide-react';
-import NavBar from '../NavBar';
-import Footer from '../Footer';
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useParams, Link } from "react-router-dom";
+import { useAuth } from "../../contexts/useAuth";
+import { chatService, Message } from "../../services/chatService";
+import { Send, ArrowLeft, User, Bot } from "lucide-react";
+import NavBar from "../NavBar";
+import Footer from "../Footer";
 
 // Function to create a consistent room name
 const getRoomName = (userId1: string, userId2: string): string => {
-  return [userId1, userId2].sort().join('-');
+  return [userId1, userId2].sort().join("-");
 };
 
 const ChatRoom: React.FC = () => {
   const { userId: otherUserId } = useParams<{ userId: string }>();
   const { user: currentUser } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [contactName, setContactName] = useState('المستخدم');
+  const [error, setError] = useState("");
+  const [contactName, setContactName] = useState("المستخدم");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const currentRoom = useRef<string | null>(null);
 
@@ -26,31 +26,35 @@ const ChatRoom: React.FC = () => {
   const fetchInitialData = useCallback(async () => {
     if (!otherUserId || !currentUser) return;
     setIsLoading(true);
-    setError('');
+    setError("");
     try {
-      console.log(`[ChatRoom] Fetching initial messages for user ${otherUserId}`);
+      console.log(
+        `[ChatRoom] Fetching initial messages for user ${otherUserId}`
+      );
       // Fetch messages - ensure senderId and receiverId are populated
       const fetchedMessages = await chatService.getMessages(otherUserId);
-      console.log('[ChatRoom] Fetched messages:', fetchedMessages); // Log fetched messages
+      console.log("[ChatRoom] Fetched messages:", fetchedMessages); // Log fetched messages
       setMessages(fetchedMessages);
 
       // Attempt to find contact name
       try {
         const contacts = await chatService.getChatUsers();
-        const contact = contacts.find(c => c.id === otherUserId);
+        const contact = contacts.find((c) => c.id === otherUserId);
         if (contact) {
           setContactName(contact.name);
         }
       } catch (contactError) {
-        console.warn('[ChatRoom] Could not fetch contact list to get name:', contactError);
+        console.warn(
+          "[ChatRoom] Could not fetch contact list to get name:",
+          contactError
+        );
       }
 
       // Mark messages as read
       await chatService.markMessagesAsRead(otherUserId);
-
     } catch (err) {
-      console.error('[ChatRoom] Error fetching initial data:', err);
-      setError('فشل في تحميل الرسائل. يرجى المحاولة مرة أخرى.');
+      console.error("[ChatRoom] Error fetching initial data:", err);
+      setError("فشل في تحميل الرسائل. يرجى المحاولة مرة أخرى.");
     } finally {
       setIsLoading(false);
     }
@@ -60,7 +64,9 @@ const ChatRoom: React.FC = () => {
   useEffect(() => {
     if (!otherUserId || !currentUser) return;
 
-    console.log('[ChatRoom] useEffect triggered for load, socket, and room management.');
+    console.log(
+      "[ChatRoom] useEffect triggered for load, socket, and room management."
+    );
     fetchInitialData();
 
     // Define the room name
@@ -71,24 +77,32 @@ const ChatRoom: React.FC = () => {
 
     // Set up listener for new messages
     chatService.onReceiveMessage((newMessage: Message) => {
-      console.log('[ChatRoom] Received new message via socket:', newMessage);
+      console.log("[ChatRoom] Received new message via socket:", newMessage);
       // Check if the message belongs to the current conversation room
-      const messageRoom = getRoomName(newMessage.senderId, newMessage.receiverId);
+      const messageRoom = getRoomName(
+        newMessage.senderId,
+        newMessage.receiverId
+      );
       if (messageRoom === currentRoom.current) {
         setMessages((prevMessages) => {
           // Avoid adding duplicate temporary messages if backend confirms quickly
-          if (prevMessages.some(msg => msg.id === newMessage.id)) {
+          if (prevMessages.some((msg) => msg.id === newMessage.id)) {
             return prevMessages;
           }
           return [...prevMessages, newMessage];
         });
         // If the current user received the message, mark it as read
-        if (newMessage.receiverId === currentUser?.id && newMessage.senderId === otherUserId) {
+        if (
+          newMessage.receiverId === currentUser?.id &&
+          newMessage.senderId === otherUserId
+        ) {
           // Debounce or delay this slightly if needed
           chatService.markMessagesAsRead(otherUserId);
         }
       } else {
-        console.log(`[ChatRoom] Received message for different room (${messageRoom}), ignoring.`);
+        console.log(
+          `[ChatRoom] Received message for different room (${messageRoom}), ignoring.`
+        );
       }
     });
 
@@ -102,20 +116,23 @@ const ChatRoom: React.FC = () => {
       // Optional: Consider removing the 'receiveMessage' listener here
       // if chatService manages listeners globally, this might not be needed.
       // chatService.off('receiveMessage'); // Example if needed
-      console.log('[ChatRoom] useEffect cleanup finished.');
+      console.log("[ChatRoom] useEffect cleanup finished.");
     };
   }, [fetchInitialData, otherUserId, currentUser]); // Rerun if users change
 
   // Auto-scroll to bottom
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSendMessage = async (e: React.FormEvent) => { // Make async
+  const handleSendMessage = async (e: React.FormEvent) => {
+    // Make async
     e.preventDefault();
     if (!input.trim() || !otherUserId || !currentUser) return;
 
-    console.log(`[ChatRoom] Attempting to send message to ${otherUserId}: ${input}`);
+    console.log(
+      `[ChatRoom] Attempting to send message to ${otherUserId}: ${input}`
+    );
 
     // Optimistic UI update (remains the same)
     const optimisticMessage: Message = {
@@ -130,19 +147,21 @@ const ChatRoom: React.FC = () => {
     setMessages((prev) => [...prev, optimisticMessage]);
 
     const messageContent = input; // Store input before clearing
-    setInput(''); // Clear input field immediately
+    setInput(""); // Clear input field immediately
 
     try {
       // Use the HTTP postMessage function from the service
       await chatService.postMessage(otherUserId, messageContent);
-      console.log('[ChatRoom] Message posted successfully via HTTP.');
+      console.log("[ChatRoom] Message posted successfully via HTTP.");
       // No need to manually add the message again here, the WebSocket listener will handle it
       // when the backend broadcasts the saved message.
     } catch (error) {
-      console.error('[ChatRoom] Error sending message via HTTP:', error);
-      setError('فشل في إرسال الرسالة.');
+      console.error("[ChatRoom] Error sending message via HTTP:", error);
+      setError("فشل في إرسال الرسالة.");
       // Optional: Remove the optimistic message if sending failed
-      setMessages((prev) => prev.filter(msg => msg.id !== optimisticMessage.id));
+      setMessages((prev) =>
+        prev.filter((msg) => msg.id !== optimisticMessage.id)
+      );
       // Optional: Restore the input field
       // setInput(messageContent);
     }
@@ -151,7 +170,7 @@ const ChatRoom: React.FC = () => {
   // --- Rendering Logic --- (Mostly unchanged, verify senderId check)
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col" dir="rtl">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <NavBar />
       <div className="flex-1 flex flex-col max-w-4xl w-full mx-auto bg-white shadow-lg rounded-b-lg overflow-hidden">
         {/* Header */}
@@ -162,7 +181,10 @@ const ChatRoom: React.FC = () => {
             </div>
             <h1 className="text-xl font-semibold">{contactName}</h1>
           </div>
-          <Link to="/chat" className="text-white hover:bg-blue-700 p-2 rounded-full">
+          <Link
+            to="/chat"
+            className="text-white hover:bg-blue-700 p-2 rounded-full"
+          >
             <ArrowLeft size={24} />
           </Link>
         </div>
@@ -174,9 +196,13 @@ const ChatRoom: React.FC = () => {
               <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
             </div>
           ) : error ? (
-            <div className="text-center text-red-600 bg-red-50 p-4 rounded-lg">{error}</div>
+            <div className="text-center text-red-600 bg-red-50 p-4 rounded-lg">
+              {error}
+            </div>
           ) : messages.length === 0 ? (
-            <div className="text-center text-gray-500 pt-10">ابدأ المحادثة...</div>
+            <div className="text-center text-gray-500 pt-10">
+              ابدأ المحادثة...
+            </div>
           ) : (
             messages.map((message) => {
               // CRITICAL FIX: Ensure currentUser.id is compared correctly
@@ -185,10 +211,14 @@ const ChatRoom: React.FC = () => {
               return (
                 <div
                   key={message.id} // Use message.id which should be unique
-                  className={`flex gap-3 ${isCurrentUserSender ? "flex-row-reverse" : ""}`}
+                  className={`flex gap-3 ${
+                    isCurrentUserSender ? "flex-row-reverse" : ""
+                  }`}
                 >
                   <div
-                    className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center ${isCurrentUserSender ? "bg-purple-100" : "bg-blue-100"}`}
+                    className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center ${
+                      isCurrentUserSender ? "bg-purple-100" : "bg-blue-100"
+                    }`}
                   >
                     {isCurrentUserSender ? (
                       <User size={18} className="text-purple-600" />
@@ -197,20 +227,26 @@ const ChatRoom: React.FC = () => {
                     )}
                   </div>
                   <div
-                    className={`flex flex-col max-w-[75%] ${isCurrentUserSender ? "items-end" : ""}`}
+                    className={`flex flex-col max-w-[75%] ${
+                      isCurrentUserSender ? "items-end" : ""
+                    }`}
                   >
                     <div
-                      className={`px-4 py-2 rounded-2xl shadow-sm ${isCurrentUserSender
+                      className={`px-4 py-2 rounded-2xl shadow-sm ${
+                        isCurrentUserSender
                           ? "bg-blue-500 text-white rounded-br-none"
                           : "bg-white text-gray-800 rounded-bl-none"
-                        }`}
+                      }`}
                     >
                       <p className="text-sm whitespace-pre-line break-words">
                         {message.content}
                       </p>
                     </div>
                     <span className="text-xs text-gray-400 mt-1 px-1">
-                      {new Date(message.timestamp).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}
+                      {new Date(message.timestamp).toLocaleTimeString("ar-SA", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </span>
                   </div>
                 </div>
@@ -221,7 +257,10 @@ const ChatRoom: React.FC = () => {
         </div>
 
         {/* Input Area */}
-        <form onSubmit={handleSendMessage} className="flex gap-2 p-4 border-t bg-white">
+        <form
+          onSubmit={handleSendMessage}
+          className="flex gap-2 p-4 border-t bg-white"
+        >
           <button
             type="submit"
             className="p-3 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors disabled:opacity-50"

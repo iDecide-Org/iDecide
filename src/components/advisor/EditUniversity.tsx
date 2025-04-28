@@ -191,10 +191,7 @@ const EditUniversity = () => {
   }
 
   return (
-    <div
-      className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100"
-      dir="rtl"
-    >
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
       <Navbar />
 
       <div className="max-w-5xl mx-auto px-4 py-12">
@@ -202,6 +199,7 @@ const EditUniversity = () => {
           <button
             onClick={() => navigate("/universities/manage")}
             className="text-blue-600 hover:text-blue-800 flex items-center transition-colors"
+            dir="rtl"
           >
             <ArrowRight className="ml-1 h-5 w-5" />
             العودة للجامعات
@@ -243,6 +241,7 @@ const EditUniversity = () => {
                   onChange={handleChange}
                   required
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  dir="rtl"
                 />
               </div>
 
@@ -262,6 +261,7 @@ const EditUniversity = () => {
                   onChange={handleChange}
                   // required
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  dir="rtl"
                 />
               </div>
 
@@ -282,6 +282,7 @@ const EditUniversity = () => {
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 pr-10"
+                    dir="rtl"
                   />
                   <MapPin className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                 </div>
@@ -302,6 +303,7 @@ const EditUniversity = () => {
                   value={university.establishment}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  dir="rtl"
                 />
               </div>
 
@@ -320,6 +322,7 @@ const EditUniversity = () => {
                   value={university.collagesCount}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  dir="rtl"
                 />
               </div>
 
@@ -338,6 +341,7 @@ const EditUniversity = () => {
                   value={university.majorsCount}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  dir="rtl"
                 />
               </div>
             </div>
@@ -357,6 +361,7 @@ const EditUniversity = () => {
                 value={university.image}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                dir="rtl"
               />
             </div>
 
@@ -376,6 +381,7 @@ const EditUniversity = () => {
                 rows={4}
                 required
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                dir="rtl"
               />
             </div>
 
@@ -395,6 +401,7 @@ const EditUniversity = () => {
                 rows={4}
                 // required
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                dir="rtl"
               />
             </div>
 
@@ -414,6 +421,7 @@ const EditUniversity = () => {
                 rows={3}
                 // required
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                dir="rtl"
               />
             </div>
 

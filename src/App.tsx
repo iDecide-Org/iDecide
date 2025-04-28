@@ -62,7 +62,7 @@ const App: React.FC = () => {
     // Advisor routes
     return (
       <BrowserRouter>
-        {/* Sticky Chat Button for Advisors */}
+        {/* Sticky Chat Button  */}
         <Link
           to="/chat"
           className="fixed bottom-6 right-6 z-50 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
@@ -85,14 +85,14 @@ const App: React.FC = () => {
               path="/universities/manage"
               element={<ManageUniversities />}
             />
-            <Route 
-              path="/universities/edit/:id" 
-              element={<EditUniversity />} 
-            />
+            <Route path="/universities/edit/:id" element={<EditUniversity />} />
             <Route path="/about" element={<About />} />
             <Route path="/chat" element={<ChatList />} />
             <Route path="/chat/:userId" element={<ChatRoom />} />
-            <Route path="/university-details/:id" element={<UniversityDetails />} />
+            <Route
+              path="/university-details/:id"
+              element={<UniversityDetails />}
+            />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="*" element={<NotFoundPage />} />
@@ -105,6 +105,16 @@ const App: React.FC = () => {
   // Student or not logged in routes (the original routes)
   return (
     <BrowserRouter>
+      {/* Sticky Chat Button for logged-in students (not pending chatbot) */}
+      {isLoggedIn && !isStudentPendingChatbot && (
+        <Link
+          to="/chat"
+          className="fixed bottom-6 right-6 z-50 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
+          aria-label="Open Chats"
+        >
+          <MessageSquare size={24} />
+        </Link>
+      )}
       <Routes>
         <Route
           path="/"

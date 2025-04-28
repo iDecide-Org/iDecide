@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useCallback } from 'react'; // Import useCallback
-import { Link } from 'react-router-dom';
-import { useAuth } from '../../contexts/useAuth';
-import { chatService } from '../../services/chatService';
-import { MessageCircle, Calendar, ChevronRight } from 'lucide-react';
-import NavBar from '../NavBar';
-import Footer from '../Footer';
-import axios from 'axios'; // Import axios
+import React, { useEffect, useState, useCallback } from "react"; // Import useCallback
+import { Link } from "react-router-dom";
+import { useAuth } from "../../contexts/useAuth";
+import { chatService } from "../../services/chatService";
+import { MessageCircle, Calendar, ChevronRight } from "lucide-react";
+import NavBar from "../NavBar";
+import Footer from "../Footer";
+import axios from "axios"; // Import axios
 
 interface Chat {
   id: string;
@@ -19,12 +19,15 @@ const ChatList: React.FC = () => {
   const { user } = useAuth();
   const [chats, setChats] = useState<Chat[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   // Use useCallback to memoize fetchChats
   const fetchChats = useCallback(async () => {
     if (!user || !user.id) {
-      console.warn('[ChatList] fetchChats skipped: User object or user.id is missing.', { user });
+      console.warn(
+        "[ChatList] fetchChats skipped: User object or user.id is missing.",
+        { user }
+      );
       setIsLoading(false);
       if (!user) setChats([]);
       return;
@@ -32,55 +35,78 @@ const ChatList: React.FC = () => {
 
     try {
       setIsLoading(true);
-      setError('');
-      console.log(`[ChatList] Attempting to call chatService.getChatUsers() for user ID: ${user.id}`);
+      setError("");
+      console.log(
+        `[ChatList] Attempting to call chatService.getChatUsers() for user ID: ${user.id}`
+      );
       const response = await chatService.getChatUsers();
-      console.log('[ChatList] Received response from getChatUsers:', response);
+      console.log("[ChatList] Received response from getChatUsers:", response);
 
-      const formattedChats: Chat[] = response.map(chatUser => {
-        if (!chatUser || typeof chatUser !== 'object' || !chatUser.id || !chatUser.name) {
-          console.warn('[ChatList] Invalid chat user data received:', chatUser);
-          return null;
-        }
-        return {
-          id: chatUser.id,
-          name: chatUser.name,
-          lastMessage: chatUser.lastMessage || 'No messages yet',
-          lastMessageTime: chatUser.timestamp ? new Date(chatUser.timestamp).toISOString() : new Date().toISOString(),
-          unreadCount: chatUser.unreadCount || 0
-        };
-      }).filter((chat): chat is Chat => chat !== null);
+      const formattedChats: Chat[] = response
+        .map((chatUser) => {
+          if (
+            !chatUser ||
+            typeof chatUser !== "object" ||
+            !chatUser.id ||
+            !chatUser.name
+          ) {
+            console.warn(
+              "[ChatList] Invalid chat user data received:",
+              chatUser
+            );
+            return null;
+          }
+          return {
+            id: chatUser.id,
+            name: chatUser.name,
+            lastMessage: chatUser.lastMessage || "No messages yet",
+            lastMessageTime: chatUser.timestamp
+              ? new Date(chatUser.timestamp).toISOString()
+              : new Date().toISOString(),
+            unreadCount: chatUser.unreadCount || 0,
+          };
+        })
+        .filter((chat): chat is Chat => chat !== null);
 
-      console.log('[ChatList] Formatted chats:', formattedChats);
+      console.log("[ChatList] Formatted chats:", formattedChats);
       setChats(formattedChats);
-
     } catch (err) {
-      console.error('[ChatList] Error fetching chats:', err);
+      console.error("[ChatList] Error fetching chats:", err);
       if (axios.isAxiosError(err)) {
-        console.error('[ChatList] Axios error details:', err.response?.data, err.response?.status);
-        setError(`فشل في تحميل المحادثات (خطأ ${err.response?.status || 'غير معروف'}). يرجى المحاولة مرة أخرى.`);
+        console.error(
+          "[ChatList] Axios error details:",
+          err.response?.data,
+          err.response?.status
+        );
+        setError(
+          `فشل في تحميل المحادثات (خطأ ${
+            err.response?.status || "غير معروف"
+          }). يرجى المحاولة مرة أخرى.`
+        );
       } else {
-        setError('فشل في تحميل المحادثات، يرجى المحاولة مرة أخرى لاحقًا');
+        setError("فشل في تحميل المحادثات، يرجى المحاولة مرة أخرى لاحقًا");
       }
     } finally {
       setIsLoading(false);
-      console.log('[ChatList] fetchChats async function finished.');
+      console.log("[ChatList] fetchChats async function finished.");
     }
   }, [user]); // Depend on user
 
   useEffect(() => {
-    console.log('[ChatList] useEffect triggered.');
+    console.log("[ChatList] useEffect triggered.");
     fetchChats(); // Initial fetch
 
     // Connect socket and set up listener for updates
     chatService.onConversationUpdate(() => {
-      console.log('[ChatList] Received conversation update. Refetching chats...');
+      console.log(
+        "[ChatList] Received conversation update. Refetching chats..."
+      );
       fetchChats(); // Refetch chats when an update is received
     });
 
     // Cleanup on unmount
     return () => {
-      console.log('[ChatList] useEffect cleanup. Disconnecting socket.');
+      console.log("[ChatList] useEffect cleanup. Disconnecting socket.");
       // Optional: Disconnect socket if ChatList is the only place using it,
       // or manage connection globally if needed elsewhere.
       // chatService.disconnectSocket();
@@ -90,26 +116,34 @@ const ChatList: React.FC = () => {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
-    const diffInDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-    
+    const diffInDays = Math.floor(
+      (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
     if (diffInDays === 0) {
-      return date.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
+      return date.toLocaleTimeString("ar-SA", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     } else if (diffInDays === 1) {
-      return 'الأمس';
+      return "الأمس";
     } else if (diffInDays < 7) {
-      return date.toLocaleDateString('ar-SA', { weekday: 'long' });
+      return date.toLocaleDateString("ar-SA", { weekday: "long" });
     } else {
-      return date.toLocaleDateString('ar-SA', { day: 'numeric', month: 'short' });
+      return date.toLocaleDateString("ar-SA", {
+        day: "numeric",
+        month: "short",
+      });
     }
   };
-  
+
   return (
-    <div className="min-h-screen bg-gray-50" dir="rtl">
+    <div className="min-h-screen bg-gray-50">
       <NavBar />
-      
+
       <div className="max-w-4xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-6">المحادثات</h1>
-        
+
         {isLoading ? (
           <div className="flex justify-center py-10">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
@@ -121,10 +155,14 @@ const ChatList: React.FC = () => {
         ) : chats.length === 0 ? (
           <div className="bg-white rounded-lg shadow p-8 text-center">
             <MessageCircle className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-            <h2 className="text-xl font-semibold text-gray-700 mb-2">لا توجد محادثات</h2>
+            <h2 className="text-xl font-semibold text-gray-700 mb-2">
+              لا توجد محادثات
+            </h2>
             <p className="text-gray-600 mb-4">لم تبدأ أي محادثات بعد</p>
-            <Link to="/advisor" 
-                className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors">
+            <Link
+              to="/advisor"
+              className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+            >
               تحدث مع مستشار
             </Link>
           </div>
@@ -133,7 +171,7 @@ const ChatList: React.FC = () => {
             <ul className="divide-y divide-gray-200">
               {chats.map((chat) => (
                 <li key={chat.id}>
-                  <Link 
+                  <Link
                     to={`/chat/${chat.id}`}
                     className="block hover:bg-blue-50 transition-colors"
                   >
@@ -175,7 +213,7 @@ const ChatList: React.FC = () => {
           </div>
         )}
       </div>
-      
+
       <Footer />
     </div>
   );
