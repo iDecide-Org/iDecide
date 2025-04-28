@@ -104,11 +104,28 @@ const ChatRoom: React.FC = () => {
         console.log("[ChatRoom] Current component room:", currentRoom.current); // Log 3: What is the expected room?
 
         if (messageRoom === currentRoom.current) {
+          // *** FIX: Check if the message is from the current user ***
+          if (newMessage.senderId === currentUser?.id) {
+            console.log(
+              "[ChatRoom] Received own message back via socket, ignoring duplicate add."
+            );
+            // Optional: Update the optimistic message ID if needed, but for now, just ignore.
+            // Find the temp message and update its ID to newMessage.id
+            setMessages((prevMessages) =>
+              prevMessages.map((msg) =>
+                msg.id.startsWith("temp-") && msg.content === newMessage.content // Basic matching
+                  ? { ...newMessage } // Replace temp with real message
+                  : msg
+              )
+            );
+            return; // Don't add it again
+          }
+
           console.log(
             "[ChatRoom] Message belongs to current room. Updating state."
           ); // Log 4: Room matches
           setMessages((prevMessages) => {
-            // Avoid adding duplicate temporary messages if backend confirms quickly
+            // Avoid adding duplicate messages if backend confirms quickly (double check)
             if (prevMessages.some((msg) => msg.id === newMessage.id)) {
               console.log(
                 "[ChatRoom] Duplicate message ID detected, skipping state update."
