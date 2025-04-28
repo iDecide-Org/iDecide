@@ -79,35 +79,63 @@ const ChatRoom: React.FC = () => {
     chatService.joinRoom(roomName);
 
     // Set up listener for new messages
-    chatService.onReceiveMessage((newMessage: Message) => {
-      console.log("[ChatRoom] Received new message via socket:", newMessage);
-      // Check if the message belongs to the current conversation room
-      const messageRoom = getRoomName(
-        newMessage.senderId,
-        newMessage.receiverId
-      );
-      if (messageRoom === currentRoom.current) {
-        setMessages((prevMessages) => {
-          // Avoid adding duplicate temporary messages if backend confirms quickly
-          if (prevMessages.some((msg) => msg.id === newMessage.id)) {
-            return prevMessages;
-          }
-          return [...prevMessages, newMessage];
-        });
-        // If the current user received the message, mark it as read
-        if (
-          newMessage.receiverId === currentUser?.id &&
-          newMessage.senderId === otherUserId
-        ) {
-          // Debounce or delay this slightly if needed
-          chatService.markMessagesAsRead(otherUserId);
+    const cleanupListener = chatService.onReceiveMessage(
+      (newMessage: Message) => {
+        console.log("[ChatRoom] Received new message via socket:", newMessage); // Log 1: Is message received?
+
+        // Ensure newMessage has valid senderId and receiverId before proceeding
+        if (!newMessage || !newMessage.senderId || !newMessage.receiverId) {
+          console.error(
+            "[ChatRoom] Received invalid message object:",
+            newMessage
+          );
+          return;
         }
-      } else {
-        console.log(
-          `[ChatRoom] Received message for different room (${messageRoom}), ignoring.`
+
+        // Check if the message belongs to the current conversation room
+        const messageRoom = getRoomName(
+          newMessage.senderId,
+          newMessage.receiverId
         );
+        console.log(
+          "[ChatRoom] Calculated messageRoom from received message:",
+          messageRoom
+        ); // Log 2: What is the room from message?
+        console.log("[ChatRoom] Current component room:", currentRoom.current); // Log 3: What is the expected room?
+
+        if (messageRoom === currentRoom.current) {
+          console.log(
+            "[ChatRoom] Message belongs to current room. Updating state."
+          ); // Log 4: Room matches
+          setMessages((prevMessages) => {
+            // Avoid adding duplicate temporary messages if backend confirms quickly
+            if (prevMessages.some((msg) => msg.id === newMessage.id)) {
+              console.log(
+                "[ChatRoom] Duplicate message ID detected, skipping state update."
+              );
+              return prevMessages;
+            }
+            return [...prevMessages, newMessage];
+          });
+          // If the current user received the message, mark it as read
+          if (
+            newMessage.receiverId === currentUser?.id &&
+            newMessage.senderId === otherUserId
+          ) {
+            console.log(
+              "[ChatRoom] Message received by current user. Marking as read."
+            );
+            // Debounce or delay this slightly if needed
+            chatService.markMessagesAsRead(otherUserId);
+          }
+        } else {
+          console.warn(
+            // Log 5: Why was it ignored?
+            `[ChatRoom] Received message for different room (${messageRoom}), expecting (${currentRoom.current}). Ignoring.`
+          );
+        }
       }
-    });
+    );
 
     // Cleanup on unmount or when users change
     return () => {
@@ -116,9 +144,11 @@ const ChatRoom: React.FC = () => {
         chatService.leaveRoom(currentRoom.current);
         currentRoom.current = null;
       }
-      // Optional: Consider removing the 'receiveMessage' listener here
-      // if chatService manages listeners globally, this might not be needed.
-      // chatService.off('receiveMessage'); // Example if needed
+      // Cleanup the specific listener instance
+      if (cleanupListener) {
+        cleanupListener();
+        console.log("[ChatRoom] Cleaned up receiveMessage listener.");
+      }
       console.log("[ChatRoom] useEffect cleanup finished.");
     };
   }, [fetchInitialData, otherUserId, currentUser]); // Rerun if users change
