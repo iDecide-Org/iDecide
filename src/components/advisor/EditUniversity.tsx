@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom"; // Import Link
 // Import getImageUrl from universityService
 import {
   getUniversityById,
@@ -10,7 +10,7 @@ import {
 import { useAuth } from "../../contexts/useAuth";
 import Navbar from "../NavBar";
 import Footer from "../Footer";
-import { MapPin, Save, Trash2, ArrowRight } from "lucide-react";
+import { MapPin, Save, Trash2, ArrowRight, Plus } from "lucide-react"; // Import Plus
 
 enum UniversityType {
   GOVERNMENTAL = "حكومية",
@@ -195,15 +195,22 @@ const EditUniversity = () => {
       <Navbar />
 
       <div className="max-w-5xl mx-auto px-4 py-12">
-        <div className="mb-6 flex items-center">
+        <div className="mb-6 flex items-center justify-between">
           <button
             onClick={() => navigate("/universities/manage")}
-            className="text-blue-600 hover:text-blue-800 flex items-center transition-colors"
-            dir="rtl"
+            className="bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors flex items-center"
           >
             <ArrowRight className="ml-1 h-5 w-5" />
             العودة للجامعات
           </button>
+          {/* Update Link to use parameterized route and remove state */}
+          <Link
+            to={`/scholarships/add/${university.id}`}
+            className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center"
+          >
+            <Plus className="w-5 h-5 ml-1" />
+            إضافة منحة دراسية
+          </Link>
         </div>
 
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">

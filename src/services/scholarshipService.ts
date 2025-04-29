@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 
 // Define the Scholarship interface based on the backend model
 export interface Scholarship {
@@ -19,16 +19,50 @@ export interface Scholarship {
   createdAt?: string;
 }
 
+// Define the DTO for creating a scholarship, based on backend
+// iDecide-API/src/scholarships/dto/create-scholarship.dto.ts
+export interface CreateScholarshipDto {
+  name: string;
+  provider: string;
+  type: "كاملة" | "جزئية"; // Matches ScholarshipType enum
+  description: string;
+  eligibility: string;
+  deadline: string; // Will be ISO string
+  link: string;
+  coverage?: ("رسوم دراسية" | "مصاريف معيشة" | "سفر" | "أخرى")[]; // Matches ScholarshipCoverage enum
+  country?: string;
+  fieldOfStudy?: string;
+  universityId: string;
+  // Note: Backend DTO might have more fields (e.g., amount, location, image) handled differently (e.g., via FormData)
+}
+
+// Define the structure for the scholarship data object to be sent
+export interface CreateScholarshipPayload {
+  name: string;
+  provider: string;
+  type: "كاملة" | "جزئية"; // Match the enum values
+  description: string;
+  eligibility: string; // Backend expects a string
+  deadline: string; // ISO 8601 format
+  link: string;
+  coverage?: string[]; // Match backend DTO
+  country?: string;
+  fieldOfStudy?: string;
+  universityId: string;
+}
+
 // Base URL for API calls
-const API_URL = 'http://localhost:3000/scholarships';
+const API_URL = "http://localhost:3000/api/scholarships";
 
 // Get all scholarships
 export const getAllScholarships = async () => {
   try {
-    const response = await axios.get<Scholarship[]>(API_URL, { withCredentials: true });
+    const response = await axios.get<Scholarship[]>(API_URL, {
+      withCredentials: true,
+    });
     return response.data;
   } catch (error) {
-    console.error('Error fetching scholarships:', error);
+    console.error("Error fetching scholarships:", error);
     throw error;
   }
 };
@@ -36,7 +70,9 @@ export const getAllScholarships = async () => {
 // Get a single scholarship by ID
 export const getScholarshipById = async (id: string) => {
   try {
-    const response = await axios.get<Scholarship>(`${API_URL}/${id}`, { withCredentials: true });
+    const response = await axios.get<Scholarship>(`${API_URL}/${id}`, {
+      withCredentials: true,
+    });
     return response.data;
   } catch (error) {
     console.error(`Error fetching scholarship with id ${id}:`, error);
@@ -47,47 +83,69 @@ export const getScholarshipById = async (id: string) => {
 // For advisors: Get scholarships created by the logged-in advisor
 export const getAdvisorScholarships = async () => {
   try {
-    const response = await axios.get<Scholarship[]>(`${API_URL}/advisor`, { withCredentials: true });
+    const response = await axios.get<Scholarship[]>(`${API_URL}/advisor`, {
+      withCredentials: true,
+    });
     return response.data;
   } catch (error) {
-    console.error('Error fetching advisor scholarships:', error);
+    console.error("Error fetching advisor scholarships:", error);
     throw error;
   }
 };
 
 // Create a new scholarship (for advisors)
-export const createScholarship = async (scholarshipData: FormData) => {
+// Expects a plain JavaScript object matching CreateScholarshipPayload
+export const createScholarship = async (
+  scholarshipData: CreateScholarshipPayload
+) => {
   try {
-    const response = await axios.post<Scholarship>(
-      API_URL, 
-      scholarshipData, 
-      { 
-        headers: { 'Content-Type': 'multipart/form-data' },
-        withCredentials: true 
-      }
-    );
+    // Send as JSON
+    const response = await axios.post<Scholarship>(API_URL, scholarshipData, {
+      headers: { "Content-Type": "application/json" }, // Set content type to JSON
+      withCredentials: true,
+    });
     return response.data;
   } catch (error) {
-    console.error('Error creating scholarship:', error);
-    throw error;
+    console.error("Error creating scholarship:", error);
+    // Rethrow for component to handle
+    if (axios.isAxiosError(error)) {
+      // Provide more specific error info if available
+      throw new Error(
+        error.response?.data?.message || "Failed to create scholarship"
+      );
+    } else {
+      throw new Error("An unexpected error occurred");
+    }
   }
 };
 
 // Update an existing scholarship (for advisors)
-export const updateScholarship = async (id: string, scholarshipData: FormData) => {
+// Expects a plain JavaScript object
+export const updateScholarship = async (
+  id: string,
+  scholarshipData: Partial<CreateScholarshipPayload> // Use Partial for updates
+) => {
   try {
     const response = await axios.put<Scholarship>(
-      `${API_URL}/${id}`, 
-      scholarshipData, 
-      { 
-        headers: { 'Content-Type': 'multipart/form-data' },
-        withCredentials: true 
+      `${API_URL}/${id}`,
+      scholarshipData,
+      {
+        headers: { "Content-Type": "application/json" }, // Set content type to JSON
+        withCredentials: true,
       }
     );
     return response.data;
   } catch (error) {
     console.error(`Error updating scholarship with id ${id}:`, error);
-    throw error;
+    // Rethrow for component to handle
+    if (axios.isAxiosError(error)) {
+      // Provide more specific error info if available
+      throw new Error(
+        error.response?.data?.message || `Failed to update scholarship ${id}`
+      );
+    } else {
+      throw new Error("An unexpected error occurred");
+    }
   }
 };
 
@@ -110,13 +168,13 @@ export const filterScholarships = async (params: {
   deadline?: string;
 }) => {
   try {
-    const response = await axios.get<Scholarship[]>(API_URL, { 
+    const response = await axios.get<Scholarship[]>(API_URL, {
       params,
-      withCredentials: true 
+      withCredentials: true,
     });
     return response.data;
   } catch (error) {
-    console.error('Error filtering scholarships:', error);
+    console.error("Error filtering scholarships:", error);
     throw error;
   }
 };

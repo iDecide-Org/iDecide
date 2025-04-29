@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import HomePage from "./components/HomePage";
 import LoginPage from "./components/LoginPage";
 import SignupPage from "./components/SignupPage";
@@ -19,7 +19,6 @@ import ScholarshipDetails from "./components/ScholarshipDetails";
 import { MessageSquare } from "lucide-react";
 
 // Import advisor-specific components
-// Use type assertion to help TypeScript understand these are valid React components
 const AdvisorDashboard = React.lazy(
   () => import("./components/advisor/Dashboard")
 ) as unknown as React.ComponentType;
@@ -32,9 +31,12 @@ const ManageUniversities = React.lazy(
   () => import("./components/advisor/ManageUniversities")
 ) as unknown as React.ComponentType;
 
-// Add new advisor components
 const EditUniversity = React.lazy(
   () => import("./components/advisor/EditUniversity")
+) as unknown as React.ComponentType;
+
+const AddScholarship = React.lazy(
+  () => import("./components/advisor/AddScholarship")
 ) as unknown as React.ComponentType;
 
 const ChatList = React.lazy(
@@ -44,6 +46,8 @@ const ChatList = React.lazy(
 const ChatRoom = React.lazy(
   () => import("./components/chat/ChatRoom")
 ) as unknown as React.ComponentType;
+
+import "./App.css";
 
 const App: React.FC = () => {
   const { isLoggedIn, isStudentPendingChatbot, isLoading, isAdvisor } =
@@ -61,7 +65,7 @@ const App: React.FC = () => {
   if (isLoggedIn && isAdvisor) {
     // Advisor routes
     return (
-      <BrowserRouter>
+      <Router>
         {/* Sticky Chat Button  */}
         <Link
           to="/chat"
@@ -86,6 +90,10 @@ const App: React.FC = () => {
               element={<ManageUniversities />}
             />
             <Route path="/universities/edit/:id" element={<EditUniversity />} />
+            <Route
+              path="/scholarships/add/:universityId"
+              element={<AddScholarship />}
+            />
             <Route path="/about" element={<About />} />
             <Route path="/chat" element={<ChatList />} />
             <Route path="/chat/:userId" element={<ChatRoom />} />
@@ -98,13 +106,13 @@ const App: React.FC = () => {
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </React.Suspense>
-      </BrowserRouter>
+      </Router>
     );
   }
 
   // Student or not logged in routes (the original routes)
   return (
-    <BrowserRouter>
+    <Router>
       {/* Sticky Chat Button for logged-in students (not pending chatbot) */}
       {isLoggedIn && !isStudentPendingChatbot && (
         <Link
@@ -199,7 +207,7 @@ const App: React.FC = () => {
         />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
 };
 
