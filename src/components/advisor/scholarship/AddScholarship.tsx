@@ -13,14 +13,14 @@ import {
   Building,
   Tag,
 } from "lucide-react";
-import Navbar from "../NavBar";
-import Footer from "../Footer";
+import Navbar from "../../NavBar";
+import Footer from "../../Footer";
 import {
   createScholarship,
   CreateScholarshipDto,
-} from "../../services/scholarshipService";
-import { getUniversityById } from "../../services/universityService";
-import { useAuth } from "../../contexts/useAuth";
+} from "../../../services/scholarshipService";
+import { getUniversityById } from "../../../services/universityService";
+import { useAuth } from "../../../contexts/useAuth";
 
 // Define the type for individual coverage options
 type ScholarshipCoverageOption = NonNullable<

@@ -36,7 +36,11 @@ const EditUniversity = React.lazy(
 ) as unknown as React.ComponentType;
 
 const AddScholarship = React.lazy(
-  () => import("./components/advisor/AddScholarship")
+  () => import("./components/advisor/scholarship/AddScholarship")
+) as unknown as React.ComponentType;
+
+const EditScholarship = React.lazy(
+  () => import("./components/advisor/scholarship/EditScholarship")
 ) as unknown as React.ComponentType;
 
 const ChatList = React.lazy(
@@ -90,10 +94,17 @@ const App: React.FC = () => {
               element={<ManageUniversities />}
             />
             <Route path="/universities/edit/:id" element={<EditUniversity />} />
+
             <Route
               path="/scholarships/add/:universityId"
               element={<AddScholarship />}
             />
+            <Route
+              path="/scholarships/edit/:id"
+              element={<EditScholarship />}
+            />
+            <Route path="/scholarships/:id" element={<ScholarshipDetails />} />
+
             <Route path="/about" element={<About />} />
             <Route path="/chat" element={<ChatList />} />
             <Route path="/chat/:userId" element={<ChatRoom />} />
