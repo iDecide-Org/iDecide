@@ -5,6 +5,14 @@ import Navbar from "../NavBar";
 import Footer from "../Footer";
 import { createUniversity } from "../../services/universityService";
 import { useAuth } from "../../contexts/useAuth";
+import axios from "axios"; // Import axios to check error details
+
+// Define type for SPARQL results
+interface SparqlResult {
+  univ: { value: string };
+  enLabel?: { value: string };
+  arLabel?: { value: string };
+}
 
 const AddUniversity: React.FC = () => {
   const navigate = useNavigate();
@@ -24,6 +32,10 @@ const AddUniversity: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [universitySuggestions, setUniversitySuggestions] = useState<
+    SparqlResult[]
+  >([]);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
 
   // Check if user is advisor
   useEffect(() => {
@@ -31,6 +43,55 @@ const AddUniversity: React.FC = () => {
       navigate("/");
     }
   }, [isAdvisor, navigate]);
+
+  // Fetch university suggestions from Wikidata
+  useEffect(() => {
+    const fetchUniversitySuggestions = async () => {
+      setLoadingSuggestions(true);
+      const sparqlQuery = `
+        SELECT ?univ ?enLabel ?arLabel WHERE {
+          ?univ wdt:P31 wd:Q3918;         # instance of University
+                 wdt:P17 wd:Q79.          # country = Egypt
+
+          OPTIONAL {
+            ?univ rdfs:label ?enLabel .
+            FILTER(LANG(?enLabel) = "en")
+          }
+
+          OPTIONAL {
+            ?univ rdfs:label ?arLabel .
+            FILTER(LANG(?arLabel) = "ar")
+          }
+        }
+      `;
+      const endpointUrl = `https://query.wikidata.org/sparql?query=${encodeURIComponent(
+        sparqlQuery
+      )}&format=json`;
+
+      try {
+        const response = await fetch(endpointUrl, {
+          headers: {
+            Accept: "application/sparql-results+json",
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        // Filter results to include only those with an Arabic label
+        const resultsWithArLabel = data.results.bindings.filter(
+          (result: SparqlResult) => result.arLabel?.value
+        );
+        setUniversitySuggestions(resultsWithArLabel);
+      } catch (err) {
+        console.error("Error fetching university suggestions:", err);
+      } finally {
+        setLoadingSuggestions(false);
+      }
+    };
+
+    fetchUniversitySuggestions();
+  }, []);
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -53,13 +114,9 @@ const AddUniversity: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // if (!image) {
-    //   setError("يرجى اختيار صورة للجامعة");
-    //   return;
-    // }
-
     setSubmitting(true);
     setError(null);
+    setSuccess(null); // Clear previous success message
 
     try {
       // Create FormData object for file upload
@@ -96,7 +153,23 @@ const AddUniversity: React.FC = () => {
       }, 2000);
     } catch (err) {
       console.error("Error creating university:", err);
-      setError("فشل في إضافة الجامعة");
+      // Check if the error is an Axios error and has a 400 status
+      if (axios.isAxiosError(err) && err.response?.status === 400) {
+        // Check if the error message indicates invalid name (optional but more specific)
+        const errorMessage = err.response?.data?.message;
+        if (
+          typeof errorMessage === "string" &&
+          errorMessage.includes("not a recognized university")
+        ) {
+          setError("اسم الجامعة غير صحيح");
+        } else {
+          // Handle other 400 errors if necessary
+          setError("فشل في إضافة الجامعة: خطأ في البيانات المدخلة");
+        }
+      } else {
+        // Generic error for other issues (network, server error, etc.)
+        setError("فشل في إضافة الجامعة");
+      }
     } finally {
       setSubmitting(false);
     }
@@ -115,7 +188,7 @@ const AddUniversity: React.FC = () => {
           {error && (
             <div className="m-6 bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg flex items-center">
               <AlertTriangle className="w-5 h-5 mr-2" />
-              <p>{error}</p>
+              <p>{error}</p> {/* Error message is now dynamic */}
             </div>
           )}
 
@@ -131,7 +204,8 @@ const AddUniversity: React.FC = () => {
               {/* University Name */}
               <div className="col-span-2">
                 <label className="block text-gray-700 text-sm font-semibold mb-2 text-right">
-                  اسم الجامعة *
+                  اسم الجامعة *{" "}
+                  {loadingSuggestions && "(جاري تحميل الاقتراحات...)"}
                 </label>
                 <input
                   type="text"
@@ -140,7 +214,21 @@ const AddUniversity: React.FC = () => {
                   value={universityData.name}
                   onChange={handleInputChange}
                   className="w-full border border-gray-300 rounded-md py-2 px-3 text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  list="university-suggestions" // Link input to datalist
+                  placeholder="ابدا بالكتابة للاقتراحات..."
+                  autoComplete="off" // Add this line to disable browser autocomplete
                 />
+                <datalist id="university-suggestions">
+                  {universitySuggestions.map((suggestion) => (
+                    <option
+                      key={suggestion.univ.value}
+                      value={suggestion.arLabel?.value} // Use Arabic label as the value
+                    >
+                      {/* Optionally display English label as well */}
+                      {/* {suggestion.enLabel?.value ? ` (${suggestion.enLabel.value})` : ''} */}
+                    </option>
+                  ))}
+                </datalist>
               </div>
 
               {/* University Type */}
