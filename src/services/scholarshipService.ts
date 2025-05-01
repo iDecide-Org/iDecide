@@ -70,7 +70,16 @@ const API_URL = "http://localhost:3000/api/scholarships";
 // Get all scholarships
 // Keep existing getAllScholarships
 export const getAllScholarships = async () => {
-  // ... existing code ...
+  try {
+    const response = await axios.get<Scholarship[]>(API_URL, {
+      headers: await authHeader(), // Assuming authHeader is defined to include JWT or session info
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching scholarships:", error);
+    throw error; // Rethrow the error for handling in the calling function
+  }
 };
 
 export const createScholarship = async (
