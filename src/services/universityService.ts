@@ -1,5 +1,7 @@
 import axios from "axios";
 import { authHeader } from "./authHeader";
+import { Scholarship } from "./scholarshipService";
+import { College } from "./collegeService";
 
 const API_URL = "http://localhost:3000/api";
 
@@ -27,6 +29,8 @@ export interface University {
     id: string;
     name: string;
   };
+  scholarships?: Scholarship[];
+  colleges?: College[]; // Added colleges field
 }
 
 // Get all universities

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom"; // Import useNavigate
+import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   Calendar,
   MapPin,
@@ -10,22 +10,34 @@ import {
   Heart,
   AlertTriangle,
   Check,
+  Award,
+  Clock,
 } from "lucide-react";
 import Navbar from "./NavBar";
 import Footer from "./Footer";
-import { getUniversityById, getImageUrl } from "../services/universityService";
-import { addFavoriteUniversity, removeFavoriteUniversity, isUniversityInFavorites } from "../services/favoriteService";
+import {
+  getUniversityById,
+  getImageUrl,
+  University,
+} from "../services/universityService";
+import {
+  addFavoriteUniversity,
+  removeFavoriteUniversity,
+  isUniversityInFavorites,
+} from "../services/favoriteService";
 import { useAuth } from "../contexts/useAuth";
+import { Scholarship } from "../services/scholarshipService";
 
 const UniversityDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate(); // Initialize useNavigate
-  const [university, setUniversity] = useState<any>(null);
+  const navigate = useNavigate();
+  const [university, setUniversity] = useState<University | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const { isLoggedIn, isAdvisor } = useAuth(); // Get isAdvisor from useAuth
+  const [activeTab, setActiveTab] = useState<string>("about");
+  const { isLoggedIn, isAdvisor } = useAuth();
 
   useEffect(() => {
     const fetchUniversity = async () => {
@@ -34,9 +46,9 @@ const UniversityDetails: React.FC = () => {
       setLoading(true);
       try {
         const data = await getUniversityById(id);
+
         setUniversity(data);
 
-        // Check if the university is in favorites
         if (isLoggedIn) {
           const favorite = await isUniversityInFavorites(id);
           setIsFavorite(favorite);
@@ -68,7 +80,6 @@ const UniversityDetails: React.FC = () => {
         setSuccessMessage("تمت إضافة الجامعة إلى المفضلة");
       }
 
-      // Clear success message after 3 seconds
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (error) {
       console.error("Error toggling favorite status:", error);
@@ -76,12 +87,20 @@ const UniversityDetails: React.FC = () => {
     }
   };
 
-  // Function to handle starting a chat
   const handleStartChat = () => {
     if (!isLoggedIn || isAdvisor || !university?.advisor?.id) return;
-    // Navigate to the chat page with the advisor's ID
     navigate(`/chat/${university.advisor.id}`);
   };
+
+  const tabs = [
+    { id: "about", label: "عن الجامعة" },
+    { id: "colleges", label: "الكليات" },
+    { id: "admission", label: "شروط القبول" },
+    { id: "fees", label: "المصروفات" },
+    { id: "scholarships", label: "المنح الدراسية" },
+    { id: "location", label: "موقع الجامعة" },
+    { id: "contact", label: "التواصل" },
+  ];
 
   if (loading) {
     return (
@@ -106,7 +125,10 @@ const UniversityDetails: React.FC = () => {
               <p>{error || "لم يتم العثور على الجامعة المطلوبة"}</p>
             </div>
             <div className="mt-4">
-              <Link to="/universities" className="text-blue-600 hover:underline">
+              <Link
+                to="/universities"
+                className="text-blue-600 hover:underline"
+              >
                 العودة إلى صفحة الجامعات
               </Link>
             </div>
@@ -129,226 +151,360 @@ const UniversityDetails: React.FC = () => {
           </div>
         )}
 
-        {/* University Hero Section */}
-        <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8">
-          <div className="relative h-64 md:h-96">
-            <img
-              src={getImageUrl(university.image)}
-              alt={university.name}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-            <div className="absolute bottom-0 w-full p-6 text-white">
-              <div className="flex justify-between items-end">
+        {university && (
+          <>
+            <div className="bg-white rounded-xl shadow-md overflow-hidden f">
+              <div className="relative h-64 md:h-96">
+                <img
+                  src={getImageUrl(university.image)}
+                  alt={university.name}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                <div className="absolute bottom-0 w-full p-6 text-white">
+                  <div className="flex justify-between items-end">
+                    <div>
+                      <h1 className="text-3xl md:text-4xl font-bold">
+                        {university.name}
+                      </h1>
+                      <div className="flex items-center mt-2">
+                        <MapPin className="w-5 h-5 mr-1" />
+                        <span>{university.location}</span>
+                      </div>
+                    </div>
+                    <div className="flex space-x-2">
+                      {isLoggedIn && (
+                        <button
+                          onClick={handleToggleFavorite}
+                          className="bg-white bg-opacity-20 hover:bg-opacity-30 p-2 rounded-full backdrop-blur-sm transition duration-300"
+                        >
+                          <Heart
+                            className={`w-5 h-5 ${
+                              isFavorite
+                                ? "fill-current text-red-500"
+                                : "text-white"
+                            }`}
+                          />
+                        </button>
+                      )}
+                      <button className="bg-white bg-opacity-20 hover:bg-opacity-30 p-2 rounded-full backdrop-blur-sm transition duration-300">
+                        <Share className="w-5 h-5 text-white" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-blue-600 text-white p-4">
+                <div className="container mx-auto">
+                  <div className="flex flex-wrap justify-center md:justify-between gap-4 md:gap-0">
+                    <div className="flex items-center">
+                      <Building className="w-5 h-5 mr-2" />
+                      <span>{university.type}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Calendar className="w-5 h-5 mr-2" />
+                      <span>تأسست عام {university.establishment}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Building className="w-5 h-5 mr-2" />
+                      <span>{university.collegesCount} كلية</span>
+                    </div>
+                    <div className="flex items-center">
+                      <GraduationCap className="w-5 h-5 mr-2" />
+                      <span>{university.majorsCount} تخصص</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className=" bg-white rounded-xl shadow-md overflow-x-auto">
+              <div className="flex border-b border-gray-200" dir="rtl">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`py-3 px-5 text-sm font-medium whitespace-nowrap focus:outline-none ${
+                      activeTab === tab.id
+                        ? "border-b-2 border-blue-500 text-blue-600"
+                        : "text-gray-500 hover:text-gray-700 hover:border-gray-300 border-b-2 border-transparent"
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-md p-6 min-h-[400px]">
+              {activeTab === "about" && (
                 <div>
-                  <h1 className="text-3xl md:text-4xl font-bold">{university.name}</h1>
-                  <div className="flex items-center mt-2">
-                    <MapPin className="w-5 h-5 mr-1" />
-                    <span>{university.location}</span>
-                  </div>
-                </div>
-                <div className="flex space-x-2">
-                  {isLoggedIn && (
-                    <button
-                      onClick={handleToggleFavorite}
-                      className="bg-white bg-opacity-20 hover:bg-opacity-30 p-2 rounded-full backdrop-blur-sm transition duration-300"
-                    >
-                      <Heart
-                        className={`w-5 h-5 ${
-                          isFavorite ? "fill-current text-red-500" : "text-white"
-                        }`}
-                      />
-                    </button>
-                  )}
-                  <button className="bg-white bg-opacity-20 hover:bg-opacity-30 p-2 rounded-full backdrop-blur-sm transition duration-300">
-                    <Share className="w-5 h-5 text-white" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Info Bar */}
-          <div className="bg-blue-600 text-white p-4">
-            <div className="container mx-auto">
-              <div className="flex flex-wrap justify-center md:justify-between gap-4 md:gap-0">
-                <div className="flex items-center">
-                  <Building className="w-5 h-5 mr-2" />
-                  <span>{university.type}</span>
-                </div>
-                <div className="flex items-center">
-                  <Calendar className="w-5 h-5 mr-2" />
-                  <span>تأسست عام {university.establishment}</span>
-                </div>
-                <div className="flex items-center">
-                  <Building className="w-5 h-5 mr-2" />
-                  <span>{university.collegesCount} كلية</span>
-                </div>
-                <div className="flex items-center">
-                  <GraduationCap className="w-5 h-5 mr-2" />
-                  <span>{university.majorsCount} تخصص</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Description Column */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-md p-6 mb-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4 text-right">
-                عن الجامعة
-              </h2>
-              <div className="prose max-w-none text-right">
-                <p className="text-gray-700">{university.description || 'لا يوجد وصف متاح حالياً.'}</p>
-              </div>
-            </div>
-
-            {/* Colleges Section - Placeholder for now */}
-            <div className="bg-white rounded-xl shadow-md p-6 mb-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4 text-right">
-                الكليات والتخصصات
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="border border-gray-200 rounded-lg p-4">
-                  <h3 className="text-lg font-semibold mb-2 text-right">كلية الهندسة</h3>
-                  <ul className="list-disc list-inside text-gray-700 space-y-1 text-right">
-                    <li>هندسة البرمجيات</li>
-                    <li>هندسة الاتصالات</li>
-                    <li>هندسة مدنية</li>
-                  </ul>
-                </div>
-                <div className="border border-gray-200 rounded-lg p-4">
-                  <h3 className="text-lg font-semibold mb-2 text-right">كلية الطب</h3>
-                  <ul className="list-disc list-inside text-gray-700 space-y-1 text-right">
-                    <li>طب بشري</li>
-                    <li>طب أسنان</li>
-                    <li>صيدلة</li>
-                  </ul>
-                </div>
-              </div>
-              <div className="mt-4 text-center">
-                <button className="bg-blue-50 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-100 transition duration-300">
-                  عرض كل الكليات والتخصصات
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Sidebar */}
-          <div className="lg:col-span-1 space-y-6">
-            {/* Contact and Request Info Card */}
-            <div className="bg-white rounded-xl shadow-md p-6">
-              <h3 className="text-xl font-bold text-gray-800 mb-4 text-right">
-                تواصل مع الجامعة
-              </h3>
-              <div className="space-y-4">
-                <div className="bg-blue-50 text-blue-700 p-4 rounded-lg text-center">
-                  <p className="mb-2">هل تريد معلومات إضافية عن الجامعة؟</p>
-                  <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300 w-full">
-                    طلب معلومات
-                  </button>
-                </div>
-
-                {/* Show chat button only for logged-in students and if advisor exists */}
-                {isLoggedIn && !isAdvisor && university?.advisor && (
-                  <div className="bg-blue-50 text-blue-700 p-4 rounded-lg text-center mt-4">
-                    <p className="mb-2">هل لديك أسئلة محددة؟</p>
-                    <button 
-                      onClick={handleStartChat} // Use the new handler
-                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300 w-full flex items-center justify-center"
-                    >
-                      <MessageSquare className="w-4 h-4 mr-2" />
-                      <span>دردشة مع المرشد الأكاديمي</span>
-                    </button>
-                  </div>
-                )}
-
-                <div className="border-t border-gray-200 pt-4">
-                  <h4 className="font-semibold mb-2 text-right">معلومات الاتصال</h4>
-                  <ul className="space-y-2 text-gray-700 text-right">
-                    <li>الموقع الإلكتروني: www.university-website.edu</li>
-                    <li>البريد الإلكتروني: admissions@university-website.edu</li>
-                    <li>الهاتف: +20 123 456 7890</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            {/* Advisor Card - Show if advisor exists (regardless of login status for info) */}
-            {university?.advisor && (
-              <div className="bg-white rounded-xl shadow-md p-6">
-                <h3 className="text-xl font-bold text-gray-800 mb-4 text-right">
-                  المرشد الأكاديمي المسؤول
-                </h3>
-                <div className="flex items-center">
-                  <div className="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
-                    {/* Placeholder for advisor image if available */}
-                    <span className="text-xl font-semibold">
-                      {university.advisor.name ? university.advisor.name.charAt(0).toUpperCase() : "A"}
-                    </span>
-                  </div>
-                  <div className="ml-4 text-right flex-grow">
-                    <p className="font-semibold">{university.advisor.name || "مرشد أكاديمي"}</p>
-                    <p className="text-gray-600 text-sm">
-                      أضاف هذه الجامعة
+                  <h2 className="text-2xl font-bold text-gray-800 mb-4 text-right">
+                    عن الجامعة
+                  </h2>
+                  <div className="prose max-w-none text-right">
+                    <p className="text-gray-700">
+                      {university.description || "لا يوجد وصف متاح حالياً."}
                     </p>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Similar Universities */}
-            <div className="bg-white rounded-xl shadow-md p-6">
-              <h3 className="text-xl font-bold text-gray-800 mb-4 text-right">
-                جامعات مشابهة
-              </h3>
-              <div className="space-y-4">
-                <div className="flex">
-                  <div className="h-14 w-14 bg-gray-200 rounded-md flex-shrink-0">
-                    <img
-                      src="https://via.placeholder.com/56"
-                      alt="University"
-                      className="h-full w-full object-cover rounded-md"
-                    />
-                  </div>
-                  <div className="ml-4 text-right">
-                    <p className="font-semibold">جامعة العلوم الحديثة</p>
-                    <p className="text-gray-600 text-sm">القاهرة، مصر</p>
+              {activeTab === "colleges" && (
+                <>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-4 text-right">
+                    الكليات
+                  </h2>
+                  {university.colleges && university.colleges.length > 0 ? (
+                    university.colleges.map((college) => (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div
+                          key={college.id}
+                          className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                        >
+                          <div className="p-4">
+                            <h3
+                              className="text-lg font-semibold text-blue-700 mb-2 text-right truncate"
+                              title={college.name}
+                            >
+                              {college.name}
+                            </h3>
+                            <p className="text-sm text-gray-600 mb-1 text-right">
+                              {college.description || "لا يوجد وصف متاح."}
+                            </p>
+                            <Link
+                              to={`/colleges/${college.id}`}
+                              className="block w-full text-center bg-blue-50 text-blue-600 py-2 rounded-md hover:bg-blue-100 transition duration-300 text-sm"
+                            >
+                              عرض التفاصيل
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-gray-700 text-right">
+                      لا توجد كليات متاحة حالياً.
+                    </p>
+                  )}
+                </>
+              )}
+
+              {activeTab === "admission" && (
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-4 text-right">
+                    شروط القبول
+                  </h2>
+                  <div className="prose max-w-none text-right">
+                    {university.admissionRequirements ? (
+                      <ul className="list-disc list-inside space-y-2">
+                        {university.admissionRequirements
+                          .split("\n")
+                          .map((req, index) => (
+                            <li key={index}>{req}</li>
+                          ))}
+                      </ul>
+                    ) : (
+                      <p className="text-gray-700">
+                        لا توجد معلومات عن شروط القبول حالياً.
+                      </p>
+                    )}
                   </div>
                 </div>
-                <div className="flex">
-                  <div className="h-14 w-14 bg-gray-200 rounded-md flex-shrink-0">
-                    <img
-                      src="https://via.placeholder.com/56"
-                      alt="University"
-                      className="h-full w-full object-cover rounded-md"
-                    />
-                  </div>
-                  <div className="ml-4 text-right">
-                    <p className="font-semibold">جامعة التكنولوجيا</p>
-                    <p className="text-gray-600 text-sm">الإسكندرية، مصر</p>
-                  </div>
-                </div>
-                <div className="flex">
-                  <div className="h-14 w-14 bg-gray-200 rounded-md flex-shrink-0">
-                    <img
-                      src="https://via.placeholder.com/56"
-                      alt="University"
-                      className="h-full w-full object-cover rounded-md"
-                    />
-                  </div>
-                  <div className="ml-4 text-right">
-                    <p className="font-semibold">جامعة المستقبل</p>
-                    <p className="text-gray-600 text-sm">الجيزة، مصر</p>
+              )}
+
+              {activeTab === "fees" && (
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-4 text-right">
+                    المصروفات الدراسية
+                  </h2>
+                  <div className="prose max-w-none text-right">
+                    <p className="text-gray-700">
+                      {university.tuitionFees ||
+                        "لا توجد معلومات عن المصروفات حالياً."}
+                    </p>
                   </div>
                 </div>
-              </div>
+              )}
+
+              {/* Updated Scholarships Tab */}
+              {activeTab === "scholarships" && (
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-6 text-right">
+                    المنح الدراسية المتاحة
+                  </h2>
+                  {/* Check if university.scholarships exists and has items */}
+                  {university.scholarships &&
+                  university.scholarships.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {university.scholarships.map(
+                        (scholarship: Scholarship) => (
+                          <div
+                            key={scholarship.id}
+                            className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                          >
+                            <div className="p-4">
+                              <h3
+                                className="text-lg font-semibold text-blue-700 mb-2 text-right truncate"
+                                title={scholarship.name}
+                              >
+                                {scholarship.name}
+                              </h3>
+                              <p className="text-sm text-gray-600 mb-1 text-right">
+                                مقدمة من: {scholarship.provider}
+                              </p>
+                              <div className="flex justify-end items-center text-sm text-gray-500 mb-3 gap-2">
+                                <span
+                                  className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                                    scholarship.type === "كاملة"
+                                      ? "bg-green-100 text-green-800"
+                                      : "bg-yellow-100 text-yellow-800"
+                                  }`}
+                                >
+                                  {scholarship.type}
+                                </span>
+                                <Award className="w-4 h-4" />
+                              </div>
+                              <div className="flex justify-end items-center text-sm text-gray-500 mb-4 gap-2">
+                                <span>
+                                  آخر موعد:{" "}
+                                  {scholarship.deadline
+                                    ? new Date(
+                                        scholarship.deadline
+                                      ).toLocaleDateString("ar-EG")
+                                    : "غير محدد"}
+                                </span>
+                                <Clock className="w-4 h-4" />
+                              </div>
+                              <Link
+                                to={`/scholarships/${scholarship.id}`} // Link to scholarship details page
+                                className="block w-full text-center bg-blue-50 text-blue-600 py-2 rounded-md hover:bg-blue-100 transition duration-300 text-sm"
+                              >
+                                عرض التفاصيل
+                              </Link>
+                            </div>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  ) : (
+                    // Message if no scholarships are found
+                    <div className="text-center py-10">
+                      <p className="text-gray-500">
+                        لا توجد منح دراسية متاحة حالياً لهذه الجامعة.
+                      </p>
+                      {/* Optional: Link to general scholarships page */}
+                      <Link
+                        to="/scholarships"
+                        className="mt-4 inline-block text-blue-600 hover:underline"
+                      >
+                        تصفح جميع المنح
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === "location" && (
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-4 text-right">
+                    موقع الجامعة على الخريطة
+                  </h2>
+                  <div className="h-64 bg-gray-200 rounded-lg flex items-center justify-center">
+                    <p className="text-gray-500">Map Placeholder</p>
+                  </div>
+                  <p className="mt-4 text-gray-700 text-right">
+                    العنوان: {university.location}
+                  </p>
+                </div>
+              )}
+
+              {activeTab === "contact" && (
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-4 text-right">
+                    التواصل مع الجامعة
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <h4 className="font-semibold mb-2 text-right">
+                        معلومات الاتصال
+                      </h4>
+                      <ul className="space-y-2 text-gray-700 text-right">
+                        <li>
+                          الموقع الإلكتروني:{" "}
+                          {university.website ? (
+                            <a
+                              href={university.website}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:underline"
+                            >
+                              {university.website}
+                            </a>
+                          ) : (
+                            "غير متوفر"
+                          )}
+                        </li>
+                        <li>البريد الإلكتروني: غير متوفر</li>
+                        <li>الهاتف: غير متوفر</li>
+                      </ul>
+                      <div className="bg-blue-50 text-blue-700 p-4 rounded-lg text-center mt-6">
+                        <p className="mb-2">
+                          هل تريد معلومات إضافية عن الجامعة؟
+                        </p>
+                        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300 w-full">
+                          طلب معلومات
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      {university?.advisor && (
+                        <div className="mb-6">
+                          <h3 className="text-xl font-bold text-gray-800 mb-4 text-right">
+                            المرشد الأكاديمي المسؤول
+                          </h3>
+                          <div className="flex items-center bg-gray-50 p-4 rounded-lg">
+                            <div className="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 flex-shrink-0">
+                              <span className="text-xl font-semibold">
+                                {university.advisor.name
+                                  ? university.advisor.name
+                                      .charAt(0)
+                                      .toUpperCase()
+                                  : "A"}
+                              </span>
+                            </div>
+                            <div className="mr-4 text-right flex-grow">
+                              <p className="font-semibold">
+                                {university.advisor.name || "مرشد أكاديمي"}
+                              </p>
+                              <p className="text-gray-600 text-sm">
+                                أضاف هذه الجامعة
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      {isLoggedIn && !isAdvisor && university?.advisor && (
+                        <div className="bg-blue-50 text-blue-700 p-4 rounded-lg text-center">
+                          <p className="mb-2">هل لديك أسئلة محددة؟</p>
+                          <button
+                            onClick={handleStartChat}
+                            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300 w-full flex items-center justify-center"
+                          >
+                            <MessageSquare className="w-4 h-4 ml-2" />
+                            <span>دردشة مع المرشد الأكاديمي</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
-        </div>
+          </>
+        )}
       </div>
 
       <Footer className="mt-auto" />
