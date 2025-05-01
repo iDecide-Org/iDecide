@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+// Import Link
+import { useNavigate, Link } from "react-router-dom";
 import {
   getAdvisorUniversities,
   deleteUniversity,
@@ -15,11 +16,12 @@ import {
   MapPin,
   Calendar,
   Info,
+  Eye, // Import Eye icon
 } from "lucide-react";
 
 export const UniversityCRUD: React.FC = () => {
   const navigate = useNavigate();
-  const { isAdvisor, user } = useAuth(); // Get user info for potential checks
+  const { isAdvisor } = useAuth(); // Get user info for potential checks
   const [university, setUniversity] = useState<University | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -136,6 +138,15 @@ export const UniversityCRUD: React.FC = () => {
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-2 items-end sm:items-center">
+                  {/* View Details Button */}
+                  <Link
+                    to={`/university-details/${university.id}`}
+                    className="text-blue-600 hover:text-blue-800 transition-colors p-2 rounded-md hover:bg-blue-100 flex items-center text-sm"
+                    title="عرض تفاصيل الجامعة"
+                  >
+                    <Eye className="w-4 h-4 ml-1" />
+                    عرض
+                  </Link>
                   <button
                     onClick={handleEditUniversity}
                     className="text-indigo-600 hover:text-indigo-800 transition-colors p-2 rounded-md hover:bg-indigo-100 flex items-center text-sm"

@@ -16,7 +16,7 @@ import {
 } from "../../services/universityService";
 import { useAuth } from "../../contexts/useAuth";
 
-import { CollegesCRUD } from "./CollegesCRUD";
+import { CollegesCRUD } from "./collages/CollegesCRUD";
 import { MajorsCRUD } from "./MajorsCRUD";
 import { ScholarshipsCRUD } from "./scholarship/ScholarshipsCRUD";
 import { UniversityCRUD } from "./university/UniversityCRUD";
@@ -30,7 +30,7 @@ import { UniversityCRUD } from "./university/UniversityCRUD";
 // --- Main ManageUniversities Component ---
 const ManageUniversities: React.FC = () => {
   const navigate = useNavigate();
-  const { isAdvisor, user } = useAuth();
+  const { isAdvisor } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [university, setUniversity] = useState<University | null>(null);

@@ -4,7 +4,7 @@ import {
   College,
   deleteCollege,
   getCollegesByUniversity,
-} from "../../services/collegeService";
+} from "../../../services/collegeService";
 
 export const CollegesCRUD: React.FC<{ universityId: string }> = ({
   universityId,
