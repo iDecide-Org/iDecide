@@ -6,10 +6,10 @@ import {
   updateUniversity,
   deleteUniversity,
   getImageUrl,
-} from "../../services/universityService";
-import { useAuth } from "../../contexts/useAuth";
-import Navbar from "../NavBar";
-import Footer from "../Footer";
+} from "../../../services/universityService";
+import { useAuth } from "../../../contexts/useAuth";
+import Navbar from "../../NavBar";
+import Footer from "../../Footer";
 import { MapPin, Save, Trash2, ArrowRight, Plus } from "lucide-react"; // Import Plus
 
 enum UniversityType {

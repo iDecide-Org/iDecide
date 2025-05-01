@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Save, ChevronLeft, AlertTriangle, Check } from "lucide-react";
-import Navbar from "../NavBar";
-import Footer from "../Footer";
-import { createUniversity } from "../../services/universityService";
-import { useAuth } from "../../contexts/useAuth";
+import Navbar from "../../NavBar";
+import Footer from "../../Footer";
+import { createUniversity } from "../../../services/universityService";
+import { useAuth } from "../../../contexts/useAuth";
 import axios from "axios"; // Import axios to check error details
 
 // Define type for SPARQL results

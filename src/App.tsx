@@ -24,7 +24,7 @@ const AdvisorDashboard = React.lazy(
 ) as unknown as React.ComponentType;
 
 const AddUniversity = React.lazy(
-  () => import("./components/advisor/AddUniversity")
+  () => import("./components/advisor/university/AddUniversity")
 ) as unknown as React.ComponentType;
 
 const ManageUniversities = React.lazy(
@@ -32,7 +32,7 @@ const ManageUniversities = React.lazy(
 ) as unknown as React.ComponentType;
 
 const EditUniversity = React.lazy(
-  () => import("./components/advisor/EditUniversity")
+  () => import("./components/advisor/university/EditUniversity")
 ) as unknown as React.ComponentType;
 
 const AddScholarship = React.lazy(

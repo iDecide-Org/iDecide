@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   Plus,
   AlertTriangle,
-  Edit,
   Building,
   GraduationCap,
   Award,
@@ -20,6 +19,7 @@ import { useAuth } from "../../contexts/useAuth";
 import { CollegesCRUD } from "./CollegesCRUD";
 import { MajorsCRUD } from "./MajorsCRUD";
 import { ScholarshipsCRUD } from "./scholarship/ScholarshipsCRUD";
+import { UniversityCRUD } from "./university/UniversityCRUD";
 
 // --- Colleges CRUD Component ---
 
@@ -71,27 +71,7 @@ const ManageUniversities: React.FC = () => {
 
     switch (activeTab) {
       case "university":
-        return (
-          <div className="bg-white rounded-xl shadow-lg p-6 text-center max-w-md mx-auto">
-            <Home className="w-12 h-12 text-indigo-500 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold mb-2 text-gray-700">
-              نظرة عامة على الجامعة
-            </h3>
-            <p className="text-gray-600 mb-1">
-              <strong>الاسم:</strong> {university.name}
-            </p>
-            <p className="text-gray-600 mb-4">
-              <strong>الموقع:</strong> {university.location}
-            </p>
-            <Link
-              to={`/universities/edit/${university.id}`}
-              className="mt-4 inline-flex items-center bg-indigo-600 text-white py-2 px-5 rounded-lg hover:bg-indigo-700 transition-colors"
-            >
-              <Edit className="w-4 h-4 ml-1" />
-              تعديل بيانات الجامعة
-            </Link>
-          </div>
-        );
+        return <UniversityCRUD />;
       case "colleges":
         return <CollegesCRUD universityId={university.id} />;
       case "majors":
