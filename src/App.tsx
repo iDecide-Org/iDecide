@@ -18,6 +18,11 @@ import Scholarships from "./components/Scholarships";
 import ScholarshipDetails from "./components/ScholarshipDetails";
 import { MessageSquare } from "lucide-react";
 
+// Import CollegeDetails
+const CollegeDetails = React.lazy(
+  () => import("./components/CollegeDetails")
+) as unknown as React.ComponentType;
+
 // Import advisor-specific components
 const AdvisorDashboard = React.lazy(
   () => import("./components/advisor/Dashboard")
@@ -128,8 +133,9 @@ const App: React.FC = () => {
             <Route path="/majors/add/:collegeId" element={<AddMajor />} />
             <Route path="/majors/edit/:id" element={<EditMajor />} />
 
-
             <Route path="/about" element={<About />} />
+            {/* Add College Details Route for Advisor */}
+            <Route path="/college-details/:id" element={<CollegeDetails />} />
             <Route path="/chat" element={<ChatList />} />
             <Route path="/chat/:userId" element={<ChatRoom />} />
             <Route
@@ -208,6 +214,21 @@ const App: React.FC = () => {
         <Route path="/jobs/:id" element={<JobDetails />} />
         <Route path="/scholarships" element={<Scholarships />} />
         <Route path="/scholarships/:id" element={<ScholarshipDetails />} />
+        {/* Add College Details Route for Student/Guest */}
+        <Route
+          path="/college-details/:id"
+          element={
+            <React.Suspense
+              fallback={
+                <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                </div>
+              }
+            >
+              <CollegeDetails />
+            </React.Suspense>
+          }
+        />
 
         <Route
           path="/chat"

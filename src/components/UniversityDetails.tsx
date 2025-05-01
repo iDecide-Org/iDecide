@@ -98,7 +98,7 @@ const UniversityDetails: React.FC = () => {
     { id: "about", label: "عن الجامعة" },
     { id: "colleges", label: "الكليات" },
     { id: "admission", label: "شروط القبول" },
-    { id: "fees", label: "المصروفات" },
+    // { id: "fees", label: "المصروفات" },
     { id: "scholarships", label: "المنح الدراسية" },
     { id: "location", label: "موقع الجامعة" },
     { id: "contact", label: "التواصل" },
@@ -297,9 +297,12 @@ const UniversityDetails: React.FC = () => {
                                 <ExternalLink className="w-3 h-3" />
                               </a>
                             )}
-                            <button className="text-xs text-gray-600 hover:text-black">
-                              عرض التخصصات
-                            </button>
+                            <Link
+                              to={`/college-details/${college.id}`}
+                              className="text-xs text-gray-600 hover:text-black"
+                            >
+                              عرض التفاصيل
+                            </Link>
                           </div>
                         </div>
                       ))}
@@ -345,7 +348,7 @@ const UniversityDetails: React.FC = () => {
                 </div>
               )}
 
-              {activeTab === "fees" && (
+              {/* {activeTab === "fees" && (
                 <div>
                   <h2 className="text-2xl font-bold text-gray-800 mb-4 text-right">
                     المصروفات الدراسية
@@ -357,7 +360,7 @@ const UniversityDetails: React.FC = () => {
                     </p>
                   </div>
                 </div>
-              )}
+              )} */}
 
               {activeTab === "scholarships" && (
                 <div>

@@ -15,6 +15,7 @@ export interface College {
     id: string;
     name: string;
     advisorId?: string;
+    image?: string;
   };
   majors?: Major[];
 }
