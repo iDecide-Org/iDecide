@@ -184,9 +184,9 @@ export const deleteScholarship = async (id: string) => {
 
 // Filter scholarships with advanced criteria
 // Keep existing filterScholarships
-export const filterScholarships = async (params: {
-  // ... existing params ...
-  universityId?: string; // Ensure universityId is a possible filter param
-}) => {
-  // ... existing code ...
-};
+// export const filterScholarships = async (params: {
+//   // ... existing params ...
+//   universityId?: string; // Ensure universityId is a possible filter param
+// }) => {
+//   // ... existing code ...
+// };

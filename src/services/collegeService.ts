@@ -1,40 +1,48 @@
 import axios from "axios";
-import { authHeader } from "./authHeader"; // Assuming authHeader exists
+import { authHeader } from "./authHeader";
+import { Major } from "./majorService";
 
-// Define the College interface based on the backend entity
+const API_URL = "http://localhost:3000/api/colleges";
+
 export interface College {
   id: string;
   name: string;
-  description?: string;
+  description: string;
   universityId: string;
   university?: {
-    // Optional: Include if backend sends nested university info
+    // Optional: If backend sends nested university info
     id: string;
     name: string;
+    advisorId?: string; // Include if needed for authorization checks
   };
-  majors?: Major[]; // Optional: Include if backend sends nested majors info
-  // Add other fields as needed based on your backend College entity
+  majors?: Major[];
 }
 
-// Define the Major interface (can be moved to majorService.ts later)
-export interface Major {
-  id: string;
-  name: string;
-  description?: string;
-  collegeId: string;
-  // Add other fields as needed
-}
+// Get all colleges (optional: filter by university)
+export const getColleges = async (
+  universityId?: string
+): Promise<College[]> => {
+  try {
+    const response = await axios.get<College[]>(API_URL, {
+      params: universityId ? { universityId } : {},
+      withCredentials: true, // If needed for public/private routes
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching colleges:", error);
+    throw error;
+  }
+};
 
-const API_URL = "http://localhost:3000/api/colleges"; // Adjust if your API URL is different
-
-// Get colleges by University ID
+// Get colleges specifically for a university (often used in advisor context)
 export const getCollegesByUniversity = async (
   universityId: string
 ): Promise<College[]> => {
   try {
     const response = await axios.get<College[]>(API_URL, {
       params: { universityId },
-      withCredentials: true, // Include cookies if needed for auth
+      headers: await authHeader(), // Assume protected endpoint for advisor context
+      withCredentials: true,
     });
     return response.data;
   } catch (error) {
@@ -42,13 +50,23 @@ export const getCollegesByUniversity = async (
       `Error fetching colleges for university ${universityId}:`,
       error
     );
-    // Return empty array or throw error based on how you want to handle errors
-    return [];
-    // throw error;
+    throw error;
   }
 };
 
-// --- Placeholder CRUD functions ---
+// Get a single college by ID
+export const getCollegeById = async (id: string): Promise<College> => {
+  try {
+    const response = await axios.get<College>(`${API_URL}/${id}`, {
+      headers: await authHeader(), // Assume protected endpoint
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching college ${id}:`, error);
+    throw error;
+  }
+};
 
 // Create a new college (requires authentication)
 export const createCollege = async (
