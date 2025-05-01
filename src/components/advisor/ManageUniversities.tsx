@@ -17,7 +17,7 @@ import {
 import { useAuth } from "../../contexts/useAuth";
 
 import { CollegesCRUD } from "./collages/CollegesCRUD";
-import { MajorsCRUD } from "./MajorsCRUD";
+import { MajorsCRUD } from "./majors/MajorsCRUD";
 import { ScholarshipsCRUD } from "./scholarship/ScholarshipsCRUD";
 import { UniversityCRUD } from "./university/UniversityCRUD";
 

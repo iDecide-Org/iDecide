@@ -11,6 +11,11 @@ export interface Major {
     // Optional: Include if backend sends nested college info
     id: string;
     name: string;
+    university?: {
+      // Optional: Include if needed for auth checks
+      id: string;
+      advisorId?: string;
+    };
   };
   // Add other fields as needed based on your backend Major entity
 }
@@ -30,12 +35,23 @@ export const getMajorsByCollege = async (
   } catch (error) {
     console.error(`Error fetching majors for college ${collegeId}:`, error);
     // Return empty array or throw error based on how you want to handle errors
-    return [];
-    // throw error;
+    throw error; // Rethrow to allow component to handle error state
   }
 };
 
-// --- Placeholder CRUD functions ---
+// Get a single major by ID
+export const getMajorById = async (id: string): Promise<Major> => {
+  try {
+    const response = await axios.get<Major>(`${API_URL}/${id}`, {
+      headers: await authHeader(), // Assume protected endpoint or public with auth check
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching major ${id}:`, error);
+    throw error;
+  }
+};
 
 // Create a new major (requires authentication)
 export const createMajor = async (

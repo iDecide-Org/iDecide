@@ -50,6 +50,14 @@ const EditCollege = React.lazy(
   () => import("./components/advisor/collages/EditCollege") // Corrected path
 ) as unknown as React.ComponentType;
 
+const AddMajor = React.lazy(
+  () => import("./components/advisor/majors/AddMajor") // Corrected path
+) as unknown as React.ComponentType;
+
+const EditMajor = React.lazy(
+  () => import("./components/advisor/majors/EditMajor") // Corrected path
+) as unknown as React.ComponentType;
+
 const ChatList = React.lazy(
   () => import("./components/chat/ChatList")
 ) as unknown as React.ComponentType;
@@ -116,6 +124,10 @@ const App: React.FC = () => {
               element={<AddCollege />}
             />
             <Route path="/colleges/edit/:id" element={<EditCollege />} />
+
+            <Route path="/majors/add/:collegeId" element={<AddMajor />} />
+            <Route path="/majors/edit/:id" element={<EditMajor />} />
+
 
             <Route path="/about" element={<About />} />
             <Route path="/chat" element={<ChatList />} />
