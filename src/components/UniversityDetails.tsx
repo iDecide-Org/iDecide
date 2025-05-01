@@ -256,7 +256,7 @@ const UniversityDetails: React.FC = () => {
               {activeTab === "colleges" && (
                 <div>
                   <h2 className="text-2xl font-bold text-gray-800 mb-6 text-right">
-                    الكليات والتخصصات
+                    الكليات المتاحة
                   </h2>
                   {university.colleges && university.colleges.length > 0 ? (
                     <div
