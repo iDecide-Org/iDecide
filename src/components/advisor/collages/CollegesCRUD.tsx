@@ -114,7 +114,7 @@ export const CollegesCRUD: React.FC<{ universityId: string }> = ({
                     </td>
                     <td
                       className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate"
-                      title={college.description}
+                      title={college.description || "-"}
                     >
                       {" "}
                       {/* Truncate long descriptions */}

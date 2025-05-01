@@ -8,10 +8,17 @@ import {
 import { useAuth } from "../../../contexts/useAuth";
 import Navbar from "../../NavBar";
 import Footer from "../../Footer";
-import { Save, ArrowRight, AlertTriangle, Check } from "lucide-react";
+import {
+  Save,
+  ArrowRight,
+  AlertTriangle,
+  Check,
+  MapPin,
+  Link as LinkIcon,
+} from "lucide-react";
 
 const EditCollege: React.FC = () => {
-  const { id } = useParams<{ id: string }>(); // College ID
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [college, setCollege] = useState<Partial<College>>({});
@@ -31,9 +38,11 @@ const EditCollege: React.FC = () => {
       setError(null);
       try {
         const data = await getCollegeById(id);
-        // Optional: Add authorization check if backend doesn't handle it fully
-        // e.g., check if data.university?.advisorId === user?.id
-        setCollege(data);
+        setCollege({
+          ...data,
+          location: data.location || "",
+          website: data.website || "",
+        });
       } catch (err) {
         setError("فشل في تحميل بيانات الكلية");
         console.error("Error fetching college:", err);
@@ -42,7 +51,7 @@ const EditCollege: React.FC = () => {
       }
     };
     fetchCollege();
-  }, [id, user?.id]); // Add user?.id if authorization check is added
+  }, [id, user?.id]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -57,25 +66,29 @@ const EditCollege: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!id) return;
+    if (!college.name?.trim()) {
+      setError("اسم الكلية مطلوب.");
+      return;
+    }
 
     setSubmitting(true);
     setError(null);
     setSuccess(null);
 
-    // Prepare data for update (only send fields that can be updated)
     const dataToUpdate: Partial<
       Omit<College, "id" | "universityId" | "university" | "majors">
     > = {
       name: college.name,
       description: college.description,
+      location: college.location || null,
+      website: college.website || null,
     };
 
     try {
       await updateCollege(id, dataToUpdate);
       setSuccess("تم تحديث الكلية بنجاح!");
-      // Optionally redirect after a delay
       setTimeout(() => {
-        navigate(`/universities/manage`); // Navigate back to the management page
+        navigate(`/universities/manage`);
       }, 1500);
     } catch (err) {
       setError("فشل في تحديث الكلية");
@@ -97,7 +110,6 @@ const EditCollege: React.FC = () => {
     );
   }
 
-  // Initial error (e.g., ID missing, fetch failed)
   if (error && !submitting) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col">
@@ -138,13 +150,12 @@ const EditCollege: React.FC = () => {
             </button>
           </div>
 
-          {error &&
-            submitting && ( // Show submission errors here
-              <div className="m-6 bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg flex items-center">
-                <AlertTriangle className="w-5 h-5 mr-2" />
-                <p>{error}</p>
-              </div>
-            )}
+          {error && submitting && (
+            <div className="m-6 bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg flex items-center">
+              <AlertTriangle className="w-5 h-5 mr-2" />
+              <p>{error}</p>
+            </div>
+          )}
 
           {success && (
             <div className="m-6 bg-green-50 border border-green-200 text-green-700 p-4 rounded-lg flex items-center">
@@ -154,7 +165,6 @@ const EditCollege: React.FC = () => {
           )}
 
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
-            {/* College Name */}
             <div>
               <label
                 htmlFor="name"
@@ -173,7 +183,6 @@ const EditCollege: React.FC = () => {
               />
             </div>
 
-            {/* Description */}
             <div>
               <label
                 htmlFor="description"
@@ -191,7 +200,53 @@ const EditCollege: React.FC = () => {
               />
             </div>
 
-            {/* Form Actions */}
+            <div>
+              <label
+                htmlFor="location"
+                className="block text-gray-700 text-sm font-semibold mb-2 text-right"
+              >
+                الموقع (اختياري)
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <MapPin className="h-5 w-5 text-gray-400" />
+                </span>
+                <input
+                  type="text"
+                  id="location"
+                  name="location"
+                  value={college.location || ""}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 rounded-md py-2 px-3 pl-10 text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="مثال: مبنى أ، الدور الثاني"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="website"
+                className="block text-gray-700 text-sm font-semibold mb-2 text-right"
+              >
+                الموقع الإلكتروني (اختياري)
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <LinkIcon className="h-5 w-5 text-gray-400" />
+                </span>
+                <input
+                  type="url"
+                  id="website"
+                  name="website"
+                  value={college.website || ""}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 rounded-md py-2 px-3 pl-10 text-left focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="https://example-college.com"
+                  dir="ltr"
+                />
+              </div>
+            </div>
+
             <div className="mt-8 flex justify-end">
               <button
                 type="submit"

@@ -10,7 +10,16 @@ import {
 import { useAuth } from "../../../contexts/useAuth";
 import Navbar from "../../NavBar";
 import Footer from "../../Footer";
-import { MapPin, Save, Trash2, ArrowRight, Plus } from "lucide-react"; // Import Plus
+import {
+  MapPin,
+  Save,
+  Trash2,
+  ArrowRight,
+  Plus,
+  Phone,
+  Mail,
+  Globe,
+} from "lucide-react"; // Import Plus, Phone, Mail, Globe
 
 enum UniversityType {
   GOVERNMENTAL = "حكومية",
@@ -35,7 +44,9 @@ const EditUniversity = () => {
     nameAr: "",
     location: "",
     description: "",
-    website: "",
+    website: "", // Add website state
+    phone: "", // Add phone state
+    email: "", // Add email state
     tuitionFees: "",
     admissionRequirements: "",
     image: "",
@@ -71,7 +82,9 @@ const EditUniversity = () => {
           nameAr: data.nameAr ?? "",
           location: data.location,
           description: data.description,
-          website: data.website ?? "",
+          website: data.website ?? "", // Set website
+          phone: data.phone ?? "", // Set phone
+          email: data.email ?? "", // Set email
           tuitionFees: data.tuitionFees ?? "",
           admissionRequirements: data.admissionRequirements ?? "",
           majors: data.majors ?? [],
@@ -134,8 +147,10 @@ const EditUniversity = () => {
       formData.append("collegesCount", university.collagesCount.toString());
       formData.append("majorsCount", university.majorsCount.toString());
       formData.append("image", university.image);
+      formData.append("website", university.website); // Add website
+      formData.append("phone", university.phone); // Add phone
+      formData.append("email", university.email); // Add email
 
-      // formData.append("website", university.website);
       // formData.append("tuitionFees", university.tuitionFees);
       // formData.append(
       //   "admissionRequirements",
@@ -351,6 +366,77 @@ const EditUniversity = () => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                   dir="rtl"
                 />
+              </div>
+
+              {/* Website */}
+              <div>
+                <label
+                  htmlFor="website"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  الموقع الإلكتروني
+                </label>
+                <div className="relative">
+                  <input
+                    type="url"
+                    id="website"
+                    name="website"
+                    value={university.website}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 pl-10"
+                    dir="ltr"
+                    placeholder="https://example.com"
+                  />
+                  <Globe className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
+                </div>
+              </div>
+
+              {/* Phone */}
+              <div>
+                <label
+                  htmlFor="phone"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  رقم الهاتف
+                </label>
+                <div className="relative">
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={university.phone}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 pl-10"
+                    dir="ltr"
+                    placeholder="+20 123 456 7890"
+                  />
+                  <Phone className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
+                </div>
+              </div>
+
+              {/* Email */}
+              <div className="md:col-span-2">
+                {" "}
+                {/* Make email span full width on medium screens */}
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  البريد الإلكتروني
+                </label>
+                <div className="relative">
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={university.email}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 pl-10"
+                    dir="ltr"
+                    placeholder="info@example.com"
+                  />
+                  <Mail className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
+                </div>
               </div>
             </div>
 

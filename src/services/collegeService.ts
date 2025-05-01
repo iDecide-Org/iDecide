@@ -7,16 +7,30 @@ const API_URL = "http://localhost:3000/api/colleges";
 export interface College {
   id: string;
   name: string;
-  description: string;
+  description: string | null; // Allow null for description as well if backend allows
+  location?: string | null; // Change to string | null
+  website?: string | null; // Change to string | null
   universityId: string;
   university?: {
-    // Optional: If backend sends nested university info
     id: string;
     name: string;
-    advisorId?: string; // Include if needed for authorization checks
+    advisorId?: string;
   };
   majors?: Major[];
 }
+
+// Define the type for data sent when creating a college
+// Ensure it matches the expected backend DTO (CreateCollegeDto)
+export type CreateCollegePayload = Omit<
+  College,
+  "id" | "university" | "majors"
+>;
+
+// Define the type for data sent when updating a college
+// Ensure it matches the expected backend DTO (UpdateCollegeDto)
+export type UpdateCollegePayload = Partial<
+  Omit<College, "id" | "universityId" | "university" | "majors">
+>;
 
 // Get all colleges (optional: filter by university)
 export const getColleges = async (
@@ -70,40 +84,38 @@ export const getCollegeById = async (id: string): Promise<College> => {
 
 // Create a new college (requires authentication)
 export const createCollege = async (
-  collegeData: Omit<College, "id" | "university" | "majors">
+  collegeData: CreateCollegePayload // Use the defined payload type
 ): Promise<College> => {
   try {
     const response = await axios.post<College>(API_URL, collegeData, {
-      headers: await authHeader(), // Add auth header
+      headers: await authHeader(),
       withCredentials: true,
     });
     return response.data;
   } catch (error) {
     console.error("Error creating college:", error);
-    throw error; // Rethrow to be handled by the component
+    throw error;
   }
 };
 
 // Update an existing college (requires authentication)
 export const updateCollege = async (
   id: string,
-  collegeData: Partial<
-    Omit<College, "id" | "universityId" | "university" | "majors">
-  >
+  collegeData: UpdateCollegePayload // Use the defined payload type
 ): Promise<College> => {
   try {
     const response = await axios.patch<College>(
       `${API_URL}/${id}`,
       collegeData,
       {
-        headers: await authHeader(), // Add auth header
+        headers: await authHeader(),
         withCredentials: true,
       }
     );
     return response.data;
   } catch (error) {
     console.error(`Error updating college ${id}:`, error);
-    throw error; // Rethrow to be handled by the component
+    throw error;
   }
 };
 
@@ -116,6 +128,6 @@ export const deleteCollege = async (id: string): Promise<void> => {
     });
   } catch (error) {
     console.error(`Error deleting college ${id}:`, error);
-    throw error; // Rethrow to be handled by the component
+    throw error;
   }
 };

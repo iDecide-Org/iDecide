@@ -12,6 +12,8 @@ export interface University {
   location: string;
   description: string;
   website?: string;
+  phone?: string;
+  email?: string;
   tuitionFees?: string;
   admissionRequirements?: string;
   image?: string; // Changed from imageUrl to image

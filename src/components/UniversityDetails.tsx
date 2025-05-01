@@ -12,6 +12,7 @@ import {
   Check,
   Award,
   Clock,
+  ExternalLink,
 } from "lucide-react";
 import Navbar from "./NavBar";
 import Footer from "./Footer";
@@ -27,6 +28,7 @@ import {
 } from "../services/favoriteService";
 import { useAuth } from "../contexts/useAuth";
 import { Scholarship } from "../services/scholarshipService";
+import { College } from "../services/collegeService";
 
 const UniversityDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -252,43 +254,72 @@ const UniversityDetails: React.FC = () => {
               )}
 
               {activeTab === "colleges" && (
-                <>
-                  <h2 className="text-2xl font-bold text-gray-800 mb-4 text-right">
-                    الكليات
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-6 text-right">
+                    الكليات والتخصصات
                   </h2>
                   {university.colleges && university.colleges.length > 0 ? (
-                    university.colleges.map((college) => (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div
+                      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                      dir="rtl"
+                    >
+                      {university.colleges.map((college: College) => (
                         <div
                           key={college.id}
-                          className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                          className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col"
                         >
-                          <div className="p-4">
+                          <div className="p-4 flex-grow">
                             <h3
                               className="text-lg font-semibold text-blue-700 mb-2 text-right truncate"
                               title={college.name}
                             >
                               {college.name}
                             </h3>
-                            <p className="text-sm text-gray-600 mb-1 text-right">
+                            {college.location && (
+                              <p className="text-sm text-gray-500 mb-3 text-right flex items-center justify-end gap-1">
+                                <span>{college.location}</span>
+                                <MapPin className="w-4 h-4" />
+                              </p>
+                            )}
+                            <p className="text-sm text-gray-600 mb-4 text-right line-clamp-3">
                               {college.description || "لا يوجد وصف متاح."}
                             </p>
-                            <Link
-                              to={`/colleges/${college.id}`}
-                              className="block w-full text-center bg-blue-50 text-blue-600 py-2 rounded-md hover:bg-blue-100 transition duration-300 text-sm"
-                            >
-                              عرض التفاصيل
-                            </Link>
+                          </div>
+                          <div className="border-t border-gray-100 p-3 bg-gray-50 flex justify-between items-center">
+                            {college.website && (
+                              <a
+                                href={college.website}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1"
+                              >
+                                <span>الموقع الإلكتروني</span>
+                                <ExternalLink className="w-3 h-3" />
+                              </a>
+                            )}
+                            <button className="text-xs text-gray-600 hover:text-black">
+                              عرض التخصصات
+                            </button>
                           </div>
                         </div>
-                      </div>
-                    ))
+                      ))}
+                    </div>
                   ) : (
-                    <p className="text-gray-700 text-right">
-                      لا توجد كليات متاحة حالياً.
-                    </p>
+                    <div className="text-center py-10">
+                      <p className="text-gray-500">
+                        لم يتم إضافة كليات لهذه الجامعة بعد.
+                      </p>
+                      {isAdvisor && (
+                        <Link
+                          to={`/universities/manage`}
+                          className="mt-4 inline-block text-blue-600 hover:underline"
+                        >
+                          إدارة الكليات
+                        </Link>
+                      )}
+                    </div>
                   )}
-                </>
+                </div>
               )}
 
               {activeTab === "admission" && (
@@ -328,16 +359,17 @@ const UniversityDetails: React.FC = () => {
                 </div>
               )}
 
-              {/* Updated Scholarships Tab */}
               {activeTab === "scholarships" && (
                 <div>
                   <h2 className="text-2xl font-bold text-gray-800 mb-6 text-right">
                     المنح الدراسية المتاحة
                   </h2>
-                  {/* Check if university.scholarships exists and has items */}
                   {university.scholarships &&
                   university.scholarships.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div
+                      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                      dir="rtl"
+                    >
                       {university.scholarships.map(
                         (scholarship: Scholarship) => (
                           <div
@@ -378,7 +410,7 @@ const UniversityDetails: React.FC = () => {
                                 <Clock className="w-4 h-4" />
                               </div>
                               <Link
-                                to={`/scholarships/${scholarship.id}`} // Link to scholarship details page
+                                to={`/scholarships/${scholarship.id}`}
                                 className="block w-full text-center bg-blue-50 text-blue-600 py-2 rounded-md hover:bg-blue-100 transition duration-300 text-sm"
                               >
                                 عرض التفاصيل
@@ -389,12 +421,10 @@ const UniversityDetails: React.FC = () => {
                       )}
                     </div>
                   ) : (
-                    // Message if no scholarships are found
                     <div className="text-center py-10">
                       <p className="text-gray-500">
                         لا توجد منح دراسية متاحة حالياً لهذه الجامعة.
                       </p>
-                      {/* Optional: Link to general scholarships page */}
                       <Link
                         to="/scholarships"
                         className="mt-4 inline-block text-blue-600 hover:underline"
@@ -432,7 +462,7 @@ const UniversityDetails: React.FC = () => {
                       </h4>
                       <ul className="space-y-2 text-gray-700 text-right">
                         <li>
-                          الموقع الإلكتروني:{" "}
+                          <span> الموقع الإلكتروني: {"  "}</span>
                           {university.website ? (
                             <a
                               href={university.website}
@@ -446,8 +476,35 @@ const UniversityDetails: React.FC = () => {
                             "غير متوفر"
                           )}
                         </li>
-                        <li>البريد الإلكتروني: غير متوفر</li>
-                        <li>الهاتف: غير متوفر</li>
+                        {/* <li>البريد الإلكتروني: غير متوفر</li>
+                        <li>الهاتف: غير متوفر</li> */}
+
+                        <li>
+                          الهاتف: {"  "}
+                          {university.phone ? (
+                            <a
+                              href={`tel:${university.phone}`}
+                              className="text-blue-600 hover:underline"
+                            >
+                              {university.phone}
+                            </a>
+                          ) : (
+                            "غير متوفر"
+                          )}
+                        </li>
+                        <li>
+                          البريد الإلكتروني:{" "}
+                          {university.email ? (
+                            <a
+                              href={`mailto:${university.email}`}
+                              className="text-blue-600 hover:underline "
+                            >
+                              {university.email}
+                            </a>
+                          ) : (
+                            "غير متوفر"
+                          )}
+                        </li>
                       </ul>
                       <div className="bg-blue-50 text-blue-700 p-4 rounded-lg text-center mt-6">
                         <p className="mb-2">

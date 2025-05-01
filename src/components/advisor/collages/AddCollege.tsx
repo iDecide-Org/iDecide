@@ -4,16 +4,25 @@ import { createCollege } from "../../../services/collegeService";
 import { useAuth } from "../../../contexts/useAuth";
 import Navbar from "../../NavBar";
 import Footer from "../../Footer";
-import { Save, ArrowRight, AlertTriangle, Check } from "lucide-react";
+import {
+  Save,
+  ArrowRight,
+  AlertTriangle,
+  Check,
+  MapPin,
+  Link as LinkIcon,
+} from "lucide-react";
 
 const AddCollege: React.FC = () => {
   const { universityId } = useParams<{ universityId: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth(); // For potential future checks
+  const { user } = useAuth();
   const [collegeData, setCollegeData] = useState({
     name: "",
     description: "",
-    universityId: universityId || "", // Ensure universityId is set
+    location: "",
+    website: "",
+    universityId: universityId || "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,22 +44,35 @@ const AddCollege: React.FC = () => {
       setError("معرف الجامعة غير موجود.");
       return;
     }
+    if (!collegeData.name.trim()) {
+      setError("اسم الكلية مطلوب.");
+      return;
+    }
 
     setSubmitting(true);
     setError(null);
     setSuccess(null);
 
+    const dataToSend = {
+      name: collegeData.name,
+      description: collegeData.description,
+      location: collegeData.location || null,
+      website: collegeData.website || null,
+      universityId: collegeData.universityId,
+    };
+
     try {
-      await createCollege(collegeData);
+      await createCollege(dataToSend);
       setSuccess("تمت إضافة الكلية بنجاح!");
       setCollegeData({
         name: "",
         description: "",
+        location: "",
+        website: "",
         universityId: universityId || "",
-      }); // Reset form
-      // Optionally redirect after a delay
+      });
       setTimeout(() => {
-        navigate(`/universities/manage`); // Navigate back to the management page
+        navigate(`/universities/manage`);
       }, 1500);
     } catch (err) {
       setError("فشل في إضافة الكلية. يرجى المحاولة مرة أخرى.");
@@ -60,10 +82,9 @@ const AddCollege: React.FC = () => {
     }
   };
 
-  // Basic check if user is logged in (more specific advisor check might be needed)
   if (!user) {
     navigate("/login");
-    return null; // Or a loading indicator
+    return null;
   }
 
   return (
@@ -97,7 +118,6 @@ const AddCollege: React.FC = () => {
           )}
 
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
-            {/* College Name */}
             <div>
               <label
                 htmlFor="name"
@@ -116,7 +136,6 @@ const AddCollege: React.FC = () => {
               />
             </div>
 
-            {/* Description */}
             <div>
               <label
                 htmlFor="description"
@@ -134,14 +153,59 @@ const AddCollege: React.FC = () => {
               />
             </div>
 
-            {/* Hidden University ID (or display if needed) */}
+            <div>
+              <label
+                htmlFor="location"
+                className="block text-gray-700 text-sm font-semibold mb-2 text-right"
+              >
+                الموقع (اختياري)
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <MapPin className="h-5 w-5 text-gray-400" />
+                </span>
+                <input
+                  type="text"
+                  id="location"
+                  name="location"
+                  value={collegeData.location}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 rounded-md py-2 px-3 pl-10 text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="مثال: مبنى أ، الدور الثاني"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="website"
+                className="block text-gray-700 text-sm font-semibold mb-2 text-right"
+              >
+                الموقع الإلكتروني (اختياري)
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <LinkIcon className="h-5 w-5 text-gray-400" />
+                </span>
+                <input
+                  type="url"
+                  id="website"
+                  name="website"
+                  value={collegeData.website}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 rounded-md py-2 px-3 pl-10 text-left focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="https://example-college.com"
+                  dir="ltr"
+                />
+              </div>
+            </div>
+
             <input
               type="hidden"
               name="universityId"
               value={collegeData.universityId}
             />
 
-            {/* Form Actions */}
             <div className="mt-8 flex justify-end">
               <button
                 type="submit"
