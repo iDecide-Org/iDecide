@@ -63,7 +63,7 @@ const Navbar: React.FC = () => {
                 to="/universities/manage"
                 className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
               >
-                إدارة الجامعات
+                إدارة الجامعة
               </Link>
               <Link
                 to="/about"
@@ -201,7 +201,7 @@ const Navbar: React.FC = () => {
                   className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-200"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  إدارة الجامعات
+                  إدارة الجامعة
                 </Link>
                 <Link
                   to="/about"

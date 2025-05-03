@@ -36,7 +36,7 @@ const ScholarshipCard: React.FC<ScholarshipCardProps> = ({
 
   const imageUrl =
     scholarship.image ||
-    "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2071&auto=format&fit=crop";
+    "https://travelwithanwar.com/wp-content/uploads/2023/09/elbashayer-2021-08-19_442043.jpg";
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col w-full hover:shadow-lg transition-shadow duration-300 h-full">

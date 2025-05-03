@@ -72,7 +72,9 @@ const Scholarships: React.FC = () => {
     ...new Set(scholarships.map((s) => s.country).filter(Boolean)),
   ];
 
-  const featuredScholarship = scholarships.find((s) => s.id === "6");
+  const featuredScholarship = scholarships.find(
+    (s) => s.id === "17ae0bfc-cd66-4021-a7cb-7d15d2cbe2a4"
+  );
 
   return (
     <div className="bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen">
@@ -289,7 +291,7 @@ const Scholarships: React.FC = () => {
                   <img
                     src={
                       featuredScholarship.image ||
-                      "https://via.placeholder.com/400x200?text=No+Image"
+                      "https://media.elwatannews.com/media/img/mediaarc/large/4718372191689360201.jpg"
                     }
                     alt={featuredScholarship.name}
                     className="w-full h-full object-cover"

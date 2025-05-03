@@ -14,7 +14,7 @@ const Dashboard: React.FC = () => {
       <div className="max-w-7xl mx-auto p-4 py-8">
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden p-8 mb-8">
           <h1 className="text-3xl font-bold text-right mb-2">
-            مرحبًا، {userName}
+            {userName} مرحبًا
           </h1>
           <p className="text-gray-600 text-right mb-6">
             لوحة تحكم المرشد الأكاديمي
@@ -41,9 +41,9 @@ const Dashboard: React.FC = () => {
               <div className="bg-blue-100 p-3 rounded-full mb-4">
                 <List className="w-8 h-8 text-blue-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">إدارة الجامعات</h3>
+              <h3 className="text-xl font-semibold mb-2">إدارة الجامعة</h3>
               <p className="text-gray-600 text-center">
-                عرض وتعديل وحذف الجامعات
+                عرض وتعديل وحذف الجامعة
               </p>
             </Link>
 
