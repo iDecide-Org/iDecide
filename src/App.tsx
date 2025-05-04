@@ -72,6 +72,8 @@ const ChatRoom = React.lazy(
 ) as unknown as React.ComponentType;
 
 import "./App.css";
+import ForgotPasswordPage from "./components/ForgotPasswordPage";
+import ResetPasswordPage from "./components/ResetPasswordPage";
 
 const App: React.FC = () => {
   const { isLoggedIn, isStudentPendingChatbot, isLoading, isAdvisor } =
@@ -114,7 +116,6 @@ const App: React.FC = () => {
               element={<ManageUniversities />}
             />
             <Route path="/universities/edit/:id" element={<EditUniversity />} />
-
             <Route
               path="/scholarships/add/:universityId"
               element={<AddScholarship />}
@@ -129,10 +130,8 @@ const App: React.FC = () => {
               element={<AddCollege />}
             />
             <Route path="/colleges/edit/:id" element={<EditCollege />} />
-
             <Route path="/majors/add/:collegeId" element={<AddMajor />} />
             <Route path="/majors/edit/:id" element={<EditMajor />} />
-
             <Route path="/about" element={<About />} />
             {/* Add College Details Route for Advisor */}
             <Route path="/college-details/:id" element={<CollegeDetails />} />
@@ -144,6 +143,16 @@ const App: React.FC = () => {
             />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
+            <Route
+              path="/forgot-password"
+              element={<ForgotPasswordPage />}
+            />{" "}
+            {/* Add route */}
+            <Route
+              path="/reset-password/:token"
+              element={<ResetPasswordPage />}
+            />{" "}
+            {/* Add route */}
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </React.Suspense>
@@ -179,6 +188,8 @@ const App: React.FC = () => {
         />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />{" "}
+        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
         <Route path="/universities" element={<UniversitiesPage />} />
         <Route
           path="/profile"
@@ -229,7 +240,6 @@ const App: React.FC = () => {
             </React.Suspense>
           }
         />
-
         <Route
           path="/chat"
           element={

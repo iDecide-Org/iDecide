@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Mail, Lock, Book } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom"; // Import Link
 import { useAuth } from "../contexts/useAuth";
 
 interface SigninFormInputs {
@@ -110,10 +110,6 @@ const LoginPage: React.FC = () => {
                 dir="rtl"
                 {...register("password", {
                   required: "Password is required",
-                  minLength: {
-                    value: 6,
-                    message: "Password must be at least 6 characters",
-                  },
                 })}
                 className="w-full text-right text-gray-800 pl-10 pr-3 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition duration-300"
               />
@@ -122,6 +118,16 @@ const LoginPage: React.FC = () => {
                   {errors.password.message}
                 </p>
               )}
+            </div>
+
+            {/* Forgot Password Link */}
+            <div className="text-right text-sm">
+              <Link
+                to="/forgot-password"
+                className="font-medium text-blue-600 hover:text-blue-500 hover:underline"
+              >
+                نسيت كلمة السر؟
+              </Link>
             </div>
 
             {/* Submit Button */}
