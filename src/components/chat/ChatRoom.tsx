@@ -5,6 +5,7 @@ import { chatService, Message } from "../../services/chatService";
 import { Send, ArrowLeft, User, Bot } from "lucide-react";
 import NavBar from "../NavBar";
 import Footer from "../Footer";
+import { getUserNameById } from "../../services/authService";
 
 // Function to create a consistent room name
 const getRoomName = (userId1: string, userId2: string): string => {
@@ -40,10 +41,10 @@ const ChatRoom: React.FC = () => {
 
       // Attempt to find contact name
       try {
-        const contacts = await chatService.getChatUsers();
-        const contact = contacts.find((c) => c.id === otherUserId);
-        if (contact) {
-          setContactName(contact.name);
+        const userName = await getUserNameById(otherUserId);
+
+        if (userName) {
+          setContactName(userName);
         }
       } catch (contactError) {
         console.warn(

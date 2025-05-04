@@ -53,3 +53,25 @@ export const resetPassword = async (
     throw error; // Re-throw to be caught in the component
   }
 };
+
+export const getUserNameById = async (id: string): Promise<string> => {
+  try {
+    const response = await fetch(`http://localhost:3000/api/auth/user/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to fetch user name.");
+    }
+
+    return data.name; // Return the user name from the backend
+  } catch (error) {
+    console.error("Error fetching user name:", error);
+    throw error; // Re-throw to be caught in the component
+  }
+};
