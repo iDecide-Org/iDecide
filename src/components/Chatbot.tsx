@@ -49,7 +49,7 @@ const Chatbot = () => {
     try {
       // Call NestJS backend to update chatbot status
       const response = await axios.post(
-        "http://localhost:3000/auth/chatbot-status",
+        "http://localhost:3000/api/auth/chatbot-status",
         { status: true },
         { withCredentials: true }
       );
