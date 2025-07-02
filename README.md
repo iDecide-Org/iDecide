@@ -46,7 +46,7 @@ iDecide-AI/      # Chatbot API and Machine Learning Model
 
 ## Getting Started
 
-### Note: The following instructions only contains the frontend setup, go to the iDecide-API for the backend setup instructions
+#### Note: The following instructions only contains the frontend setup, go to the iDecide-API for the backend setup instructions
 
 ### **Clone the Repository**
 
@@ -73,11 +73,5 @@ npm run preview
 ```
 
 The frontend will typically run on [http://localhost:5173](http://localhost:5173)
-
----
-
-### 5. **Access the App**
-
-- **Frontend:** [http://localhost:5173](http://localhost:5173)
 
 ---
