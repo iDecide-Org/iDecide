@@ -1,6 +1,5 @@
 # iDecide
-
-EventBond is a full-stack college major and career recommendation app that allows students to browse universities, colleges, majors, and career paths. It provides a chatbot that collects the data from the student and use a machine learning model to recommend the best-suited majors for him. The advisor is able to register his own university and add it's colleges and majors and communicate with students.
+iDecide is a full-stack college major and career recommendation app that allows students to browse universities, colleges, majors, and career paths. It provides a chatbot that collects the data from the student and use a machine learning model to recommend the best-suited majors for him. The advisor is able to register his own university and add it's colleges and majors and communicate with students.
 
 ---
 
